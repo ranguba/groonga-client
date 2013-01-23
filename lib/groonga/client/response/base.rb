@@ -20,16 +20,12 @@ require "json"
 
 module Groonga
   class Client
-    class Response
-      attr_accessor :header, :body
+    module Response
+      class Base
+        attr_accessor :header, :body
 
-      def initialize(json)
-      end
-
-      def has_parameter?(parameter)
-      end
-
-      def method_missing(name, arguments)
+        def initialize(json_text)
+        end
       end
     end
   end
