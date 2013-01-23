@@ -33,7 +33,18 @@ module Groonga
       end
     end
 
-    def initialize
+    attr_reader :protocol, :real_client
+
+    def initialize(options)
+      @protocol = options[:protocol] || :gqtp
+      options.delete(:protocol)
+
+      @real_client = nil
+      if @protocol == :gqtp
+        @real_client = GQTP::Client.new(options)
+      else
+        # TODO: choose HTTP Client
+      end
     end
 
     def close
