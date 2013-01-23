@@ -28,5 +28,80 @@ module Groonga
 
     def close
     end
+
+    def cache_limit(parameters)
+    end
+
+    def check(parameters)
+    end
+
+    def clearlock(parameters)
+    end
+
+    def column_create(parameters)
+    end
+
+    def column_list(parameters)
+    end
+
+    def column_remove(parameters)
+    end
+
+    def column_rename(parameters)
+    end
+
+    def define_selector(parameters)
+    end
+
+    def defrag(parameters)
+    end
+
+    def delete(parameters)
+    end
+
+    def dump(parameters)
+    end
+
+    def load(parameters)
+    end
+
+    def log_level(parameters)
+    end
+
+    def log_put(parameters)
+    end
+
+    def log_reopen
+    end
+
+    def quit
+    end
+
+    def register(parameters)
+    end
+
+    def select(parameters)
+    end
+
+    def shutdown
+    end
+
+    def status
+    end
+
+    def table_create(parameters)
+    end
+
+    def table_list
+    end
+
+    def table_remove(parameters)
+    end
+
+    def table_rename(parameters)
+    end
+
+    def truncate(parameters)
+    end
   end
 end
