@@ -124,5 +124,11 @@ module Groonga
 
     def truncate(parameters)
     end
+
+    private
+    def exec_command(command_name, parameters={})
+      command = Groonga::Command::Base.new(command_name, parameters)
+      Client::Command.new(command).execute(@real_client, @protocol)
+    end
   end
 end

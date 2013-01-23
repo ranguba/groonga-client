@@ -16,16 +16,33 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "groonga/client/response"
 require "groonga/command"
+require "groonga/client/response"
 
 module Groonga
   class Client
     class Command
-      def initialize(client, command)
+      def initialize(command)
+        @command = command
       end
 
-      def execute
+      def execute(client, protocol)
+        response = nil
+        case protocol
+        when :http
+          formatted_command = @command.to_uri_format
+          # TODO
+        when :gqtp
+          formatted_command = @command.to_command_format
+
+          request = client.send(formatted_command) do |header, body|
+            response = body
+          end
+          request.wait
+        end
+
+        command_class = Groonga::Client::Response.find(@command.name)
+        command_class.new(response)
       end
     end
   end
