@@ -23,7 +23,7 @@ module Groonga
   class Client
     class << self
       def open(options={}, &block)
-        client = self.new(options)
+        client = new(options)
         if block_given?
           yield(client)
           client.close
