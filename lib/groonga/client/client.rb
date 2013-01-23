@@ -28,8 +28,5 @@ module Groonga
 
     def close
     end
-
-    def method_missing(command_name, arguments)
-    end
   end
 end
