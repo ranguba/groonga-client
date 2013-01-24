@@ -49,7 +49,7 @@ EOJ
 ["Bob",21]]
 ]
 EOJ
-      expected_header = [0,1,2]
+      expected_header = [0, 1, 2]
       expected_table_infos = [
         {:name => "Alice", :age => 32},
         {:name => "Bob", :age => 21}
