@@ -126,7 +126,7 @@ module Groonga
     end
 
     private
-    def exec_command(command_name, parameters={})
+    def execute_command(command_name, parameters={})
       command = Groonga::Command::Base.new(command_name, parameters)
       Client::Command.new(command).execute(@real_client, @protocol)
     end
