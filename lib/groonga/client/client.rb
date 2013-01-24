@@ -17,8 +17,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "groonga/client/command"
-require "groonga/client/real-client/gqtp"
-require "groonga/client/real-client/http"
+require "groonga/client/protocol/gqtp"
+require "groonga/client/protocol/http"
 
 module Groonga
   class Client
