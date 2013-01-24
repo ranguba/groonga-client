@@ -108,6 +108,7 @@ module Groonga
     end
 
     def status
+      execute_command("status")
     end
 
     def table_create(parameters)

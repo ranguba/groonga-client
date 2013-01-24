@@ -16,28 +16,4 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "json"
-
-module Groonga
-  class Client
-    module Response
-      class << self
-        @@registered_commands = {}
-        def register(name, klass)
-          @@registered_commands[name] = klass
-        end
-
-        def find(name)
-          @@registered_commands[name] || Base
-        end
-      end
-
-      class Base
-        attr_accessor :header, :body
-
-        def initialize(json_text)
-        end
-      end
-    end
-  end
-end
+require "groonga/client/response/status"
