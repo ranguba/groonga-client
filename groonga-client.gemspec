@@ -47,7 +47,6 @@ Gem::Specification.new do |spec|
   # end
 
   spec.add_runtime_dependency("gqtp")
-  # TODO: add HTML client library
   spec.add_runtime_dependency("groonga-command")
 
   spec.add_development_dependency("bundler")
