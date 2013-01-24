@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env ruby
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
 #
