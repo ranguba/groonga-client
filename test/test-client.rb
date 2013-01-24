@@ -76,7 +76,7 @@ EOJ
       @thread = Thread.new do
         client = @server.accept
         @server.close
-        response_header = <<EOH
+        response_header = <<-EOH
 HTTP/1.1 200 OK
 Connection: close
 Content-Type: application/json
