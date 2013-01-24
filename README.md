@@ -26,17 +26,19 @@ TODO: use commands with parameters for examples
 ### GQTP
 
   Groonga::Client.open(:host => host, :port => port, :protocol => :gqtp) do |client|
-  tables = client.table_list
-  tables.each do |table|
-    table.name
+    tables = client.table_list
+    tables.each do |table|
+      table.name
+    end
   end
 
 ### HTTP
 
   Groonga::Client.open(:host => host, :port => port, :protocol => :http) do |client|
-  tables = client.table_list
-  tables.each do |table|
-    table.name
+    tables = client.table_list
+    tables.each do |table|
+      table.name
+    end
   end
 
 ## Dependencies
