@@ -29,7 +29,6 @@ module Groonga
 
         def send(command)
           url = "http://#{@host}:#{@port}#{command.to_uri_format}"
-          raw_response = nil
           begin
             open(url) do |response|
               body = response.read
