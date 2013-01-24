@@ -29,7 +29,7 @@ class TestClient < Test::Unit::TestCase
 {"key":"value"}
 ]
 JSON
-      expected_header = [0,1,2]
+      expected_header = [0, 1, 2]
       expected_body = {"key" => "value"}
 
       Groonga::Client.open(options) do |client|
