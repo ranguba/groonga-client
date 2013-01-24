@@ -21,29 +21,29 @@ require "open-uri"
 module Groonga
   class Client
     module RealClient
-    class HTTP
-      def initialize(options)
-        @host = options[:host] || "127.0.0.1"
-        @port = options[:port] || 10041
-      end
+      class HTTP
+        def initialize(options)
+          @host = options[:host] || "127.0.0.1"
+          @port = options[:port] || 10041
+        end
 
-      def send(command)
-        url = "http://#{@host}:#{@port}#{command.to_uri_format}"
-        raw_response = nil
-        begin
-          open(url) do |response|
-            body = response.read
-            if block_given?
-              yield(body)
-            else
-              body
+        def send(command)
+          url = "http://#{@host}:#{@port}#{command.to_uri_format}"
+          raw_response = nil
+          begin
+            open(url) do |response|
+              body = response.read
+              if block_given?
+                yield(body)
+              else
+                body
+              end
             end
+          rescue OpenURI::HTTPError
+            raise("Failed to send command: #{$!}: <#{url}>")
           end
-        rescue OpenURI::HTTPError
-          raise("Failed to send command: #{$!}: <#{url}>")
         end
       end
-    end
     end
   end
 end
