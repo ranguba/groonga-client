@@ -65,4 +65,46 @@ EOJ
       end
     end
   end
+
+  class TestHTTP < self
+    def setup
+      @address = "127.0.0.1"
+      @server = TCPServer.new(@address, 0)
+      @port = @server.addr[1]
+
+      @response_body = nil
+      @thread = Thread.new do
+        client = @server.accept
+        @server.close
+        response_header =<<EOH
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: application/json
+Content-Length: #{@response_body.bytesize}
+
+EOH
+        client.write(response_header)
+        client.write(@response_body)
+        client.close
+      end
+    end
+
+    def test_wihout_columns_in_responses
+      options = {:host => @address, :port => @port, :protocol => :http}
+      @response_body = <<-EOJ
+[
+[0,1,2],
+{"key":"value"}
+]
+EOJ
+      expected_header = [0,1,2]
+      expected_body = {"key" => "value"}
+
+      Groonga::Client.open(options) do |client|
+        response = client.status
+        assert_equal(expected_header, response.header)
+        assert_equal(expected_body, response.body)
+      end
+    end
+  end
 end

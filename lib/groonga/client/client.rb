@@ -18,6 +18,7 @@
 
 require "groonga/client/command"
 require "groonga/client/client/gqtp"
+require "groonga/client/client/http"
 
 module Groonga
   class Client
@@ -43,7 +44,7 @@ module Groonga
       if @protocol == :gqtp
         @real_client = Groonga::Client::GQTP.new(options)
       else
-        # TODO: implement HTTP Client
+        @real_client = Groonga::Client::HTTP.new(options)
       end
     end
 
