@@ -23,12 +23,12 @@ class TestClient < Test::Unit::TestCase
   module ClientTests
     def test_without_columns_in_responses
       options = {:host => @address, :port => @port, :protocol => @protocol}
-      @response_body = <<-EOJ
+      @response_body = <<-JSON
 [
 [0,1,2],
 {"key":"value"}
 ]
-EOJ
+JSON
       expected_header = [0,1,2]
       expected_body = {"key" => "value"}
 
@@ -41,14 +41,14 @@ EOJ
 
     def test_with_columns_in_responses
       options = {:host => @address, :port => @port, :protocol => @protocol}
-      @response_body = <<-EOJ
+      @response_body = <<-JSON
 [[0,1,2],
 [[["name","ShortText"],
 ["age","UInt32"]],
 ["Alice",32],
 ["Bob",21]]
 ]
-EOJ
+JSON
       expected_header = [0, 1, 2]
       expected_table_infos = [
         {:name => "Alice", :age => 32},
