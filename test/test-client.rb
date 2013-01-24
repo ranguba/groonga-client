@@ -20,11 +20,32 @@ require "socket"
 require "groonga/client"
 
 class TestClient < Test::Unit::TestCase
+  module ClientTestCases
+    def test_without_columns_in_responses
+      options = {:host => @address, :port => @port, :protocol => @protocol}
+      @response_body = <<-EOJ
+[
+[0,1,2],
+{"key":"value"}
+]
+EOJ
+      expected_header = [0,1,2]
+      expected_body = {"key" => "value"}
+
+      Groonga::Client.open(options) do |client|
+        response = client.status
+        assert_equal(expected_header, response.header)
+        assert_equal(expected_body, response.body)
+      end
+    end
+  end
+
   class TestGQTP < self
     def setup
       @address = "127.0.0.1"
       @server = TCPServer.new(@address, 0)
       @port = @server.addr[1]
+      @protocol = :gqtp
 
       @response_body = nil
       @thread = Thread.new do
@@ -47,23 +68,7 @@ class TestClient < Test::Unit::TestCase
       @thread.kill
     end
 
-    def test_command_without_parameters
-      options = {:host => @address, :port => @port, :protocol => :gqtp}
-      @response_body = <<-EOJ
-[
-[0,1,2],
-{"key":"value"}
-]
-EOJ
-      expected_header = [0,1,2]
-      expected_body = {"key" => "value"}
-
-      Groonga::Client.open(options) do |client|
-        response = client.status
-        assert_equal(expected_header, response.header)
-        assert_equal(expected_body, response.body)
-      end
-    end
+    include ClientTestCases
   end
 
   class TestHTTP < self
@@ -71,6 +76,7 @@ EOJ
       @address = "127.0.0.1"
       @server = TCPServer.new(@address, 0)
       @port = @server.addr[1]
+      @protocol = :http
 
       @response_body = nil
       @thread = Thread.new do
@@ -89,22 +95,6 @@ EOH
       end
     end
 
-    def test_wihout_columns_in_responses
-      options = {:host => @address, :port => @port, :protocol => :http}
-      @response_body = <<-EOJ
-[
-[0,1,2],
-{"key":"value"}
-]
-EOJ
-      expected_header = [0,1,2]
-      expected_body = {"key" => "value"}
-
-      Groonga::Client.open(options) do |client|
-        response = client.status
-        assert_equal(expected_header, response.header)
-        assert_equal(expected_body, response.body)
-      end
-    end
+    include ClientTestCases
   end
 end
