@@ -21,25 +21,26 @@ require "gqtp"
 module Groonga
   class Client
     module RealClient
-    class GQTP
-      def initialize(options)
-        @client = ::GQTP::Client.new(options)
-      end
-
-      def send(command, &block)
-        formatted_command = command.to_command_format
-        response = nil
-        request = @client.send(formatted_command) do |header, body|
-          if block_given?
-            response = yield(body)
-          else
-            response = body
-          end
+      class GQTP
+        def initialize(options)
+          @client = ::GQTP::Client.new(options)
         end
-        request.wait
-        response
+
+        def send(command, &block)
+          formatted_command = command.to_command_format
+          response = nil
+
+          request = @client.send(formatted_command) do |header, body|
+            if block_given?
+              response = yield(body)
+            else
+              response = body
+            end
+          end
+          request.wait
+          response
+        end
       end
-    end
     end
   end
 end
