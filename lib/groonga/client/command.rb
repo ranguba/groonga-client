@@ -27,7 +27,6 @@ module Groonga
       end
 
       def execute(client, protocol)
-        response = nil
         client.send(@command) do |response|
           command_class = Groonga::Client::Response.find(@command.name)
           command_class.new(response)
