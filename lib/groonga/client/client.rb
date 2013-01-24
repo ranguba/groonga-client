@@ -117,6 +117,7 @@ module Groonga
     end
 
     def table_list
+      execute_command("table_list")
     end
 
     def table_remove(parameters)
