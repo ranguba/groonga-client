@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "groonga/client/command"
-require "gqtp"
+require "groonga/client/client/gqtp"
 
 module Groonga
   class Client
@@ -41,9 +41,9 @@ module Groonga
 
       @real_client = nil
       if @protocol == :gqtp
-        @real_client = GQTP::Client.new(options)
+        @real_client = Groonga::Client::GQTP.new(options)
       else
-        # TODO: choose HTTP Client
+        # TODO: implement HTTP Client
       end
     end
 

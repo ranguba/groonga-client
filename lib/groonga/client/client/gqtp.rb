@@ -16,24 +16,28 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "groonga/command"
-require "groonga/client/response"
+require "gqtp"
 
 module Groonga
   class Client
-    class Command
-      def initialize(command)
-        @command = command
+    class GQTP
+      def initialize(options)
+        @client = ::GQTP::Client.new(options)
       end
 
-      def execute(client, protocol)
+      def send(command, &block)
+        formatted_command = command.to_command_format
         response = nil
-        client.send(@command) do |response|
-          command_class = Groonga::Client::Response.find(@command.name)
-          command_class.new(response)
+        request = @client.send(formatted_command) do |header, body|
+          if block_given?
+            response = yield(body)
+          else
+            response = body
+          end
         end
+        request.wait
+        response
       end
     end
   end
 end
-
