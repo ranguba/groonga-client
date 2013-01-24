@@ -38,6 +38,32 @@ EOJ
         assert_equal(expected_body, response.body)
       end
     end
+
+    def test_with_columns_in_responses
+      options = {:host => @address, :port => @port, :protocol => @protocol}
+      @response_body = <<-EOJ
+[[0,1,2],
+[[["name","ShortText"],
+["age","UInt32"]],
+["Alice",32],
+["Bob",21]]
+]
+EOJ
+      expected_header = [0,1,2]
+      expected_table_infos = [
+        {:name => "Alice", :age => 32},
+        {:name => "Bob", :age => 21}
+      ]
+
+      Groonga::Client.open(options) do |client|
+        response = client.table_list
+        actual_table_infos = response.body.collect do |value|
+          value.table_info
+        end
+        assert_equal(expected_header, response.header)
+        assert_equal(expected_table_infos, actual_table_infos)
+      end
+    end
   end
 
   class TestGQTP < self

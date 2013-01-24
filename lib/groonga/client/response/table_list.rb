@@ -62,6 +62,9 @@ module Groonga
         end
 
         class TableInfo
+
+          attr_reader :table_info
+
           def initialize(table_info)
             @table_info = table_info
           end
