@@ -20,7 +20,7 @@ require "socket"
 require "groonga/client"
 
 class TestClient < Test::Unit::TestCase
-  module ClientTestCases
+  module ClientTests
     def test_without_columns_in_responses
       options = {:host => @address, :port => @port, :protocol => @protocol}
       @response_body = <<-EOJ
@@ -94,7 +94,7 @@ EOJ
       @thread.kill
     end
 
-    include ClientTestCases
+    include ClientTests
   end
 
   class TestHTTP < self
@@ -121,6 +121,6 @@ EOH
       end
     end
 
-    include ClientTestCases
+    include ClientTests
   end
 end
