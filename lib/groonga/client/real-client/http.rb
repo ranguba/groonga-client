@@ -20,6 +20,7 @@ require "open-uri"
 
 module Groonga
   class Client
+    module RealClient
     class HTTP
       def initialize(options)
         @host = options[:host] || "127.0.0.1"
@@ -42,6 +43,7 @@ module Groonga
           raise("Failed to send command: #{$!}: <#{url}>")
         end
       end
+    end
     end
   end
 end

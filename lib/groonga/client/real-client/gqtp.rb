@@ -20,6 +20,7 @@ require "gqtp"
 
 module Groonga
   class Client
+    module RealClient
     class GQTP
       def initialize(options)
         @client = ::GQTP::Client.new(options)
@@ -38,6 +39,7 @@ module Groonga
         request.wait
         response
       end
+    end
     end
   end
 end
