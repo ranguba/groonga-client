@@ -24,17 +24,15 @@ class TestClient < Test::Unit::TestCase
     def test_without_columns_in_responses
       options = {:host => @address, :port => @port, :protocol => @protocol}
       @response_body = <<-JSON
-[
-[0,1,2],
 {"key":"value"}
-]
 JSON
-      expected_header = [0, 1, 2]
+
       expected_body = {"key" => "value"}
 
       Groonga::Client.open(options) do |client|
         response = client.status
-        assert_equal(expected_header, response.header)
+
+        assert_header(response)
         assert_equal(expected_body, response.body)
       end
     end
@@ -42,12 +40,10 @@ JSON
     def test_with_columns_in_responses
       options = {:host => @address, :port => @port, :protocol => @protocol}
       @response_body = <<-JSON
-[[0,1,2],
 [[["name","ShortText"],
 ["age","UInt32"]],
 ["Alice",32],
 ["Bob",21]]
-]
 JSON
       expected_header = [0, 1, 2]
       expected_table_infos = [
@@ -60,7 +56,8 @@ JSON
         actual_table_infos = response.body.collect do |value|
           value.table_info
         end
-        assert_equal(expected_header, response.header)
+
+        assert_header(response)
         assert_equal(expected_table_infos, actual_table_infos)
       end
     end
@@ -68,18 +65,25 @@ JSON
     def test_with_parameters
       options = {:host => @address, :port => @port, :protocol => @protocol}
       @response_body = <<-JSON
-[[0,1,2],
 100
-]
 JSON
-      expected_header = [0, 1, 2]
       expected_body = 100
 
       Groonga::Client.open(options) do |client|
         response = client.cache_limit(:max => 4)
-        assert_equal(expected_header, response.header)
+
+        assert_header(response)
         assert_equal(expected_body, response.body)
       end
+    end
+
+    def groonga_response_header
+      [0,"START_TIME","ELAPSED_TIME"]
+    end
+
+    def assert_header(response)
+      normalized_header = normalize_header(response.header)
+      assert_equal(groonga_response_header, normalized_header)
     end
   end
 
@@ -111,6 +115,14 @@ JSON
       @thread.kill
     end
 
+    def normalize_header(header)
+      start_time = header[1]
+      elapsed_time = header[2]
+      header[1] = "START_TIME" if /\A[\d\.]+\z/ =~ start_time.to_s
+      header[2] = "ELAPSED_TIME" if /\A[\d\.]+\z/ =~ elapsed_time.to_s
+      header
+    end
+
     include ClientTests
   end
 
@@ -125,6 +137,7 @@ JSON
       @thread = Thread.new do
         client = @server.accept
         @server.close
+        @response_body = "[#{groonga_response_header},\n#{@response_body}]"
         response_header = <<-EOH
 HTTP/1.1 200 OK
 Connection: close
@@ -136,6 +149,10 @@ EOH
         client.write(@response_body)
         client.close
       end
+    end
+
+    def normalize_header(header)
+      header
     end
 
     include ClientTests
