@@ -77,6 +77,20 @@ JSON
       end
     end
 
+    def test_define_command
+      options = {:host => @address, :port => @port, :protocol => @protocol}
+      @response_body = "true"
+      expected_body = true
+
+      Groonga::Client.open(options) do |client|
+        response = client.define_selector(:name  => "new_selector",
+                                          :table => "TABLE")
+        assert_header(response)
+        assert_equal(expected_body, response.body)
+        assert_true(client.respond_to?(:new_selector))
+      end
+    end
+
     def groonga_response_header
       [0,"START_TIME","ELAPSED_TIME"]
     end
