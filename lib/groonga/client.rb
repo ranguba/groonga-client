@@ -107,6 +107,7 @@ module Groonga
     end
 
     def load(parameters)
+      execute_command("load", parameters)
     end
 
     def log_level(parameters)
