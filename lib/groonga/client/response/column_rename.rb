@@ -16,12 +16,19 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "groonga/client/response/cache_limit"
-require "groonga/client/response/check"
-require "groonga/client/response/clearlock"
-require "groonga/client/response/column_create"
-require "groonga/client/response/column_list"
-require "groonga/client/response/column_remove"
-require "groonga/client/response/column_rename"
-require "groonga/client/response/status"
-require "groonga/client/response/table_list"
+require "groonga/client/response/base"
+
+module Groonga
+  class Client
+    module Response
+      class ColumnRename < Base
+        Response.register("column_rename", self)
+
+        def initialize(json_text)
+          super(json_text)
+        end
+      end
+    end
+  end
+end
+

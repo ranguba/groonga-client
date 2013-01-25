@@ -77,6 +77,7 @@ module Groonga
     end
 
     def column_rename(parameters)
+      execute_command("column_rename", parameters)
     end
 
     def define_selector(parameters)
