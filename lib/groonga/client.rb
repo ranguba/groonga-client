@@ -37,15 +37,15 @@ module Groonga
     attr_reader :protocol, :real_client
 
     def initialize(options)
-      @protocol = options[:protocol] || :gqtp
+      @protocol_name = options[:protocol] || :gqtp
       options.delete(:protocol)
 
-      @real_client = nil
-      if @protocol == :gqtp
+      @protocol = nil
+      if @protocol_name == :gqtp
         options[:connection] ||= :synchronous
-        @real_client = Groonga::Client::Protocol::GQTP.new(options)
+        @protocol = Groonga::Client::Protocol::GQTP.new(options)
       else
-        @real_client = Groonga::Client::Protocol::HTTP.new(options)
+        @protocol = Groonga::Client::Protocol::HTTP.new(options)
       end
     end
 
@@ -132,7 +132,7 @@ module Groonga
     private
     def execute_command(command_name, parameters={})
       command = Groonga::Command::Base.new(command_name, parameters)
-      Client::Command.new(command).execute(@real_client, @protocol)
+      Client::Command.new(command).execute(@protocol, @protocol_name)
     end
   end
 end
