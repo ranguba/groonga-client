@@ -60,7 +60,8 @@ module Groonga
       execute_command("check", parameters)
     end
 
-    def clearlock(parameters)
+    def clearlock(parameters={})
+      execute_command("clearlock", parameters)
     end
 
     def column_create(parameters)
