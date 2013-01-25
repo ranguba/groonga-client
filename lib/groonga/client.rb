@@ -94,7 +94,8 @@ module Groonga
       response
     end
 
-    def defrag(parameters)
+    def defrag(parameters={})
+      execute_command("defrag", parameters)
     end
 
     def delete(parameters)
