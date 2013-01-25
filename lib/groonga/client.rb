@@ -43,9 +43,9 @@ module Groonga
       @real_client = nil
       if @protocol == :gqtp
         options[:connection] ||= :synchronous
-        @real_client = Groonga::Client::RealClient::GQTP.new(options)
+        @real_client = Groonga::Client::Protocol::GQTP.new(options)
       else
-        @real_client = Groonga::Client::RealClient::HTTP.new(options)
+        @real_client = Groonga::Client::Protocol::HTTP.new(options)
       end
     end
 
