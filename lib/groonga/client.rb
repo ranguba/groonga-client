@@ -115,6 +115,7 @@ module Groonga
     end
 
     def log_put(parameters)
+      execute_command("log_put", parameters)
     end
 
     def log_reopen
