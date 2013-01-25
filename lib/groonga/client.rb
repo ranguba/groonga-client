@@ -123,6 +123,7 @@ module Groonga
     end
 
     def quit
+      execute_command("quit")
     end
 
     def register(parameters)

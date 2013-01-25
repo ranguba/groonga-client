@@ -16,21 +16,19 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "groonga/client/response/cache_limit"
-require "groonga/client/response/check"
-require "groonga/client/response/clearlock"
-require "groonga/client/response/column_create"
-require "groonga/client/response/column_list"
-require "groonga/client/response/column_remove"
-require "groonga/client/response/column_rename"
-require "groonga/client/response/define_selector"
-require "groonga/client/response/defrag"
-require "groonga/client/response/delete"
-require "groonga/client/response/dump"
-require "groonga/client/response/load"
-require "groonga/client/response/log_level"
-require "groonga/client/response/log_put"
-require "groonga/client/response/log_reopen"
-require "groonga/client/response/quit"
-require "groonga/client/response/status"
-require "groonga/client/response/table_list"
+require "groonga/client/response/base"
+
+module Groonga
+  class Client
+    module Response
+      class Quit < Base
+        Response.register("quit", self)
+
+        def initialize(json)
+          super(json)
+        end
+      end
+    end
+  end
+end
+
