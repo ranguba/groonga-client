@@ -73,6 +73,7 @@ module Groonga
     end
 
     def column_remove(parameters)
+      execute_command("column_remove", parameters)
     end
 
     def column_rename(parameters)
