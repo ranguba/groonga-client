@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "gqtp"
+require "json"
 
 module Groonga
   class Client
@@ -24,21 +25,36 @@ module Groonga
       class GQTP
         def initialize(options)
           @client = ::GQTP::Client.new(options)
+          @start_time = nil
         end
 
         def send(command, &block)
-          formatted_command = command.to_command_format
           response = nil
-
+          @start_time = Time.now.to_f
+          formatted_command = command.to_command_format
           request = @client.send(formatted_command) do |header, body|
+            output = convert_groonga_output(header, body)
             if block_given?
-              response = yield(body)
+              response = yield(output)
             else
-              response = body
+              response = output
             end
           end
           request.wait
           response
+        end
+
+        private
+        def convert_groonga_output(header, body)
+          elapsed_time = Time.now.to_f
+          output_header = [
+            header.status,
+            @start_time,
+            elapsed_time - @start_time
+          ]
+          output_body = [JSON.parse(body)]
+          output = output_body.unshift(output_header)
+          JSON.generate(output)
         end
       end
     end
