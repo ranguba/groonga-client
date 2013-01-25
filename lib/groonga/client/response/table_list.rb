@@ -29,36 +29,11 @@ module Groonga
             @header = nil
             @body = nil
           else
-            @header, table_infos = create_formatted_response(json_text)
+            @header, table_infos = format_response(json_text)
             @body = table_infos.collect do |table_info|
               TableInfo.new(table_info)
             end
           end
-        end
-
-        def create_formatted_response(json_text)
-          header = nil
-          formatted_body = []
-
-          json = JSON.parse(json_text)
-          header = json.first
-          body = json.last
-
-          columns_with_type = body.first
-          columns = columns_with_type.collect do |column, type|
-            column.to_sym
-          end
-
-          tables = body[1..-1]
-          tables.each.with_index do |table, n_table|
-            formatted_body[n_table] = {}
-            table.each.with_index do |table_value, n_column|
-              column = columns[n_column]
-              formatted_body[n_table][column] = table_value
-            end
-          end
-
-          [header, formatted_body]
         end
 
         class TableInfo

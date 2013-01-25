@@ -36,31 +36,6 @@ module Groonga
           end
         end
 
-        def format_response(json_text)
-          header = nil
-          formatted_body = []
-
-          json = JSON.parse(json_text)
-          header = json.first
-          body = json.last
-
-          columns_with_type = body.first
-          columns = columns_with_type.collect do |column, type|
-            column.to_sym
-          end
-
-          entries = body[1..-1]
-          entries.each.with_index do |entry, n_entry|
-            formatted_body[n_entry] = {}
-            entry.each.with_index do |value, n_value|
-              column = columns[n_value]
-              formatted_body[n_entry][column] = value
-            end
-          end
-
-          [header, formatted_body]
-        end
-
         class ColumnInfo
           attr_reader :column_info
 
