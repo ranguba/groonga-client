@@ -57,6 +57,7 @@ module Groonga
     end
 
     def check(parameters)
+      execute_command("check", parameters)
     end
 
     def clearlock(parameters)
