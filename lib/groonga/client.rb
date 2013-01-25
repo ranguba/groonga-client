@@ -34,7 +34,7 @@ module Groonga
       end
     end
 
-    attr_reader :protocol, :real_client
+    attr_reader :protocol, :protocol_name
 
     def initialize(options)
       @protocol_name = options[:protocol] || :gqtp
