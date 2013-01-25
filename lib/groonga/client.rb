@@ -65,6 +65,7 @@ module Groonga
     end
 
     def column_create(parameters)
+      execute_command("column_create", parameters)
     end
 
     def column_list(parameters)
