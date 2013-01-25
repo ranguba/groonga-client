@@ -50,9 +50,9 @@ module Groonga
           header = nil
           formatted_body = []
 
-          json = JSON.parse(json)
-          header = json.first
-          body = json.last
+          response = JSON.parse(json)
+          header = response.first
+          body = response.last
 
           columns_with_type = body.first
           columns = columns_with_type.collect do |column, type|
