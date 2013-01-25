@@ -64,6 +64,23 @@ JSON
         assert_equal(expected_table_infos, actual_table_infos)
       end
     end
+
+    def test_with_parameters
+      options = {:host => @address, :port => @port, :protocol => @protocol}
+      @response_body = <<-JSON
+[[0,1,2],
+100
+]
+JSON
+      expected_header = [0, 1, 2]
+      expected_body = 100
+
+      Groonga::Client.open(options) do |client|
+        response = client.cache_limit(:max => 4)
+        assert_equal(expected_header, response.header)
+        assert_equal(expected_body, response.body)
+      end
+    end
   end
 
   class TestGQTP < self

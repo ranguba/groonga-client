@@ -53,6 +53,7 @@ module Groonga
     end
 
     def cache_limit(parameters)
+      execute_command("cache_limit", parameters)
     end
 
     def check(parameters)
@@ -131,8 +132,17 @@ module Groonga
 
     private
     def execute_command(command_name, parameters={})
+      parameters = stringfy_values(parameters)
       command = Groonga::Command::Base.new(command_name, parameters)
       Client::Command.new(command).execute(@protocol, @protocol_name)
+    end
+
+    def stringfy_values(hash)
+      stringfy_hash = {}
+      hash.each do |key, value|
+        stringfy_hash[key] = value.to_s
+      end
+      stringfy_hash
     end
   end
 end

@@ -16,6 +16,26 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "groonga/client/response/cache_limit"
-require "groonga/client/response/status"
-require "groonga/client/response/table_list"
+require "groonga/client/response/base"
+
+module Groonga
+  class Client
+    module Response
+      class CacheLimit < Base
+        Response.register("cache_limit", self)
+
+        def initialize(json_text)
+          if json_text.nil?
+            @header = nil
+            @body = nil
+          else
+            response = JSON.parse(json_text)
+            @header = response.first
+            @body = response.last
+          end
+        end
+      end
+    end
+  end
+end
+
