@@ -119,6 +119,7 @@ module Groonga
     end
 
     def log_reopen
+      execute_command("log_reopen")
     end
 
     def quit
