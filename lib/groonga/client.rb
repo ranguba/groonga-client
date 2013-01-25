@@ -111,6 +111,7 @@ module Groonga
     end
 
     def log_level(parameters)
+      execute_command("log_level", parameters)
     end
 
     def log_put(parameters)
