@@ -25,14 +25,7 @@ module Groonga
         Response.register("cache_limit", self)
 
         def initialize(json_text)
-          if json_text.nil?
-            @header = nil
-            @body = nil
-          else
-            response = JSON.parse(json_text)
-            @header = response.first
-            @body = response.last
-          end
+          super(json_text)
         end
       end
     end

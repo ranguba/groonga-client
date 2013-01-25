@@ -36,6 +36,14 @@ module Groonga
         attr_accessor :header, :body
 
         def initialize(json_text)
+          if json_text.nil?
+            @header = nil
+            @body = nil
+          else
+            response = JSON.parse(json_text)
+            @header = response.first
+            @body = response.last
+          end
         end
 
         def format_response(json_text)
