@@ -23,9 +23,7 @@ class TestClient < Test::Unit::TestCase
   module ClientTests
     def test_without_columns_in_responses
       options = {:host => @address, :port => @port, :protocol => @protocol}
-      @response_body = <<-JSON
-{"key":"value"}
-JSON
+      @response_body = '{"key":"value"}'
 
       expected_body = {"key" => "value"}
 
@@ -64,9 +62,7 @@ JSON
 
     def test_with_parameters
       options = {:host => @address, :port => @port, :protocol => @protocol}
-      @response_body = <<-JSON
-100
-JSON
+      @response_body = "100"
       expected_body = 100
 
       Groonga::Client.open(options) do |client|
