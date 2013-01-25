@@ -127,6 +127,7 @@ module Groonga
     end
 
     def register(parameters)
+      execute_command("register", parameters)
     end
 
     def select(parameters)
