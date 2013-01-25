@@ -52,7 +52,11 @@ module Groonga
             @start_time,
             elapsed_time - @start_time
           ]
-          output_body = [JSON.parse(body)]
+          if /\A[^\[{].+[^\]}]/ =~ body
+            output_body = JSON.parse("[#{body.chomp}]")
+          else
+            output_body = [JSON.parse(body)]
+          end
           output = output_body.unshift(output_header)
           JSON.generate(output)
         end
