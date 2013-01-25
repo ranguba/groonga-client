@@ -69,6 +69,7 @@ module Groonga
     end
 
     def column_list(parameters)
+      execute_command("column_list", parameters)
     end
 
     def column_remove(parameters)
