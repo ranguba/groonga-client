@@ -23,6 +23,7 @@ class TestClient < Test::Unit::TestCase
   module ClientTests
     def test_without_columns_in_responses
       options = {:host => @address, :port => @port, :protocol => @protocol}
+      @response_header = groonga_response_header
       @response_body = '{"key":"value"}'
 
       expected_body = {"key" => "value"}
@@ -37,6 +38,7 @@ class TestClient < Test::Unit::TestCase
 
     def test_with_columns_in_responses
       options = {:host => @address, :port => @port, :protocol => @protocol}
+      @response_header = groonga_response_header
       @response_body = <<-JSON
 [[["name","ShortText"],
 ["age","UInt32"]],
@@ -62,6 +64,7 @@ JSON
 
     def test_with_parameters
       options = {:host => @address, :port => @port, :protocol => @protocol}
+      @response_header = groonga_response_header
       @response_body = "100"
       expected_body = 100
 
@@ -75,6 +78,7 @@ JSON
 
     def test_define_command
       options = {:host => @address, :port => @port, :protocol => @protocol}
+      @response_header = groonga_response_header
       @response_body = "true"
       expected_body = true
 
@@ -84,6 +88,19 @@ JSON
         assert_header(response)
         assert_equal(expected_body, response.body)
         assert_true(client.respond_to?(:new_selector))
+      end
+    end
+
+    def test_not_json_as_response
+      options = {:host => @address, :port => @port, :protocol => @protocol}
+      @response_header = nil
+      @response_body = "table_create TEST_TABLE TABLE_NO_KEY"
+      expected_body = @response_body
+
+      Groonga::Client.open(options) do |client|
+        response = client.dump
+        assert_nil(response.header)
+        assert_equal(expected_body, response.body)
       end
     end
 
@@ -147,16 +164,20 @@ JSON
       @thread = Thread.new do
         client = @server.accept
         @server.close
-        @response_body = "[#{groonga_response_header},\n#{@response_body}]"
-        response_header = <<-EOH
+        if @response_header.nil?
+          body = @response_body
+        else
+          body = "[#{@response_header},\n#{@response_body}]"
+        end
+        header = <<-EOH
 HTTP/1.1 200 OK
 Connection: close
 Content-Type: application/json
-Content-Length: #{@response_body.bytesize}
+Content-Length: #{body.bytesize}
 
 EOH
-        client.write(response_header)
-        client.write(@response_body)
+        client.write(header)
+        client.write(body)
         client.close
       end
     end

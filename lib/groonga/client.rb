@@ -102,7 +102,8 @@ module Groonga
       execute_command("delete", parameters)
     end
 
-    def dump(parameters)
+    def dump(parameters={})
+      execute_command("dump", parameters)
     end
 
     def load(parameters)

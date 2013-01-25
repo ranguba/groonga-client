@@ -33,7 +33,7 @@ module Groonga
           @start_time = Time.now.to_f
           formatted_command = command.to_command_format
           request = @client.send(formatted_command) do |header, body|
-            output = convert_groonga_output(header, body)
+            output = convert_groonga_output(command, header, body)
             if block_given?
               response = yield(output)
             else
@@ -45,7 +45,9 @@ module Groonga
         end
 
         private
-        def convert_groonga_output(header, body)
+        def convert_groonga_output(command, header, body)
+          return body if command.name == "dump"
+
           elapsed_time = Time.now.to_f
           output_header = [
             header.status,
