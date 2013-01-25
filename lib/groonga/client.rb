@@ -99,6 +99,7 @@ module Groonga
     end
 
     def delete(parameters)
+      execute_command("delete", parameters)
     end
 
     def dump(parameters)
