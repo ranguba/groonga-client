@@ -24,8 +24,8 @@ module Groonga
       class ClearLock < Base
         Response.register("clearlock", self)
 
-        def initialize(json_text)
-          super(json_text)
+        def initialize(json)
+          super(json)
         end
       end
     end

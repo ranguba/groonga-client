@@ -35,22 +35,22 @@ module Groonga
       class Base
         attr_accessor :header, :body
 
-        def initialize(json_text)
-          if json_text.nil?
+        def initialize(json)
+          if json.nil?
             @header = nil
             @body = nil
           else
-            response = JSON.parse(json_text)
+            response = JSON.parse(json)
             @header = response.first
             @body = response.last
           end
         end
 
-        def format_response(json_text)
+        def format_response(json)
           header = nil
           formatted_body = []
 
-          json = JSON.parse(json_text)
+          json = JSON.parse(json)
           header = json.first
           body = json.last
 

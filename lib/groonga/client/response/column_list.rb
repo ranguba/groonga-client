@@ -24,12 +24,12 @@ module Groonga
       class ColumnList < Base
         Response.register("column_list", self)
 
-        def initialize(json_text)
-          if json_text.nil?
+        def initialize(json)
+          if json.nil?
             @header = nil
             @body = nil
           else
-            @header, column_infos = format_response(json_text)
+            @header, column_infos = format_response(json)
             @body = column_infos.collect do |column_info|
               ColumnInfo.new(column_info)
             end

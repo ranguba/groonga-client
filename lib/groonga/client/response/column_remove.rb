@@ -24,8 +24,8 @@ module Groonga
       class ColumnRemove < Base
         Response.register("column_remove", self)
 
-        def initialize(json_text)
-          super(json_text)
+        def initialize(json)
+          super(json)
         end
       end
     end

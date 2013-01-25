@@ -24,12 +24,12 @@ module Groonga
       class TableList < Base
         Response.register("table_list", self)
 
-        def initialize(json_text)
-          if json_text.nil?
+        def initialize(json)
+          if json.nil?
             @header = nil
             @body = nil
           else
-            @header, table_infos = format_response(json_text)
+            @header, table_infos = format_response(json)
             @body = table_infos.collect do |table_info|
               TableInfo.new(table_info)
             end

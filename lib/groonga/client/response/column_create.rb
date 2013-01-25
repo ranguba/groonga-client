@@ -24,8 +24,8 @@ module Groonga
       class ColumnCreate < Base
         Response.register("column_create", self)
 
-        def initialize(json_text)
-          super(json_text)
+        def initialize(json)
+          super(json)
         end
       end
     end
