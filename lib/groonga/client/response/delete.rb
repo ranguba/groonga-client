@@ -24,8 +24,8 @@ module Groonga
       class Delete < Base
         Response.register("delete", self)
 
-        def initialize(json_text)
-          super(json_text)
+        def initialize(json)
+          super(json)
         end
       end
     end
