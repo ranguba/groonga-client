@@ -54,10 +54,10 @@ module Groonga
             @start_time,
             elapsed_time - @start_time
           ]
-          if not json?(body)
-            output_body = JSON.parse("[#{body.chomp}]")
-          else
+          if json?(body)
             output_body = [JSON.parse(body)]
+          else
+            output_body = JSON.parse("[#{body.chomp}]")
           end
           output = output_body.unshift(output_header)
           JSON.generate(output)
