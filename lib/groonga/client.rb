@@ -80,20 +80,6 @@ module Groonga
       execute_command("column_rename", parameters)
     end
 
-    def define_selector(parameters)
-      response = execute_command("define_selector", parameters)
-
-      if response.header.first.zero?
-        new_command_name = parameters[:name]
-        Client.class_eval do
-          define_method(new_command_name) do
-            execute_command(new_command_name)
-          end
-        end
-      end
-      response
-    end
-
     def defrag(parameters={})
       execute_command("defrag", parameters)
     end

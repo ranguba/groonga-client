@@ -76,21 +76,6 @@ JSON
       end
     end
 
-    def test_define_command
-      options = {:host => @address, :port => @port, :protocol => @protocol}
-      @response_header = groonga_response_header
-      @response_body = "true"
-      expected_body = true
-
-      Groonga::Client.open(options) do |client|
-        response = client.define_selector(:name  => "new_selector",
-                                          :table => "TABLE")
-        assert_header(response)
-        assert_equal(expected_body, response.body)
-        assert_true(client.respond_to?(:new_selector))
-      end
-    end
-
     def test_not_json_as_response
       options = {:host => @address, :port => @port, :protocol => @protocol}
       @response_header = nil
