@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
+# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -27,12 +28,22 @@ module Groonga
       end
 
       def execute(connection)
-        connection.send(@command) do |response|
+        sync = !block_given?
+
+        result = nil
+        request = connection.send(@command) do |response|
           command_class = Groonga::Client::Response.find(@command.name)
-          command_class.new(response)
+          result = command_class.new(response)
+          yield(result) unless sync
+        end
+
+        if sync
+          request.wait
+          result
+        else
+          request
         end
       end
     end
   end
 end
-

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
+# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,6 +22,16 @@ require "open-uri"
 module Groonga
   class Client
     module Protocol
+      class Request
+        def initialize(thread)
+          @thread = thread
+        end
+
+        def wait
+          @thread.join
+        end
+      end
+
       class HTTP
         def initialize(options)
           @host = options[:host] || "127.0.0.1"
@@ -29,18 +40,13 @@ module Groonga
 
         def send(command)
           url = "http://#{@host}:#{@port}#{command.to_uri_format}"
-          begin
+          thread = Thread.new do
             open(url) do |response|
               body = response.read
-              if block_given?
-                yield(body)
-              else
-                body
-              end
+              yield(body)
             end
-          rescue OpenURI::HTTPError
-            raise("Failed to send command: #{$!}: <#{url}>")
           end
+          Request.new(thread)
         end
       end
     end

@@ -43,7 +43,6 @@ module Groonga
 
       @connection = nil
       if @protocol == :gqtp
-        options[:connection] ||= :synchronous
         @connection = Groonga::Client::Protocol::GQTP.new(options)
       else
         @connection = Groonga::Client::Protocol::HTTP.new(options)
@@ -143,8 +142,8 @@ module Groonga
     def truncate(parameters)
     end
 
-    def execute(command)
-      Client::Command.new(command).execute(@connection)
+    def execute(command, &block)
+      Client::Command.new(command).execute(@connection, &block)
     end
 
     private

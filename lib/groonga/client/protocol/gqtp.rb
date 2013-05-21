@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
+# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -28,20 +29,13 @@ module Groonga
           @start_time = nil
         end
 
-        def send(command, &block)
-          response = nil
+        def send(command)
           @start_time = Time.now.to_f
           formatted_command = command.to_command_format
-          request = @client.send(formatted_command) do |header, body|
+          @client.send(formatted_command) do |header, body|
             output = convert_groonga_output(command, header, body)
-            if block_given?
-              response = yield(output)
-            else
-              response = output
-            end
+            yield(output)
           end
-          request.wait
-          response
         end
 
         private
