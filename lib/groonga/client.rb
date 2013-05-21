@@ -143,11 +143,15 @@ module Groonga
     def truncate(parameters)
     end
 
+    def execute(command)
+      Client::Command.new(command).execute(@connection)
+    end
+
     private
     def execute_command(command_name, parameters={})
       parameters = normalize_parameters(parameters)
       command = Groonga::Command::Base.new(command_name, parameters)
-      Client::Command.new(command).execute(@connection)
+      execute(command)
     end
 
     def normalize_parameters(parameters)
