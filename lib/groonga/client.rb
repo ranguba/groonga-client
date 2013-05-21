@@ -35,15 +35,15 @@ module Groonga
       end
     end
 
-    attr_reader :protocol_name
+    attr_reader :protocol
     attr_reader :connection
 
     def initialize(options)
-      @protocol_name = options[:protocol] || :gqtp
+      @protocol = options[:protocol] || :gqtp
       options.delete(:protocol)
 
       @connection = nil
-      if @protocol_name == :gqtp
+      if @protocol == :gqtp
         options[:connection] ||= :synchronous
         @connection = Groonga::Client::Protocol::GQTP.new(options)
       else
@@ -148,7 +148,7 @@ module Groonga
     def execute_command(command_name, parameters={})
       parameters = normalize_parameters(parameters)
       command = Groonga::Command::Base.new(command_name, parameters)
-      Client::Command.new(command).execute(@connection, @protocol_name)
+      Client::Command.new(command).execute(@connection, @protocol)
     end
 
     def normalize_parameters(parameters)
