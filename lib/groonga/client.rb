@@ -39,8 +39,7 @@ module Groonga
     attr_reader :connection
 
     def initialize(options)
-      @protocol = options[:protocol] || :gqtp
-      options.delete(:protocol)
+      @protocol = options.delete(:protocol) || :gqtp
 
       @connection = nil
       if @protocol == :gqtp
