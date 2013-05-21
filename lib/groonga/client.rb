@@ -147,7 +147,7 @@ module Groonga
     def execute_command(command_name, parameters={})
       parameters = normalize_parameters(parameters)
       command = Groonga::Command::Base.new(command_name, parameters)
-      Client::Command.new(command).execute(@connection, @protocol)
+      Client::Command.new(command).execute(@connection)
     end
 
     def normalize_parameters(parameters)
