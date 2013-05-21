@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
+# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -34,18 +35,19 @@ module Groonga
       end
     end
 
-    attr_reader :protocol, :protocol_name
+    attr_reader :protocol_name
+    attr_reader :connection
 
     def initialize(options)
       @protocol_name = options[:protocol] || :gqtp
       options.delete(:protocol)
 
-      @protocol = nil
+      @connection = nil
       if @protocol_name == :gqtp
         options[:connection] ||= :synchronous
-        @protocol = Groonga::Client::Protocol::GQTP.new(options)
+        @connection = Groonga::Client::Protocol::GQTP.new(options)
       else
-        @protocol = Groonga::Client::Protocol::HTTP.new(options)
+        @connection = Groonga::Client::Protocol::HTTP.new(options)
       end
     end
 
@@ -146,7 +148,7 @@ module Groonga
     def execute_command(command_name, parameters={})
       parameters = normalize_parameters(parameters)
       command = Groonga::Command::Base.new(command_name, parameters)
-      Client::Command.new(command).execute(@protocol, @protocol_name)
+      Client::Command.new(command).execute(@connection, @protocol_name)
     end
 
     def normalize_parameters(parameters)
