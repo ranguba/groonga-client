@@ -19,6 +19,11 @@
 $VERBOSE = true
 
 base_dir = File.expand_path(File.join(File.dirname(__FILE__), ".."))
+
+gqtp_base_dir = File.expand_path(File.join(base_dir, "..", "gqtp"))
+gqtp_lib_dir = File.join(gqtp_base_dir, "lib")
+$LOAD_PATH.unshift(gqtp_lib_dir)
+
 lib_dir = File.join(base_dir, "lib")
 test_dir = File.join(base_dir, "test")
 
