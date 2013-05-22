@@ -25,6 +25,10 @@ class TestClient < Test::Unit::TestCase
       options = {:host => @address, :port => @port, :protocol => @protocol}
       Groonga::Client.open(options, &block)
     end
+
+    def groonga_response_header
+      [0, "START_TIME", "ELAPSED_TIME"]
+    end
   end
 
   module Assertions
@@ -103,10 +107,6 @@ JSON
         assert_header(response)
         assert_equal(expected_body, response.body)
       end
-    end
-
-    def groonga_response_header
-      [0, "START_TIME", "ELAPSED_TIME"]
     end
   end
 
