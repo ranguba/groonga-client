@@ -71,9 +71,9 @@ class TestClient < Test::Unit::TestCase
     def test_dump
       dumped_commands = "table_create TEST_TABLE TABLE_NO_KEY"
       stub_response(nil, dumped_commands)
-        response = client.dump
-        assert_nil(response.header)
-        assert_equal(dumped_commands, response.body)
+      response = client.dump
+      assert_nil(response.header)
+      assert_equal(dumped_commands, response.body)
     end
   end
 
@@ -88,10 +88,10 @@ class TestClient < Test::Unit::TestCase
 
       expected_body = {"key" => "value"}
 
-        response = client.status
+      response = client.status
 
-        assert_header(response)
-        assert_equal(expected_body, response.body)
+      assert_header(response)
+      assert_equal(expected_body, response.body)
     end
 
     def test_with_columns_in_responses
@@ -106,23 +106,23 @@ JSON
         {:name => "Bob", :age => 21}
       ]
 
-        response = client.table_list
-        actual_table_infos = response.body.collect do |value|
-          value.table_info
-        end
+      response = client.table_list
+      actual_table_infos = response.body.collect do |value|
+        value.table_info
+      end
 
-        assert_header(response)
-        assert_equal(expected_table_infos, actual_table_infos)
+      assert_header(response)
+      assert_equal(expected_table_infos, actual_table_infos)
     end
 
     def test_with_parameters
       stub_response(groonga_response_header, "100")
       expected_body = 100
 
-        response = client.cache_limit(:max => 4)
+      response = client.cache_limit(:max => 4)
 
-        assert_header(response)
-        assert_equal(expected_body, response.body)
+      assert_header(response)
+      assert_equal(expected_body, response.body)
     end
   end
 
