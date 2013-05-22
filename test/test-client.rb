@@ -29,6 +29,11 @@ class TestClient < Test::Unit::TestCase
     def groonga_response_header
       [0, "START_TIME", "ELAPSED_TIME"]
     end
+
+    def stub_response(header, body)
+      @response_header = header
+      @response_body = body
+    end
   end
 
   module Assertions
@@ -40,14 +45,12 @@ class TestClient < Test::Unit::TestCase
 
   module OutputTypeTests
     def test_dump
-      @response_header = nil
-      @response_body = "table_create TEST_TABLE TABLE_NO_KEY"
-      expected_body = @response_body
-
+      dumped_commands = "table_create TEST_TABLE TABLE_NO_KEY"
+      stub_response(nil, dumped_commands)
       open_client do |client|
         response = client.dump
         assert_nil(response.header)
-        assert_equal(expected_body, response.body)
+        assert_equal(dumped_commands, response.body)
       end
     end
   end
@@ -59,8 +62,7 @@ class TestClient < Test::Unit::TestCase
     include OutputTypeTests
 
     def test_without_columns_in_responses
-      @response_header = groonga_response_header
-      @response_body = '{"key":"value"}'
+      stub_response(groonga_response_header, '{"key":"value"}')
 
       expected_body = {"key" => "value"}
 
@@ -73,8 +75,7 @@ class TestClient < Test::Unit::TestCase
     end
 
     def test_with_columns_in_responses
-      @response_header = groonga_response_header
-      @response_body = <<-JSON
+      stub_response(groonga_response_header, <<-JSON)
 [[["name","ShortText"],
 ["age","UInt32"]],
 ["Alice",32],
@@ -97,8 +98,7 @@ JSON
     end
 
     def test_with_parameters
-      @response_header = groonga_response_header
-      @response_body = "100"
+      stub_response(groonga_response_header, "100")
       expected_body = 100
 
       open_client do |client|
