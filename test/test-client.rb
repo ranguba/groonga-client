@@ -20,7 +20,31 @@ require "socket"
 require "groonga/client"
 
 class TestClient < Test::Unit::TestCase
+  module ClientFixture
+    class << self
+      def included(base)
+        super
+        base.class_eval do
+          setup :setup_client
+          teardown :teardown_client
+        end
+      end
+    end
+
+    def setup_client
+      @client = nil
+    end
+
+    def teardown_client
+      @client.close if @client
+    end
+  end
+
   module Utils
+    def client
+      @client ||= open_client
+    end
+
     def open_client(&block)
       options = {:host => @address, :port => @port, :protocol => @protocol}
       Groonga::Client.open(options, &block)
@@ -47,11 +71,9 @@ class TestClient < Test::Unit::TestCase
     def test_dump
       dumped_commands = "table_create TEST_TABLE TABLE_NO_KEY"
       stub_response(nil, dumped_commands)
-      open_client do |client|
         response = client.dump
         assert_nil(response.header)
         assert_equal(dumped_commands, response.body)
-      end
     end
   end
 
@@ -66,12 +88,10 @@ class TestClient < Test::Unit::TestCase
 
       expected_body = {"key" => "value"}
 
-      open_client do |client|
         response = client.status
 
         assert_header(response)
         assert_equal(expected_body, response.body)
-      end
     end
 
     def test_with_columns_in_responses
@@ -86,7 +106,6 @@ JSON
         {:name => "Bob", :age => 21}
       ]
 
-      open_client do |client|
         response = client.table_list
         actual_table_infos = response.body.collect do |value|
           value.table_info
@@ -94,24 +113,22 @@ JSON
 
         assert_header(response)
         assert_equal(expected_table_infos, actual_table_infos)
-      end
     end
 
     def test_with_parameters
       stub_response(groonga_response_header, "100")
       expected_body = 100
 
-      open_client do |client|
         response = client.cache_limit(:max => 4)
 
         assert_header(response)
         assert_equal(expected_body, response.body)
-      end
     end
   end
 
   class TestGQTP < self
     include ClientTests
+    include ClientFixture
 
     def setup
       @address = "127.0.0.1"
@@ -151,6 +168,7 @@ JSON
 
   class TestHTTP < self
     include ClientTests
+    include ClientFixture
 
     def setup
       @address = "127.0.0.1"
