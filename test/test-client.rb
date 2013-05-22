@@ -160,9 +160,10 @@ JSON
     def normalize_header(header)
       start_time = header[1]
       elapsed_time = header[2]
-      header[1] = "START_TIME" if /\A[\d\.]+\z/ =~ start_time.to_s
-      header[2] = "ELAPSED_TIME" if /\A[\d\.]+\z/ =~ elapsed_time.to_s
-      header
+      normalized_header = header.dup
+      normalized_header[1] = "START_TIME" if /\A[\d\.]+\z/ =~ start_time.to_s
+      normalized_header[2] = "ELAPSED_TIME" if /\A[\d\.]+\z/ =~ elapsed_time.to_s
+      normalized_header
     end
   end
 
