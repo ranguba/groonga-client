@@ -34,9 +34,25 @@ class TestClient < Test::Unit::TestCase
     end
   end
 
+  module OutputTypeTests
+    def test_dump
+      @response_header = nil
+      @response_body = "table_create TEST_TABLE TABLE_NO_KEY"
+      expected_body = @response_body
+
+      open_client do |client|
+        response = client.dump
+        assert_nil(response.header)
+        assert_equal(expected_body, response.body)
+      end
+    end
+  end
+
   module ClientTests
     include Utils
     include Assertions
+
+    include OutputTypeTests
 
     def test_without_columns_in_responses
       @response_header = groonga_response_header
@@ -85,18 +101,6 @@ JSON
         response = client.cache_limit(:max => 4)
 
         assert_header(response)
-        assert_equal(expected_body, response.body)
-      end
-    end
-
-    def test_not_json_as_response
-      @response_header = nil
-      @response_body = "table_create TEST_TABLE TABLE_NO_KEY"
-      expected_body = @response_body
-
-      open_client do |client|
-        response = client.dump
-        assert_nil(response.header)
         assert_equal(expected_body, response.body)
       end
     end
