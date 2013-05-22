@@ -99,6 +99,8 @@ JSON
   end
 
   class TestGQTP < self
+    include ClientTests
+
     def setup
       @address = "127.0.0.1"
       @server = TCPServer.new(@address, 0)
@@ -133,11 +135,11 @@ JSON
       header[2] = "ELAPSED_TIME" if /\A[\d\.]+\z/ =~ elapsed_time.to_s
       header
     end
-
-    include ClientTests
   end
 
   class TestHTTP < self
+    include ClientTests
+
     def setup
       @address = "127.0.0.1"
       @server = TCPServer.new(@address, 0)
@@ -169,7 +171,5 @@ EOH
     def normalize_header(header)
       header
     end
-
-    include ClientTests
   end
 end
