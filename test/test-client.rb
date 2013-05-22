@@ -86,8 +86,8 @@ class TestClient < Test::Unit::TestCase
       dumped_commands = "table_create TEST_TABLE TABLE_NO_KEY"
       stub_response(nil, dumped_commands)
       response = client.dump
-      assert_nil(response.header)
-      assert_equal(dumped_commands, response.body)
+      assert_equal([nil, dumped_commands],
+                   [response.header, response.body])
     end
   end
 
