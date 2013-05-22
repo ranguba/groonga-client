@@ -20,15 +20,23 @@ require "socket"
 require "groonga/client"
 
 class TestClient < Test::Unit::TestCase
-  module ClientTests
-    def test_without_columns_in_responses
+  module Utils
+    def open_client(&block)
       options = {:host => @address, :port => @port, :protocol => @protocol}
+      Groonga::Client.open(options, &block)
+    end
+  end
+
+  module ClientTests
+    include Utils
+
+    def test_without_columns_in_responses
       @response_header = groonga_response_header
       @response_body = '{"key":"value"}'
 
       expected_body = {"key" => "value"}
 
-      Groonga::Client.open(options) do |client|
+      open_client do |client|
         response = client.status
 
         assert_header(response)
@@ -37,7 +45,6 @@ class TestClient < Test::Unit::TestCase
     end
 
     def test_with_columns_in_responses
-      options = {:host => @address, :port => @port, :protocol => @protocol}
       @response_header = groonga_response_header
       @response_body = <<-JSON
 [[["name","ShortText"],
@@ -50,7 +57,7 @@ JSON
         {:name => "Bob", :age => 21}
       ]
 
-      Groonga::Client.open(options) do |client|
+      open_client do |client|
         response = client.table_list
         actual_table_infos = response.body.collect do |value|
           value.table_info
@@ -62,12 +69,11 @@ JSON
     end
 
     def test_with_parameters
-      options = {:host => @address, :port => @port, :protocol => @protocol}
       @response_header = groonga_response_header
       @response_body = "100"
       expected_body = 100
 
-      Groonga::Client.open(options) do |client|
+      open_client do |client|
         response = client.cache_limit(:max => 4)
 
         assert_header(response)
@@ -76,12 +82,11 @@ JSON
     end
 
     def test_not_json_as_response
-      options = {:host => @address, :port => @port, :protocol => @protocol}
       @response_header = nil
       @response_body = "table_create TEST_TABLE TABLE_NO_KEY"
       expected_body = @response_body
 
-      Groonga::Client.open(options) do |client|
+      open_client do |client|
         response = client.dump
         assert_nil(response.header)
         assert_equal(expected_body, response.body)
