@@ -27,8 +27,16 @@ class TestClient < Test::Unit::TestCase
     end
   end
 
+  module Assertions
+    def assert_header(response)
+      normalized_header = normalize_header(response.header)
+      assert_equal(groonga_response_header, normalized_header)
+    end
+  end
+
   module ClientTests
     include Utils
+    include Assertions
 
     def test_without_columns_in_responses
       @response_header = groonga_response_header
@@ -95,11 +103,6 @@ JSON
 
     def groonga_response_header
       [0, "START_TIME", "ELAPSED_TIME"]
-    end
-
-    def assert_header(response)
-      normalized_header = normalize_header(response.header)
-      assert_equal(groonga_response_header, normalized_header)
     end
   end
 
