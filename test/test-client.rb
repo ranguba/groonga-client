@@ -89,7 +89,7 @@ JSON
     end
 
     def groonga_response_header
-      [0,"START_TIME","ELAPSED_TIME"]
+      [0, "START_TIME", "ELAPSED_TIME"]
     end
 
     def assert_header(response)
