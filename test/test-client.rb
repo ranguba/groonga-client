@@ -65,6 +65,20 @@ class TestClient < Test::Unit::TestCase
       normalized_header = normalize_header(response.header)
       assert_equal(groonga_response_header, normalized_header)
     end
+
+    def assert_response(expected_body, response)
+      normalized_header = normalize_header(response.header)
+      actual_body = response.body
+      actual_body = yield(actual_body) if block_given?
+      assert_equal({
+                     :header => groonga_response_header,
+                     :body   => expected_body,
+                   },
+                   {
+                     :header => normalized_header,
+                     :body   => actual_body,
+                   })
+    end
   end
 
   module OutputTypeTests
@@ -85,13 +99,8 @@ class TestClient < Test::Unit::TestCase
 
     def test_without_columns_in_responses
       stub_response(groonga_response_header, '{"key":"value"}')
-
-      expected_body = {"key" => "value"}
-
       response = client.status
-
-      assert_header(response)
-      assert_equal(expected_body, response.body)
+      assert_response({"key" => "value"}, response)
     end
 
     def test_with_columns_in_responses
@@ -105,24 +114,18 @@ JSON
         {:name => "Alice", :age => 32},
         {:name => "Bob", :age => 21}
       ]
-
       response = client.table_list
-      actual_table_infos = response.body.collect do |value|
-        value.table_info
+      assert_response(expected_table_infos, response) do |actual_body|
+        actual_body.collect do |value|
+          value.table_info
+        end
       end
-
-      assert_header(response)
-      assert_equal(expected_table_infos, actual_table_infos)
     end
 
     def test_with_parameters
       stub_response(groonga_response_header, "100")
-      expected_body = 100
-
       response = client.cache_limit(:max => 4)
-
-      assert_header(response)
-      assert_equal(expected_body, response.body)
+      assert_response(100, response)
     end
   end
 
