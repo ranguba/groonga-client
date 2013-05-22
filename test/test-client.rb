@@ -45,7 +45,6 @@ class TestClient < Test::Unit::TestCase
 ["Alice",32],
 ["Bob",21]]
 JSON
-      expected_header = [0, 1, 2]
       expected_table_infos = [
         {:name => "Alice", :age => 32},
         {:name => "Bob", :age => 21}
