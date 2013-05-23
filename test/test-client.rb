@@ -127,7 +127,7 @@ JSON
     end
   end
 
-  module ClientTests
+  module Tests
     include Utils
     include Assertions
 
@@ -137,7 +137,7 @@ JSON
   end
 
   class TestGQTP < self
-    include ClientTests
+    include Tests
     include ClientFixture
 
     def setup
@@ -178,7 +178,7 @@ JSON
   end
 
   class TestHTTP < self
-    include ClientTests
+    include Tests
     include ClientFixture
 
     def setup
