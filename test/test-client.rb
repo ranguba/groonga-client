@@ -80,20 +80,25 @@ class TestClient < Test::Unit::TestCase
     end
 
     def assert_response(expected_body, response)
-      expected_normalized_header = [
-        0,
-        NORMALIZED_START_TIME,
-        NORMALIZED_ELAPSED_TIME,
-      ]
-      actual_normalized_header = normalize_header(response.header)
+      if @response_output_type == :none
+        expected_header = nil
+        actual_header = response.header
+      else
+        expected_header = [
+          0,
+          NORMALIZED_START_TIME,
+          NORMALIZED_ELAPSED_TIME,
+        ]
+        actual_header = normalize_header(response.header)
+      end
       actual_body = response.body
       actual_body = yield(actual_body) if block_given?
       assert_equal({
-                     :header => expected_normalized_header,
+                     :header => expected_header,
                      :body   => expected_body,
                    },
                    {
-                     :header => actual_normalized_header,
+                     :header => actual_header,
                      :body   => actual_body,
                    })
     end
@@ -104,8 +109,7 @@ class TestClient < Test::Unit::TestCase
       dumped_commands = "table_create TEST_TABLE TABLE_NO_KEY"
       stub_response(dumped_commands, :none)
       response = client.dump
-      assert_equal([nil, dumped_commands],
-                   [response.header, response.body])
+      assert_response(dumped_commands, response)
     end
   end
 
