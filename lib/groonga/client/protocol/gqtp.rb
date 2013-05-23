@@ -29,36 +29,49 @@ module Groonga
         end
 
         def send(command)
-          start_time = Time.now.to_f
           formatted_command = command.to_command_format
+          raw_response = RawResponse.new(command)
           @client.send(formatted_command) do |header, body|
-            output = convert_groonga_output(command, start_time, header, body)
-            yield(output)
+            raw_response.header = header
+            raw_response.body = body
+            response = raw_response.to_groonga_command_compatible_response
+            yield(response)
           end
         end
 
-        private
-        def convert_groonga_output(command, start_time, header, body)
-          return body if command.name == "dump"
-
-          elapsed_time = Time.now.to_f - start_time
-          output_header = [
-            header.status,
-            start_time,
-            elapsed_time,
-          ]
-          if json?(body)
-            output_body = [JSON.parse(body)]
-          else
-            output_body = JSON.parse("[#{body.chomp}]")
+        class RawResponse
+          attr_accessor :header
+          attr_accessor :body
+          def initialize(command)
+            @start_time = Time.now.to_f
+            @command = command
+            @header = nil
+            @body = nil
           end
-          output = output_body.unshift(output_header)
-          JSON.generate(output)
-        end
 
-        def json?(body)
-          (body.start_with?("[") and body.end_with?("]")) or
-            (body.start_with?("{") and body.end_with?("}"))
+          def to_groonga_command_compatible_response
+            return body if @command.name == "dump"
+
+            elapsed_time = Time.now.to_f - @start_time
+            output_header = [
+              @header.status,
+              @start_time,
+              elapsed_time,
+            ]
+            if json?(@body)
+              output_body = [JSON.parse(@body)]
+            else
+              output_body = JSON.parse("[#{@body.chomp}]")
+            end
+            output = output_body.unshift(output_header)
+            JSON.generate(output)
+          end
+
+          private
+          def json?(body)
+            (body.start_with?("[") and body.end_with?("]")) or
+              (body.start_with?("{") and body.end_with?("}"))
+          end
         end
       end
     end
