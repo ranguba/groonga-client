@@ -33,7 +33,7 @@ module Groonga
         result = nil
         request = connection.send(@command) do |response|
           command_class = Groonga::Client::Response.find(@command.name)
-          result = command_class.new(response)
+          result = command_class.parse(response, @command.output_type)
           yield(result) unless sync
         end
 

@@ -23,11 +23,6 @@ module Groonga
     module Response
       class Dump < Base
         Response.register("dump", self)
-
-        def initialize(dump)
-          @header = nil
-          @body = dump
-        end
       end
     end
   end

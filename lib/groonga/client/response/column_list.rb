@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
+# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -24,52 +25,29 @@ module Groonga
       class ColumnList < Base
         Response.register("column_list", self)
 
-        def initialize(json)
-          if json.nil?
-            @header = nil
-            @body = nil
-          else
-            @header, column_infos = format_response(json)
-            @body = column_infos.collect do |column_info|
-              ColumnInfo.new(column_info)
+        def initialize(header, body)
+          super(header, parse_body(body))
+        end
+
+        def parse_body(body)
+          properties = body.first
+          infos = body[1..-1]
+          infos.collect do |info|
+            column = Column.new
+            properties.each_with_index do |(name, _), i|
+              column.send("#{name}=", info[i])
             end
           end
         end
 
-        class ColumnInfo
-          attr_reader :column_info
-
-          def initialize(column_info)
-            @column_info = column_info
-          end
-
-          def id
-            @column_info[:id]
-          end
-
-          def name
-            @column_info[:name]
-          end
-
-          def path
-            @column_info[:path]
-          end
-
-          def flags
-            @column_info[:flags]
-          end
-
-          def domain
-            @column_info[:domain]
-          end
-
-          def range
-            @column_info[:range]
-          end
-
-          def source
-            @column_info[:source]
-          end
+        class Column < Struct.new(:id,
+                                  :name,
+                                  :path,
+                                  :type,
+                                  :flags,
+                                  :domain,
+                                  :range,
+                                  :source)
         end
       end
     end

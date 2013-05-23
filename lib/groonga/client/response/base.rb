@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
+# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -33,42 +34,24 @@ module Groonga
       end
 
       class Base
-        attr_accessor :header, :body
-
-        def initialize(json)
-          if json.nil?
-            @header = nil
-            @body = nil
-          else
-            response = JSON.parse(json)
-            @header = response.first
-            @body = response.last
+        class << self
+          def parse(response, type)
+            case type
+            when :json
+              header, body = JSON.parse(response)
+            else
+              header = nil
+              body = response
+            end
+            new(header, body)
           end
         end
 
-        def format_response(json)
-          header = nil
-          formatted_body = []
+        attr_accessor :header, :body
 
-          response = JSON.parse(json)
-          header = response.first
-          body = response.last
-
-          columns_with_type = body.first
-          columns = columns_with_type.collect do |column, type|
-            column.to_sym
-          end
-
-          entries = body[1..-1]
-          entries.each.with_index do |entry, n_entry|
-            formatted_body[n_entry] = {}
-            entry.each.with_index do |value, n_value|
-              column = columns[n_value]
-              formatted_body[n_entry][column] = value
-            end
-          end
-
-          [header, formatted_body]
+        def initialize(header, body)
+          @header = header
+          @body = body
         end
       end
     end
