@@ -26,27 +26,26 @@ module Groonga
       class GQTP
         def initialize(options)
           @client = ::GQTP::Client.new(options)
-          @start_time = nil
         end
 
         def send(command)
-          @start_time = Time.now.to_f
+          start_time = Time.now.to_f
           formatted_command = command.to_command_format
           @client.send(formatted_command) do |header, body|
-            output = convert_groonga_output(command, header, body)
+            output = convert_groonga_output(command, start_time, header, body)
             yield(output)
           end
         end
 
         private
-        def convert_groonga_output(command, header, body)
+        def convert_groonga_output(command, start_time, header, body)
           return body if command.name == "dump"
 
           elapsed_time = Time.now.to_f
           output_header = [
             header.status,
-            @start_time,
-            elapsed_time - @start_time
+            start_time,
+            elapsed_time - start_time
           ]
           if json?(body)
             output_body = [JSON.parse(body)]
