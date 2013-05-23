@@ -52,14 +52,14 @@ module Groonga
           def to_groonga_command_compatible_response
             case @command.output_type
             when :json
-              convert_from_json
+              convert_for_json
             when :none
               @body
             end
           end
 
           private
-          def convert_from_json
+          def convert_for_json
             elapsed_time = Time.now.to_f - @start_time
             header = [
               @header.status,
