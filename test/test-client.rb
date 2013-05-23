@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
+# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -91,19 +92,14 @@ class TestClient < Test::Unit::TestCase
     end
   end
 
-  module ClientTests
-    include Utils
-    include Assertions
-
-    include OutputTypeTests
-
-    def test_without_columns_in_responses
+  module ColumnsTests
+    def test_not_exist
       stub_response(groonga_response_header, '{"key":"value"}')
       response = client.status
       assert_response({"key" => "value"}, response)
     end
 
-    def test_with_columns_in_responses
+    def test_exist
       stub_response(groonga_response_header, <<-JSON)
 [[["name","ShortText"],
 ["age","UInt32"]],
@@ -121,6 +117,14 @@ JSON
         end
       end
     end
+  end
+
+  module ClientTests
+    include Utils
+    include Assertions
+
+    include OutputTypeTests
+    include ColumnsTests
 
     def test_with_parameters
       stub_response(groonga_response_header, "100")
