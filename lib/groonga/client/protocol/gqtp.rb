@@ -52,7 +52,7 @@ module Groonga
           def to_groonga_command_compatible_response
             case @command.output_type
             when :none
-              return @body
+              @body
             when :json
               convert_from_json
             end
