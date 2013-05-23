@@ -149,7 +149,8 @@ module Groonga
     private
     def execute_command(command_name, parameters={})
       parameters = normalize_parameters(parameters)
-      command = Groonga::Command::Base.new(command_name, parameters)
+      command_class = Groonga::Command.find(command_name)
+      command = command_class.new(command_name, parameters)
       execute(command)
     end
 
