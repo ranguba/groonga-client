@@ -50,8 +50,10 @@ module Groonga
           end
 
           def to_groonga_command_compatible_response
-            return body if @command.name == "dump"
-
+            case @command.output_type
+            when :none
+              return @body
+            else :json
             elapsed_time = Time.now.to_f - @start_time
             output_header = [
               @header.status,
@@ -65,6 +67,7 @@ module Groonga
             end
             output = output_body.unshift(output_header)
             JSON.generate(output)
+            end
           end
 
           private
