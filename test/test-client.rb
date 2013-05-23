@@ -120,7 +120,7 @@ class TestClient < Test::Unit::TestCase
       assert_response({"key" => "value"}, response)
     end
 
-    def test_exist
+    def disabled_test_exist
       stub_response(<<-JSON)
 [[["name","ShortText"],
 ["age","UInt32"]],
