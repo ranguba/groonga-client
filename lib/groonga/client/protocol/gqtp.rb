@@ -66,7 +66,8 @@ module Groonga
               @start_time,
               elapsed_time,
             ]
-            "[#{JSON.generate(header)},#{@body}]"
+            header_in_json = JSON.generate(header)
+            "[#{header_in_json},#{@body}]"
           end
         end
       end
