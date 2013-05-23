@@ -104,12 +104,12 @@ module Groonga
       execute_command("log_put", parameters)
     end
 
-    def log_reopen
-      execute_command("log_reopen")
+    def log_reopen(parameters={})
+      execute_command("log_reopen", parameters)
     end
 
-    def quit
-      execute_command("quit")
+    def quit(parameters={})
+      execute_command("quit", parameters)
     end
 
     def register(parameters)
@@ -119,18 +119,18 @@ module Groonga
     def select(parameters)
     end
 
-    def shutdown
+    def shutdown(parameters={})
     end
 
-    def status
-      execute_command("status")
+    def status(parameters={})
+      execute_command("status", parameters)
     end
 
     def table_create(parameters)
     end
 
-    def table_list
-      execute_command("table_list")
+    def table_list(parameters={})
+      execute_command("table_list", parameters)
     end
 
     def table_remove(parameters)
