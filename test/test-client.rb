@@ -119,18 +119,21 @@ JSON
     end
   end
 
+  module ParametersTests
+    def test_integer
+      stub_response(groonga_response_header, "100")
+      response = client.cache_limit(:max => 4)
+      assert_response(100, response)
+    end
+  end
+
   module ClientTests
     include Utils
     include Assertions
 
     include OutputTypeTests
     include ColumnsTests
-
-    def test_with_parameters
-      stub_response(groonga_response_header, "100")
-      response = client.cache_limit(:max => 4)
-      assert_response(100, response)
-    end
+    include ParametersTests
   end
 
   class TestGQTP < self
