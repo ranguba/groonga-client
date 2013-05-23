@@ -51,32 +51,49 @@ class TestClient < Test::Unit::TestCase
       Groonga::Client.open(options, &block)
     end
 
-    def groonga_response_header
-      [0, "START_TIME", "ELAPSED_TIME"]
-    end
-
-    def stub_response(header, body)
-      @response_header = header
+    def stub_response(body, output_type=:json)
       @response_body = body
+      @response_output_type = output_type
     end
   end
 
   module Assertions
+    NORMALIZED_START_TIME   = Time.parse("2013-05-23T16:43:39+09:00").to_i
+    NORMALIZED_ELAPSED_TIME = 29
+    def normalize_header(header)
+      normalized_header = header.dup
+      start_time = header[1]
+      if start_time.is_a?(Numeric)
+        normalized_header[1] = NORMALIZED_START_TIME
+      end
+      elapsed_time = header[2]
+      if elapsed_time.is_a?(Numeric)
+        normalized_header[2] = NORMALIZED_ELAPSED_TIME
+      end
+      normalized_header
+    end
+
     def assert_header(response)
       normalized_header = normalize_header(response.header)
-      assert_equal(groonga_response_header, normalized_header)
+      assert_equal([0, NORMALIZED_START_TIME, NORMALIZED_ELAPSED_TIME],
+                   normalized_header)
     end
 
     def assert_response(expected_body, response)
-      normalized_header = normalize_header(response.header)
+      expected_normalized_header = [
+        0,
+        NORMALIZED_START_TIME,
+        NORMALIZED_ELAPSED_TIME,
+      ]
+      actual_normalized_header = normalize_header(response.header)
       actual_body = response.body
       actual_body = yield(actual_body) if block_given?
       assert_equal({
-                     :header => groonga_response_header,
+                     :header => expected_normalized_header,
                      :body   => expected_body,
                    },
                    {
-                     :header => normalized_header,
+                     :header => actual_normalized_header,
                      :body   => actual_body,
                    })
     end
@@ -85,7 +102,7 @@ class TestClient < Test::Unit::TestCase
   module OutputTypeTests
     def test_dump
       dumped_commands = "table_create TEST_TABLE TABLE_NO_KEY"
-      stub_response(nil, dumped_commands)
+      stub_response(dumped_commands, :none)
       response = client.dump
       assert_equal([nil, dumped_commands],
                    [response.header, response.body])
@@ -94,13 +111,13 @@ class TestClient < Test::Unit::TestCase
 
   module ColumnsTests
     def test_not_exist
-      stub_response(groonga_response_header, '{"key":"value"}')
+      stub_response('{"key":"value"}')
       response = client.status
       assert_response({"key" => "value"}, response)
     end
 
     def test_exist
-      stub_response(groonga_response_header, <<-JSON)
+      stub_response(<<-JSON)
 [[["name","ShortText"],
 ["age","UInt32"]],
 ["Alice",32],
@@ -121,7 +138,7 @@ JSON
 
   module ParametersTests
     def test_integer
-      stub_response(groonga_response_header, "100")
+      stub_response("100")
       response = client.cache_limit(:max => 4)
       assert_response(100, response)
     end
@@ -166,15 +183,6 @@ JSON
     def teardown
       @thread.kill
     end
-
-    def normalize_header(header)
-      start_time = header[1]
-      elapsed_time = header[2]
-      normalized_header = header.dup
-      normalized_header[1] = "START_TIME" if /\A[\d\.]+\z/ =~ start_time.to_s
-      normalized_header[2] = "ELAPSED_TIME" if /\A[\d\.]+\z/ =~ elapsed_time.to_s
-      normalized_header
-    end
   end
 
   class TestHTTP < self
@@ -191,10 +199,12 @@ JSON
       @thread = Thread.new do
         client = @server.accept
         @server.close
-        if @response_header.nil?
-          body = @response_body
+        case @response_output_type
+        when :json
+          header = "[0,#{Time.now.to_f},#{rand}]"
+          body = "[#{header},#{@response_body}]"
         else
-          body = "[#{@response_header},\n#{@response_body}]"
+          body = @response_body
         end
         header = <<-EOH
 HTTP/1.1 200 OK
@@ -207,10 +217,6 @@ EOH
         client.write(body)
         client.close
       end
-    end
-
-    def normalize_header(header)
-      header
     end
   end
 end
