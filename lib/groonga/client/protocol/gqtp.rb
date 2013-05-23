@@ -41,11 +41,11 @@ module Groonga
         def convert_groonga_output(command, start_time, header, body)
           return body if command.name == "dump"
 
-          elapsed_time = Time.now.to_f
+          elapsed_time = Time.now.to_f - start_time
           output_header = [
             header.status,
             start_time,
-            elapsed_time - start_time
+            elapsed_time,
           ]
           if json?(body)
             output_body = [JSON.parse(body)]
