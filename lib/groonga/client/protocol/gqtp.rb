@@ -17,6 +17,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "erb"
+
 require "gqtp"
 require "json"
 
@@ -40,6 +42,8 @@ module Groonga
         end
 
         class RawResponse
+          include ERB::Util
+
           attr_accessor :header
           attr_accessor :body
           def initialize(command)
@@ -53,6 +57,8 @@ module Groonga
             case @command.output_type
             when :json
               convert_for_json
+            when :xml
+              convert_for_xml
             when :none
               @body
             end
@@ -68,6 +74,17 @@ module Groonga
             ]
             header_in_json = JSON.generate(header)
             "[#{header_in_json},#{@body}]"
+          end
+
+          def convert_for_xml
+            code = @header.status
+            up = @start_time.to_f
+            elapsed = Time.now.to_f - @start_time.to_f
+            <<-XML
+<RESULT CODE="#{h(code)}" UP="#{h(up)}" ELAPSED="#{h(elapsed)}">
+#{@body}
+</RESULT>
+            XML
           end
         end
       end

@@ -111,6 +111,71 @@ class TestClient < Test::Unit::TestCase
       response = client.dump
       assert_response(dumped_commands, response)
     end
+
+    def test_xml
+      stub_response(<<-XML, :xml)
+<TABLE_LIST>
+<HEADER>
+<PROPERTY>
+<TEXT>id</TEXT>
+<TEXT>UInt32</TEXT></PROPERTY>
+<PROPERTY>
+<TEXT>name</TEXT>
+<TEXT>ShortText</TEXT></PROPERTY>
+<PROPERTY>
+<TEXT>path</TEXT>
+<TEXT>ShortText</TEXT></PROPERTY>
+<PROPERTY>
+<TEXT>flags</TEXT>
+<TEXT>ShortText</TEXT></PROPERTY>
+<PROPERTY>
+<TEXT>domain</TEXT>
+<TEXT>ShortText</TEXT></PROPERTY>
+<PROPERTY>
+<TEXT>range</TEXT>
+<TEXT>ShortText</TEXT></PROPERTY>
+<PROPERTY>
+<TEXT>default_tokenizer</TEXT>
+<TEXT>ShortText</TEXT></PROPERTY>
+<PROPERTY>
+<TEXT>normalizer</TEXT>
+<TEXT>ShortText</TEXT></PROPERTY></HEADER>
+<TABLE>
+<INT>256</INT>
+<TEXT>Users</TEXT>
+<TEXT>/tmp/db/db.0000100</TEXT>
+<TEXT>TABLE_HASH_KEY|PERSISTENT</TEXT>
+<NULL/>
+<NULL/>
+<NULL/>
+<NULL/></TABLE></TABLE_LIST>
+      XML
+      response = client.table_list(:output_type => :xml)
+      expected_body = [
+        table(256,
+              "Users",
+              "/tmp/db/db.0000100",
+              "TABLE_HASH_KEY|PERSISTENT",
+              nil,
+              nil,
+              nil,
+              nil),
+      ]
+      assert_response(expected_body, response)
+    end
+
+    private
+    def table(id, name, path, flags, domain, range, default_tokenizer,
+              normalizer)
+      Groonga::Client::Response::TableList::Table.new(id,
+                                                      name,
+                                                      path,
+                                                      flags,
+                                                      domain,
+                                                      range,
+                                                      default_tokenizer,
+                                                      normalizer)
+    end
   end
 
   module ColumnsTests
@@ -203,10 +268,19 @@ JSON
       @thread = Thread.new do
         client = @server.accept
         @server.close
+        status = 0
+        start = Time.now.to_f
+        elapsed = rand
         case @response_output_type
         when :json
-          header = "[0,#{Time.now.to_f},#{rand}]"
+          header = "[#{status},#{start},#{elapsed}]"
           body = "[#{header},#{@response_body}]"
+        when :xml
+          body = <<-XML
+<RESULT CODE="#{status}" UP="#{start}" ELAPSED="#{elapsed}">
+#{@response_body}
+</RESULT>
+          XML
         else
           body = @response_body
         end

@@ -17,6 +17,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "rexml/document"
+
 require "json"
 
 module Groonga
@@ -39,11 +41,54 @@ module Groonga
             case type
             when :json
               header, body = JSON.parse(response)
+            when :xml
+              header, body = parse_xml(response)
             else
               header = nil
               body = response
             end
             new(header, body)
+          end
+
+          private
+          def parse_xml(response)
+            # FIXME: Use more fast XML parser
+            # Extract as a class
+            document = REXML::Document.new(response)
+            result_element = document.root
+            header = parse_xml_header(result_element)
+            body = parse_xml_body(result_element.elements[1])
+            [header, body]
+          end
+
+          def parse_xml_header(result_element)
+            attributes = result_element.attributes
+            code    = Integer(attributes["CODE"])
+            up      = Float(attributes["UP"])
+            elapsed = Float(attributes["ELAPSED"])
+            [code, up, elapsed]
+          end
+
+          def parse_xml_body(body_element)
+            xml_to_ruby(body_element)
+          end
+
+          def xml_to_ruby(element)
+            elements = element.elements
+            if elements.empty?
+              case element.name
+              when "NULL"
+                nil
+              when "INT"
+                Integer(element.text)
+              else
+                element.text
+              end
+            else
+              elements.collect do |child|
+                xml_to_ruby(child)
+              end
+            end
           end
         end
 
