@@ -51,10 +51,10 @@ module Groonga
 
           def to_groonga_command_compatible_response
             case @command.output_type
-            when :none
-              @body
             when :json
               convert_from_json
+            when :none
+              @body
             end
           end
 
