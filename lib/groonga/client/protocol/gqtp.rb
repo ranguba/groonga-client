@@ -61,12 +61,12 @@ module Groonga
           private
           def convert_from_json
             elapsed_time = Time.now.to_f - @start_time
-            output_header = [
+            header = [
               @header.status,
               @start_time,
               elapsed_time,
             ]
-            "[#{JSON.generate(output_header)},#{@body}]"
+            "[#{JSON.generate(header)},#{@body}]"
           end
         end
       end
