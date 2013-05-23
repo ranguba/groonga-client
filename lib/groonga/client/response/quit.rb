@@ -23,10 +23,6 @@ module Groonga
     module Response
       class Quit < Base
         Response.register("quit", self)
-
-        def initialize(json)
-          super(json)
-        end
       end
     end
   end

@@ -23,10 +23,6 @@ module Groonga
     module Response
       class Delete < Base
         Response.register("delete", self)
-
-        def initialize(json)
-          super(json)
-        end
       end
     end
   end

@@ -23,10 +23,6 @@ module Groonga
     module Response
       class Defrag < Base
         Response.register("defrag", self)
-
-        def initialize(json)
-          super(json)
-        end
       end
     end
   end

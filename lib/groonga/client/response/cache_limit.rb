@@ -23,10 +23,6 @@ module Groonga
     module Response
       class CacheLimit < Base
         Response.register("cache_limit", self)
-
-        def initialize(json)
-          super(json)
-        end
       end
     end
   end

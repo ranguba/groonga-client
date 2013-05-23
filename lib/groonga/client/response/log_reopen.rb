@@ -23,10 +23,6 @@ module Groonga
     module Response
       class LogReopen < Base
         Response.register("log_reopen", self)
-
-        def initialize(json)
-          super(json)
-        end
       end
     end
   end

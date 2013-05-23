@@ -23,10 +23,6 @@ module Groonga
     module Response
       class ColumnRename < Base
         Response.register("column_rename", self)
-
-        def initialize(json)
-          super(json)
-        end
       end
     end
   end

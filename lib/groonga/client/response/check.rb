@@ -22,12 +22,7 @@ module Groonga
   class Client
     module Response
       class Check < Base
-
         Response.register("check", self)
-
-        def initialize(json)
-          super(json)
-        end
       end
     end
   end

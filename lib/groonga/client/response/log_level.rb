@@ -23,10 +23,6 @@ module Groonga
     module Response
       class LogLevel < Base
         Response.register("log_level", self)
-
-        def initialize(json)
-          super(json)
-        end
       end
     end
   end

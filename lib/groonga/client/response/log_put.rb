@@ -23,10 +23,6 @@ module Groonga
     module Response
       class LogPut < Base
         Response.register("log_put", self)
-
-        def initialize(json)
-          super(json)
-        end
       end
     end
   end

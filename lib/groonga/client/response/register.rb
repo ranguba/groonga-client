@@ -23,10 +23,6 @@ module Groonga
     module Response
       class Register < Base
         Response.register("register", self)
-
-        def initialize(json)
-          super(json)
-        end
       end
     end
   end

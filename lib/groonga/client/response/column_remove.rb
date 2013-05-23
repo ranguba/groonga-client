@@ -23,10 +23,6 @@ module Groonga
     module Response
       class ColumnRemove < Base
         Response.register("column_remove", self)
-
-        def initialize(json)
-          super(json)
-        end
       end
     end
   end
