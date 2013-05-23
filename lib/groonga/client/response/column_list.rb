@@ -37,6 +37,7 @@ module Groonga
             properties.each_with_index do |(name, _), i|
               column.send("#{name}=", info[i])
             end
+            column
           end
         end
 

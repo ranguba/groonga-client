@@ -38,6 +38,7 @@ module Groonga
             properties.each_with_index do |(name, _), i|
               table.send("#{name}=", info[i])
             end
+            table
           end
         end
 
