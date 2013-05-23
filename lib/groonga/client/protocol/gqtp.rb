@@ -53,7 +53,13 @@ module Groonga
             case @command.output_type
             when :none
               return @body
-            else :json
+            when :json
+              convert_from_json
+            end
+          end
+
+          private
+          def convert_from_json
             elapsed_time = Time.now.to_f - @start_time
             output_header = [
               @header.status,
@@ -67,10 +73,8 @@ module Groonga
             end
             output = output_body.unshift(output_header)
             JSON.generate(output)
-            end
           end
 
-          private
           def json?(body)
             (body.start_with?("[") and body.end_with?("]")) or
               (body.start_with?("{") and body.end_with?("}"))
