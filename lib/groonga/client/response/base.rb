@@ -37,17 +37,19 @@ module Groonga
 
       class Base
         class << self
-          def parse(response, type)
+          def parse(raw_response, type)
             case type
             when :json
-              header, body = JSON.parse(response)
+              header, body = JSON.parse(raw_response)
             when :xml
-              header, body = parse_xml(response)
+              header, body = parse_xml(raw_response)
             else
               header = nil
-              body = response
+              body = raw_response
             end
-            new(header, body)
+            response = new(header, body)
+            response.raw = raw_response
+            response
           end
 
           private
@@ -93,10 +95,12 @@ module Groonga
         end
 
         attr_accessor :header, :body
+        attr_accessor :raw
 
         def initialize(header, body)
           @header = header
           @body = body
+          @raw = nil
         end
       end
     end
