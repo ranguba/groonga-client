@@ -28,20 +28,20 @@ module Groonga
       end
 
       def execute(connection)
-        sync = !block_given?
+        async = block_given?
 
         response = nil
         request = connection.send(@command) do |raw_response|
           response_class = Groonga::Client::Response.find(@command.name)
           response = response_class.parse(raw_response, @command.output_type)
-          yield(response) unless sync
+          yield(response) if async
         end
 
-        if sync
+        if async
+          request
+        else
           request.wait
           response
-        else
-          request
         end
       end
     end
