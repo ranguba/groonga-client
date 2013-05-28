@@ -57,9 +57,15 @@ module Groonga
             # FIXME: Use more fast XML parser
             # Extract as a class
             document = REXML::Document.new(response)
-            result_element = document.root
-            header = parse_xml_header(result_element)
-            body = parse_xml_body(result_element.elements[1])
+            root_element = document.root
+            if root_element.name == "RESULT"
+              result_element = root_element
+              header = parse_xml_header(result_element)
+              body = parse_xml_body(result_element.elements[1])
+            else
+              header = nil
+              body = parse_xml_body(root_element)
+            end
             [header, body]
           end
 
