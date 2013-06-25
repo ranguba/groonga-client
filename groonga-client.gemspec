@@ -27,8 +27,8 @@ Gem::Specification.new do |spec|
   spec.name = "groonga-client"
   spec.version = Groonga::Client::VERSION
   spec.homepage = "https://github.com/ranguba/groonga-client"
-  spec.authors = ["Haruka Yoshihara"]
-  spec.email = ["yoshihara@clear-code.com"]
+  spec.authors = ["Haruka Yoshihara", "Kouhei Sutou", "Kosuke Asami"]
+  spec.email = ["yshr04hrk@gmail.com", "kou@clear-code.com", "tfortress58@gmail.com"]
 
   readme = File.read("README.md")
   readme.force_encoding("UTF-8") if readme.respond_to?(:force_encoding)
