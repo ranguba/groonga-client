@@ -117,6 +117,7 @@ module Groonga
     end
 
     def select(parameters)
+      execute_command("select", parameters)
     end
 
     def shutdown(parameters={})
