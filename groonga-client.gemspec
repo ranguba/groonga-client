@@ -47,7 +47,7 @@ Gem::Specification.new do |spec|
   # end
 
   spec.add_runtime_dependency("gqtp")
-  spec.add_runtime_dependency("groonga-command", ">= 1.0.1")
+  spec.add_runtime_dependency("groonga-command", ">= 1.0.2")
 
   spec.add_development_dependency("bundler")
   spec.add_development_dependency("rake")
