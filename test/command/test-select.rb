@@ -9,10 +9,10 @@ class TestCommandSelect < Test::Unit::TestCase
     header = HEADER
     body = [[[1], [["_id", "UInt32"]], [1]]]
     response = Groonga::Client::Response::Select.new(header, body)
-    mock(client).execute_command("select", :table => :Tests) do
+    mock(client).execute_command("select", :table => :TestTable) do
       response
     end
-    assert_equal(body, client.select(:table => :Tests).body)
+    assert_equal(body, client.select(:table => :TestTable).body)
   end
 
   def test_response
@@ -21,10 +21,10 @@ class TestCommandSelect < Test::Unit::TestCase
     body = [[[6],[["_id","UInt32"],["country","Country"]],[1,"japan"],[2,"brazil"],[3,"japan"],[4,"usa"],[5,"japan"],[6,"usa"]],
       [[3],[["_key","ShortText"],["_nsubrecs","Int32"]],["japan",3],["brazil",1],["usa",2]]]
     response = Groonga::Client::Response::Select.new(header, body)
-    mock(client).execute_command("select", :table => :Test) do
+    mock(client).execute_command("select", :table => :TestTable) do
       response
     end
-    select = client.select(:table => :Test)
+    select = client.select(:table => :TestTable)
 
     assert_equal(6, select.total_records)
     expected_records = [
@@ -51,10 +51,10 @@ class TestCommandSelect < Test::Unit::TestCase
     header = HEADER
     body = [[[6],[["_id","UInt32"],["country","Country"]]]]
     response = Groonga::Client::Response::Select.new(header, body)
-    mock(client).execute_command("select", :table => :Test) do
+    mock(client).execute_command("select", :table => :TestTable) do
       response
     end
-    select = client.select(:table => :Test)
+    select = client.select(:table => :TestTable)
 
     assert_equal(6, select.total_records)
     assert_equal([], select.records)
