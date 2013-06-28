@@ -2,9 +2,11 @@ require "groonga/client"
 require "test/unit/rr"
 
 class TestCommandSelect < Test::Unit::TestCase
+  HEADER = [0,1372430096.70991,0.000522851943969727]
+
   def test_request
     client = Groonga::Client.open(:protocol => :http)
-    header = [0, 1372318932.42163, 0.000810809899121523]
+    header = HEADER
     body = [[[1], [["_id", "UInt32"]], [1]]]
     response = Groonga::Client::Response::Select.new(header, body)
     mock(client).execute_command("select", :table => :Tests) do
@@ -15,7 +17,7 @@ class TestCommandSelect < Test::Unit::TestCase
 
   def test_response
     client = Groonga::Client.open(:protocol => :http)
-    header = [0,1372430096.70991,0.000522851943969727]
+    header = HEADER
     body = [[[6],[["_id","UInt32"],["country","Country"]],[1,"japan"],[2,"brazil"],[3,"japan"],[4,"usa"],[5,"japan"],[6,"usa"]],
       [[3],[["_key","ShortText"],["_nsubrecs","Int32"]],["japan",3],["brazil",1],["usa",2]]]
     response = Groonga::Client::Response::Select.new(header, body)
@@ -46,7 +48,7 @@ class TestCommandSelect < Test::Unit::TestCase
 
   def test_response_limit_zero
     client = Groonga::Client.open(:protocol => :http)
-    header = [0,1372430096.70991,0.000522851943969727]
+    header = HEADER
     body = [[[6],[["_id","UInt32"],["country","Country"]]]]
     response = Groonga::Client::Response::Select.new(header, body)
     mock(client).execute_command("select", :table => :Test) do
