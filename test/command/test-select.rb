@@ -6,7 +6,7 @@ class TestCommandSelect < Test::Unit::TestCase
     client = Groonga::Client.open(:protocol => :http)
     header = [0, 1372318932.42163, 0.000810809899121523]
     body = [[[1], [["_id", "UInt32"]], [1]]]
-    response = Groonga::Client::Response::Base.new(header, body)
+    response = Groonga::Client::Response::Select.new(header, body)
     mock(client).execute_command("select", :table => :Tests) do
       response
     end
