@@ -23,10 +23,30 @@ module Groonga
   class Client
     module Response
       class TableList < Base
+        include Enumerable
+
         Response.register("table_list", self)
 
         def initialize(header, body)
           super(header, parse_body(body))
+        end
+
+        def each
+          @body.each do |table|
+            yield table
+          end
+        end
+
+        def size
+          @body.size
+        end
+
+        def [](index)
+          @body[index]
+        end
+
+        def []=(index, value)
+          @body[index] = value
         end
 
         private

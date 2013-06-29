@@ -29,12 +29,12 @@ class TestCommandTableList < Test::Unit::TestCase
     end
 
     table_list = client.table_list
-    assert_equal(3, table_list.body.size)
-    table_list.body.each do |table|
+    assert_equal(3, table_list.size)
+    table_list.each do |table|
       assert_equal(Groonga::Client::Response::TableList::Table, table.class)
     end
 
-    table = table_list.body[1]
+    table = table_list[1]
     assert_equal(256, table.id)
     assert_equal("Lexicon", table.name)
     assert_equal("/tmp/test.db.0000100", table.path)
