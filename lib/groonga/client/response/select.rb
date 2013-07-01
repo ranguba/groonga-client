@@ -33,20 +33,6 @@ module Groonga
           end if infos
           [total_records, records]
         end
-
-        def parse_drilldowns(drilldowns)
-          total_drilldowns = drilldowns.first.first
-          properties = drilldowns[1]
-          infos = drilldowns[2..-1]
-          records = infos.collect do |info|
-            record = {}
-            properties.each_with_index do |(name, _), i|
-              record[name] = info[i]
-            end
-            record
-          end if infos
-          [total_drilldowns, records]
-        end
       end
     end
   end
