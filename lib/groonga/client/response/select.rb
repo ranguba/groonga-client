@@ -21,17 +21,17 @@ module Groonga
         end
 
         def parse_match_items(match_items)
-          total_records = match_items.first.first
+          total_items = match_items.first.first
           properties = match_items[1]
           infos = match_items[2..-1]
-          records = infos.collect do |info|
-            record = {}
+          items = infos.collect do |info|
+            item = {}
             properties.each_with_index do |(name, _), i|
-              record[name] = info[i]
+              item[name] = info[i]
             end
-            record
+            item
           end if infos
-          [total_records, records]
+          [total_items, items]
         end
       end
     end
