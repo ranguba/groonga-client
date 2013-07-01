@@ -32,8 +32,7 @@ module Groonga
 
         response = nil
         request = connection.send(@command) do |raw_response|
-          response_class = Groonga::Client::Response.find(@command.name)
-          response = response_class.parse(raw_response, @command.output_type)
+          response = parse_raw_response(raw_response)
           yield(response) if async
         end
 
@@ -43,6 +42,12 @@ module Groonga
           request.wait
           response
         end
+      end
+
+      private
+      def parse_raw_response(raw_response)
+        response_class = Groonga::Client::Response.find(@command.name)
+        response_class.parse(raw_response, @command.output_type)
       end
     end
   end
