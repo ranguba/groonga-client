@@ -20,9 +20,11 @@ class TestCommandSelect < Test::Unit::TestCase
     header = HEADER
     body = [[[6],[["_id","UInt32"],["country","Country"]],[1,"japan"],[2,"brazil"],[3,"japan"],[4,"usa"],[5,"japan"],[6,"usa"]],
       [[3],[["_key","ShortText"],["_nsubrecs","Int32"]],["japan",3],["brazil",1],["usa",2]]]
-    response = Groonga::Client::Response::Select.new(header, body)
-    mock(client).execute_command("select", :table => :TestTable) do
-      response
+    stub(client.connection).send.with_any_args.yields([header, body].to_json) do
+      request = Object.new
+      stub(request).wait do
+        true
+      end
     end
     select = client.select(:table => :TestTable)
 
