@@ -7,19 +7,11 @@ class TestResultsSelect < Test::Unit::TestCase
 
   class TestResults < self
     def setup
-      client = open_client
       header = [0,1372430096.70991,0.000522851943969727]
-
       body = [[[6],[["_id","UInt32"],["country","Country"],["domain","Domain"]],[1,"japan",".com"],[2,"brazil",".com"],[3,"japan",".org"],[4,"usa",".com"],[5,"japan",".org"],[6,"usa",".com"]],
         [[3],[["_key","ShortText"],["_nsubrecs","Int32"]],["japan",3],["brazil",1],["usa",2]],
         [[2],[["_key","ShortText"],["_nsubrecs","Int32"]],[".com",4],[".org",2]]]
-      stub(client.connection).send.with_any_args.yields([header, body].to_json) do
-        request = Object.new
-        stub(request).wait do
-          true
-        end
-      end
-      @select = client.select(:table => :TestTable, :drilldown => "country,domain")
+      @select = Groonga::Client::Response::Select.new(header, body)
     end
 
     def test_n_records
@@ -56,14 +48,9 @@ class TestResultsSelect < Test::Unit::TestCase
 
   class TestNoRecordsBody < self
     def setup
-      client = open_client
       header = [0,1372430096.70991,0.000522851943969727]
       body = [[[6],[["_id","UInt32"],["country","Country"]]]]
-      response = Groonga::Client::Response::Select.new(header, body)
-      mock(client).execute_command("select", :table => :TestTable) do
-        response
-      end
-      @select = client.select(:table => :TestTable)
+      @select = Groonga::Client::Response::Select.new(header, body)
     end
 
     def test_n_records
