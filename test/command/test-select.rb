@@ -1,4 +1,3 @@
-require "groonga/client"
 require "test/unit/rr"
 
 require "command/helper"
