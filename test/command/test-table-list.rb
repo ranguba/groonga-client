@@ -13,21 +13,17 @@ class TestCommandTableList < Test::Unit::TestCase
 
   def test_request
     client = open_client
-    header = @header
-    body = @body
-    response = Groonga::Client::Response::TableList.new(header, body)
+    response = Groonga::Client::Response::TableList.new(@header, @body)
     mock(client).execute_command("table_list", {}) do
       response
     end
 
-    assert_equal(header, client.table_list.header)
+    assert_equal(@header, client.table_list.header)
   end
 
   def test_response
     client = open_client
-    header = @header
-    body = @body
-    response = Groonga::Client::Response::TableList.new(header, body)
+    response = Groonga::Client::Response::TableList.new(@header, @body)
     mock(client).execute_command("table_list", {}) do
       response
     end
