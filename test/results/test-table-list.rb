@@ -20,15 +20,52 @@ class TestResultsTableList < Test::Unit::TestCase
       assert_equal(Groonga::Client::Response::TableList::Table, table.class)
     end
 
-    table = @table_list[1]
-    assert_equal(256, table.id)
-    assert_equal("Lexicon", table.name)
-    assert_equal("/tmp/test.db.0000100", table.path)
-    assert_equal("TABLE_PAT_KEY|PERSISTENT", table.flags)
-    assert_equal("ShortText", table.domain)
-    assert_equal(nil, table.range)
-    assert_equal("TokenBigram", table.default_tokenizer)
-    assert_equal("NormalizerAuto", table.normalizer)
+    assert_equal(
+      [
+        {
+          :id => 257,
+          :name => "Ages",
+          :path => "/tmp/test.db.0000101",
+          :flags => "TABLE_DAT_KEY|PERSISTENT",
+          :domain => "UInt32",
+          :range => nil,
+          :default_tokenizer => nil,
+          :normalizer => nil,
+        },
+        {
+          :id => 256,
+          :name => "Lexicon",
+          :path => "/tmp/test.db.0000100",
+          :flags => "TABLE_PAT_KEY|PERSISTENT",
+          :domain => "ShortText",
+          :range => nil,
+          :default_tokenizer => "TokenBigram",
+          :normalizer => "NormalizerAuto"
+        },
+        {
+          :id => 258,
+          :name => "Logs",
+          :path => "/tmp/test.db.0000102",
+          :flags => "TABLE_NO_KEY|PERSISTENT",
+          :domain => nil,
+          :range => nil,
+          :default_tokenizer => nil,
+          :normalizer => nil
+        },
+      ],
+      @table_list.collect {|table|
+        {
+          :id => table.id,
+          :name => table.name,
+          :path => table.path,
+          :flags => table.flags,
+          :domain => table.domain,
+          :range => table.range,
+          :default_tokenizer => table.default_tokenizer,
+          :normalizer => table.normalizer,
+        }
+      }
+    )
   end
 end
 
