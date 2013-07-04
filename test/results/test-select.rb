@@ -66,8 +66,11 @@ class TestResultsSelect < Test::Unit::TestCase
       @select = client.select(:table => :TestTable)
     end
 
-    def test_no_records_body
+    def test_n_records
       assert_equal(6, @select.n_records)
+    end
+
+    def test_records
       assert_equal([], @select.records)
     end
   end
