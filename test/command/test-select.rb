@@ -45,13 +45,13 @@ class TestCommandSelect < Test::Unit::TestCase
     ]
     assert_equal(expected_records, select.records)
 
-    assert_equal(3, select.n_drilldowns)
+    assert_equal(3, select.drilldowns.first.n_hits)
     expected_drilldowns = [
       {"_key"=>"japan", "_nsubrecs"=>3},
       {"_key"=>"brazil", "_nsubrecs"=>1},
       {"_key"=>"usa", "_nsubrecs"=>2},
     ]
-    assert_equal(expected_drilldowns, select.drilldowns)
+    assert_equal(expected_drilldowns, select.drilldowns.first.items)
   end
 
   def test_response_limit_zero
