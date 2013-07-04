@@ -13,12 +13,12 @@ class TestCommandTableList < Test::Unit::TestCase
 
   def test_request
     client = open_client
-    response = Groonga::Client::Response::TableList.new(@header, @body)
+    response = Object.new
     mock(client).execute_command("table_list", {}) do
       response
     end
 
-    assert_equal(@header, client.table_list.header)
+    client.table_list
   end
 
   def test_response
