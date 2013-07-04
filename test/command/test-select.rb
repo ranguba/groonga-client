@@ -11,15 +11,6 @@ class TestCommandSelect < Test::Unit::TestCase
     @body = [[[1], [["_id", "UInt32"]], [1]]]
   end
 
-  def test_request
-    client = open_client
-    response = Object.new
-    mock(client).execute_command("select", :table => :TestTable) do
-      response
-    end
-    client.select(:table => :TestTable)
-  end
-
   def test_response
     client = open_client
     stub(client.connection).send.with_any_args.yields([@header, @body].to_json) do

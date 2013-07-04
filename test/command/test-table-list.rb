@@ -11,16 +11,6 @@ class TestCommandTableList < Test::Unit::TestCase
       [256,"Test","/tmp/test.db.0000100","TABLE_HASH_KEY|PERSISTENT",nil,nil,nil,nil]]
   end
 
-  def test_request
-    client = open_client
-    response = Object.new
-    mock(client).execute_command("table_list", {}) do
-      response
-    end
-
-    client.table_list
-  end
-
   def test_response
     client = open_client
     stub(client.connection).send.with_any_args.yields([@header, @body].to_json) do
