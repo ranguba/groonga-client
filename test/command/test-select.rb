@@ -17,7 +17,7 @@ class TestCommandSelect < Test::Unit::TestCase
     mock(client).execute_command("select", :table => :TestTable) do
       response
     end
-    assert_equal(body, client.select(:table => :TestTable).body)
+    assert_equal(@body, client.select(:table => :TestTable).body)
   end
 
   def test_response
