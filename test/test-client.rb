@@ -297,4 +297,29 @@ EOH
       end
     end
   end
+
+  class TestCommand < self
+    include Utils
+
+    def setup
+      @address = nil
+      @port = nil
+      @protocol = nil
+    end
+
+    def test_select
+      client = open_client
+      mock(client).execute_command("select", :table => :Test) do
+        Object.new
+      end
+      client.select(:table => :Test)
+    end
+
+    def test_table_list
+      mock(client).execute_command("table_list", {}) do
+        Object.new
+      end
+      client.table_list
+    end
+  end
 end
