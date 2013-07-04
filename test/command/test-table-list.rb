@@ -4,7 +4,7 @@ class TestCommandTableList < Test::Unit::TestCase
   HEADER = [0,1372430096.70991,0.000522851943969727]
 
   def test_request
-    client = Groonga::Client.open
+    client = Groonga::Client.open(:protocol => :http)
     header = HEADER
     body = [[["id","UInt32"],["name","ShortText"],["path","ShortText"],["flags","ShortText"],["domain","ShortText"],["range","ShortText"],["default_tokenizer","ShortText"],["normalizer","ShortText"]],
       [256,"Test","/tmp/test.db.0000100","TABLE_HASH_KEY|PERSISTENT",nil,nil,nil,nil]]
@@ -17,7 +17,7 @@ class TestCommandTableList < Test::Unit::TestCase
   end
 
   def test_response
-    client = Groonga::Client.open
+    client = Groonga::Client.open(:protocol => :http)
     header = HEADER
     body = [[["id","UInt32"],["name","ShortText"],["path","ShortText"],["flags","ShortText"],["domain","ShortText"],["range","ShortText"],["default_tokenizer","ShortText"],["normalizer","ShortText"]],
       [257,"Ages","/tmp/test.db.0000101","TABLE_DAT_KEY|PERSISTENT","UInt32",nil,nil,nil],
