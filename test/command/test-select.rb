@@ -13,11 +13,11 @@ class TestCommandSelect < Test::Unit::TestCase
 
   def test_request
     client = open_client
-    response = Groonga::Client::Response::Select.new(@header, @body)
+    response = Object.new
     mock(client).execute_command("select", :table => :TestTable) do
       response
     end
-    assert_equal(@body, client.select(:table => :TestTable).body)
+    client.select(:table => :TestTable)
   end
 
   def test_response
