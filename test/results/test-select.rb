@@ -57,9 +57,7 @@ class TestResultsSelect < Test::Unit::TestCase
   class TestNoRecordsBody < self
     def setup
       @header = [0,1372430096.70991,0.000522851943969727]
-    end
 
-    def test_no_records_body
       client = open_client
       header = @header
       body = [[[6],[["_id","UInt32"],["country","Country"]]]]
@@ -67,10 +65,12 @@ class TestResultsSelect < Test::Unit::TestCase
       mock(client).execute_command("select", :table => :TestTable) do
         response
       end
-      select = client.select(:table => :TestTable)
+      @select = client.select(:table => :TestTable)
+    end
 
-      assert_equal(6, select.n_records)
-      assert_equal([], select.records)
+    def test_no_records_body
+      assert_equal(6, @select.n_records)
+      assert_equal([], @select.records)
     end
   end
 
