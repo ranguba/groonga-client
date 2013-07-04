@@ -14,7 +14,7 @@ class TestResultsTableList < Test::Unit::TestCase
     @table_list = Groonga::Client::Response::TableList.new(header, body)
   end
 
-  def test_results
+  def test_table_list
     assert_equal(
       [
         {
