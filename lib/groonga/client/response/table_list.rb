@@ -32,28 +32,28 @@ module Groonga
         end
 
         def each
-          @body.each do |table|
+          @tables.each do |table|
             yield table
           end
         end
 
         def size
-          @body.size
+          @tables.size
         end
 
         def [](index)
-          @body[index]
+          @tables[index]
         end
 
         def []=(index, value)
-          @body[index] = value
+          @tables[index] = value
         end
 
         private
         def parse_body(body)
           properties = body.first
           infos = body[1..-1]
-          infos.collect do |info|
+          @tables = infos.collect do |info|
             table = Table.new
             properties.each_with_index do |(name, _), i|
               table.send("#{name}=", info[i])
