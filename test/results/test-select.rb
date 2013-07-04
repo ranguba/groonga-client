@@ -1,10 +1,6 @@
 require "test/unit/rr"
 
-require "results/helper"
-
 class TestResultsSelect < Test::Unit::TestCase
-  include TestResultsHelper
-
   class TestResults < self
     def setup
       header = [0,1372430096.70991,0.000522851943969727]

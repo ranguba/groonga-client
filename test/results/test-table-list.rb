@@ -1,10 +1,6 @@
 require "test/unit/rr"
 
-require "results/helper"
-
 class TestResultsTableList < Test::Unit::TestCase
-  include TestResultsHelper
-
   def setup
     header = [0,1372430096.70991,0.000522851943969727]
     body = [[["id","UInt32"],["name","ShortText"],["path","ShortText"],["flags","ShortText"],["domain","ShortText"],["range","ShortText"],["default_tokenizer","ShortText"],["normalizer","ShortText"]],
