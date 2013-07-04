@@ -20,7 +20,7 @@ module Groonga
           body
         end
 
-        def parse_match_items(match_items)
+        def parse_result(match_items)
           total_items = match_items.first.first
           properties = match_items[1]
           infos = match_items[2..-1]
@@ -35,11 +35,11 @@ module Groonga
         end
 
         def parse_match_records(raw_records)
-          parse_match_items(raw_records)
+          parse_result(raw_records)
         end
 
         def parse_drilldowns(raw_drilldowns)
-          parse_match_items(raw_drilldowns)
+          parse_result(raw_drilldowns)
         end
       end
     end
