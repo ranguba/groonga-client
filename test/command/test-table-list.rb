@@ -23,9 +23,11 @@ class TestCommandTableList < Test::Unit::TestCase
 
   def test_response
     client = open_client
-    response = Groonga::Client::Response::TableList.new(@header, @body)
-    mock(client).execute_command("table_list", {}) do
-      response
+    stub(client.connection).send.with_any_args.yields([@header, @body].to_json) do
+      request = Object.new
+      stub(request).wait do
+        true
+      end
     end
 
     table_list = client.table_list
