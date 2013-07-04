@@ -24,10 +24,7 @@ class TestCommandSelect < Test::Unit::TestCase
   def test_response
     client = open_client
     header = @header
-
-    body = [[[6],[["_id","UInt32"],["country","Country"],["domain","Domain"]],[1,"japan",".com"],[2,"brazil",".com"],[3,"japan",".org"],[4,"usa",".com"],[5,"japan",".org"],[6,"usa",".com"]],
-      [[3],[["_key","ShortText"],["_nsubrecs","Int32"]],["japan",3],["brazil",1],["usa",2]],
-      [[2],[["_key","ShortText"],["_nsubrecs","Int32"]],[".com",4],[".org",2]]]
+    body = [[[1], [["_id", "UInt32"]], [1]]]
     stub(client.connection).send.with_any_args.yields([header, body].to_json) do
       request = Object.new
       stub(request).wait do
