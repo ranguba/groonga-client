@@ -47,13 +47,18 @@ class TestCommandSelect < Test::Unit::TestCase
     ]
     assert_equal(expected_records, select.records)
 
-    assert_equal(3, select.drilldowns.first.n_hits)
     expected_drilldowns = [
+      Drilldown.new(3, [
       {"_key"=>"japan", "_nsubrecs"=>3},
       {"_key"=>"brazil", "_nsubrecs"=>1},
-      {"_key"=>"usa", "_nsubrecs"=>2},
+      {"_key"=>"usa", "_nsubrecs"=>2},]),
+      Drilldown.new(2, [
+          {"_key"=>".com", "_nsubrecs"=>4},
+          {"_key"=>".org", "_nsubrecs"=>2}]),
     ]
-    assert_equal(expected_drilldowns, select.drilldowns.first.items)
+    assert_equal(expected_drilldowns, select.drilldowns.collect{|drilldown|
+        Drilldown.new(drilldown.n_hits, drilldown.items)
+      })
   end
 
   def test_response_limit_zero
@@ -69,5 +74,7 @@ class TestCommandSelect < Test::Unit::TestCase
     assert_equal(6, select.n_records)
     assert_equal([], select.records)
   end
+
+  Drilldown = Struct.new(:n_hits, :items)
 end
 
