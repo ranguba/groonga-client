@@ -22,8 +22,11 @@ class TestResultsSelect < Test::Unit::TestCase
       @select = client.select(:table => :TestTable, :drilldown => "country,domain")
     end
 
-    def test_results
+    def test_n_records
       assert_equal(6, @select.n_records)
+    end
+
+    def test_records
       expected_records = [
         {"_id"=>1, "country"=>"japan", "domain"=>".com"},
         {"_id"=>2, "country"=>"brazil", "domain"=>".com"},
@@ -33,7 +36,9 @@ class TestResultsSelect < Test::Unit::TestCase
         {"_id"=>6, "country"=>"usa", "domain"=>".com"},
       ]
       assert_equal(expected_records, @select.records)
+    end
 
+    def test_drilldowns
       expected_drilldowns = [
         Drilldown.new(3, [
             {"_key"=>"japan", "_nsubrecs"=>3},
