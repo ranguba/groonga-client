@@ -6,8 +6,8 @@ module Groonga
       class Select < Base
         Response.register("select", self)
 
-        attr_accessor :records, :total_records
-        attr_accessor :drilldowns, :total_drilldowns
+        attr_accessor :records, :n_records
+        attr_accessor :drilldowns, :n_drilldowns
 
         def initialize(header, body)
           super(header, parse_body(body))
@@ -15,8 +15,8 @@ module Groonga
 
         private
         def parse_body(body)
-          @total_records, @records = parse_match_items(body.first)
-          @total_drilldowns, @drilldowns = parse_match_items(body.last)
+          @n_records, @records = parse_match_items(body.first)
+          @n_drilldowns, @drilldowns = parse_match_items(body.last)
           body
         end
 

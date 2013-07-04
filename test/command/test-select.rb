@@ -34,7 +34,7 @@ class TestCommandSelect < Test::Unit::TestCase
     end
     select = client.select(:table => :TestTable)
 
-    assert_equal(6, select.total_records)
+    assert_equal(6, select.n_records)
     expected_records = [
       {"_id"=>1, "country"=>"japan"},
       {"_id"=>2, "country"=>"brazil"},
@@ -45,7 +45,7 @@ class TestCommandSelect < Test::Unit::TestCase
     ]
     assert_equal(expected_records, select.records)
 
-    assert_equal(3, select.total_drilldowns)
+    assert_equal(3, select.n_drilldowns)
     expected_drilldowns = [
       {"_key"=>"japan", "_nsubrecs"=>3},
       {"_key"=>"brazil", "_nsubrecs"=>1},
@@ -64,7 +64,7 @@ class TestCommandSelect < Test::Unit::TestCase
     end
     select = client.select(:table => :TestTable)
 
-    assert_equal(6, select.total_records)
+    assert_equal(6, select.n_records)
     assert_equal([], select.records)
   end
 end
