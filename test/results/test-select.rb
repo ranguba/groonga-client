@@ -56,10 +56,8 @@ class TestResultsSelect < Test::Unit::TestCase
 
   class TestNoRecordsBody < self
     def setup
-      @header = [0,1372430096.70991,0.000522851943969727]
-
       client = open_client
-      header = @header
+      header = [0,1372430096.70991,0.000522851943969727]
       body = [[[6],[["_id","UInt32"],["country","Country"]]]]
       response = Groonga::Client::Response::Select.new(header, body)
       mock(client).execute_command("select", :table => :TestTable) do
