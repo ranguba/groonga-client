@@ -34,7 +34,7 @@ class TestCommandSelect < Test::Unit::TestCase
         true
       end
     end
-    select = client.select(:table => :TestTable)
+    select = client.select(:table => :TestTable, :drilldown => "country,domain")
 
     assert_equal(6, select.n_records)
     expected_records = [
