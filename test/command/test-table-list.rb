@@ -7,13 +7,14 @@ class TestCommandTableList < Test::Unit::TestCase
 
   def setup
     @header = [0,1372430096.70991,0.000522851943969727]
+    @body = [[["id","UInt32"],["name","ShortText"],["path","ShortText"],["flags","ShortText"],["domain","ShortText"],["range","ShortText"],["default_tokenizer","ShortText"],["normalizer","ShortText"]],
+      [256,"Test","/tmp/test.db.0000100","TABLE_HASH_KEY|PERSISTENT",nil,nil,nil,nil]]
   end
 
   def test_request
     client = open_client
     header = @header
-    body = [[["id","UInt32"],["name","ShortText"],["path","ShortText"],["flags","ShortText"],["domain","ShortText"],["range","ShortText"],["default_tokenizer","ShortText"],["normalizer","ShortText"]],
-      [256,"Test","/tmp/test.db.0000100","TABLE_HASH_KEY|PERSISTENT",nil,nil,nil,nil]]
+    body = @body
     response = Groonga::Client::Response::TableList.new(header, body)
     mock(client).execute_command("table_list", {}) do
       response
@@ -25,8 +26,7 @@ class TestCommandTableList < Test::Unit::TestCase
   def test_response
     client = open_client
     header = @header
-    body = [[["id","UInt32"],["name","ShortText"],["path","ShortText"],["flags","ShortText"],["domain","ShortText"],["range","ShortText"],["default_tokenizer","ShortText"],["normalizer","ShortText"]],
-      [256,"Test","/tmp/test.db.0000100","TABLE_HASH_KEY|PERSISTENT",nil,nil,nil,nil]]
+    body = @body
     response = Groonga::Client::Response::TableList.new(header, body)
     mock(client).execute_command("table_list", {}) do
       response
