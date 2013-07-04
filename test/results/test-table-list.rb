@@ -15,11 +15,6 @@ class TestResultsTableList < Test::Unit::TestCase
   end
 
   def test_results
-    assert_equal(3, @table_list.size)
-    @table_list.each do |table|
-      assert_equal(Groonga::Client::Response::TableList::Table, table.class)
-    end
-
     assert_equal(
       [
         {
