@@ -20,10 +20,10 @@ module Groonga
           body
         end
 
-        def parse_result(match_items)
-          total_items = match_items.first.first
-          properties = match_items[1]
-          infos = match_items[2..-1]
+        def parse_result(raw_result)
+          total_items = raw_result.first.first
+          properties = raw_result[1]
+          infos = raw_result[2..-1]
           items = infos.collect do |info|
             item = {}
             properties.each_with_index do |(name, _), i|
