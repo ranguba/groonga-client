@@ -21,7 +21,7 @@ module Groonga
         end
 
         def parse_result(raw_result)
-          total_items = raw_result.first.first
+          n_items = raw_result.first.first
           properties = raw_result[1]
           infos = raw_result[2..-1]
           items = infos.collect do |info|
@@ -31,7 +31,7 @@ module Groonga
             end
             item
           end if infos
-          [total_items, items]
+          [n_items, items]
         end
 
         def parse_match_records(raw_records)
