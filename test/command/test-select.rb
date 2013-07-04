@@ -29,6 +29,7 @@ class TestCommandSelect < Test::Unit::TestCase
       end
     end
     select = client.select(:table => :TestTable, :drilldown => "country,domain")
+    assert_equal(Groonga::Client::Response::Select, select.class)
   end
 end
 
