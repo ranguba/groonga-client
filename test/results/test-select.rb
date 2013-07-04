@@ -7,10 +7,8 @@ class TestResultsSelect < Test::Unit::TestCase
 
   class TestResults < self
     def setup
-      @header = [0,1372430096.70991,0.000522851943969727]
-
       client = open_client
-      header = @header
+      header = [0,1372430096.70991,0.000522851943969727]
 
       body = [[[6],[["_id","UInt32"],["country","Country"],["domain","Domain"]],[1,"japan",".com"],[2,"brazil",".com"],[3,"japan",".org"],[4,"usa",".com"],[5,"japan",".org"],[6,"usa",".com"]],
         [[3],[["_key","ShortText"],["_nsubrecs","Int32"]],["japan",3],["brazil",1],["usa",2]],
