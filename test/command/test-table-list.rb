@@ -26,16 +26,14 @@ class TestCommandTableList < Test::Unit::TestCase
     client = open_client
     header = @header
     body = [[["id","UInt32"],["name","ShortText"],["path","ShortText"],["flags","ShortText"],["domain","ShortText"],["range","ShortText"],["default_tokenizer","ShortText"],["normalizer","ShortText"]],
-      [257,"Ages","/tmp/test.db.0000101","TABLE_DAT_KEY|PERSISTENT","UInt32",nil,nil,nil],
-      [256,"Lexicon","/tmp/test.db.0000100","TABLE_PAT_KEY|PERSISTENT","ShortText",nil,"TokenBigram","NormalizerAuto"],
-      [258,"Logs","/tmp/test.db.0000102","TABLE_NO_KEY|PERSISTENT",nil,nil,nil,nil]]
+      [256,"Test","/tmp/test.db.0000100","TABLE_HASH_KEY|PERSISTENT",nil,nil,nil,nil]]
     response = Groonga::Client::Response::TableList.new(header, body)
     mock(client).execute_command("table_list", {}) do
       response
     end
 
     table_list = client.table_list
-    assert_equal(3, table_list.size)
+    assert_equal(1, table_list.size)
     table_list.each do |table|
       assert_equal(Groonga::Client::Response::TableList::Table, table.class)
     end
