@@ -16,7 +16,7 @@ module Groonga
         private
         def parse_body(body)
           @n_records, @records = parse_match_items(body.first)
-          @n_drilldowns, @drilldowns = parse_match_items(body.last)
+          @n_drilldowns, @drilldowns = parse_drilldowns(body.last)
           body
         end
 
@@ -32,6 +32,10 @@ module Groonga
             item
           end if infos
           [total_items, items]
+        end
+
+        def parse_drilldowns(raw_drilldowns)
+          parse_match_items(raw_drilldowns)
         end
       end
     end
