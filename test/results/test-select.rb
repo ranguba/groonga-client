@@ -5,11 +5,12 @@ require "results/helper"
 class TestResultsSelect < Test::Unit::TestCase
   include TestResultsHelper
 
-  def setup
+  class TestResults < self
+    def setup
     @header = [0,1372430096.70991,0.000522851943969727]
-  end
+    end
 
-  def test_results
+    def test_results
     client = open_client
     header = @header
 
@@ -47,9 +48,15 @@ class TestResultsSelect < Test::Unit::TestCase
     assert_equal(expected_drilldowns, select.drilldowns.collect{|drilldown|
         Drilldown.new(drilldown.n_hits, drilldown.items)
       })
+    end
   end
 
-  def test_results_limit_zero
+  class TestNoRecordsBody < self
+    def setup
+    @header = [0,1372430096.70991,0.000522851943969727]
+    end
+
+    def test_no_records_body
     client = open_client
     header = @header
     body = [[[6],[["_id","UInt32"],["country","Country"]]]]
@@ -61,6 +68,7 @@ class TestResultsSelect < Test::Unit::TestCase
 
     assert_equal(6, select.n_records)
     assert_equal([], select.records)
+    end
   end
 
   Drilldown = Struct.new(:n_hits, :items)
