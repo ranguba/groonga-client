@@ -23,16 +23,32 @@ module Groonga
   class Client
     module Response
       class ColumnList < Base
+        include Enumerable
+
         Response.register("column_list", self)
 
         def initialize(header, body)
           super(header, parse_body(body))
         end
 
+        def each
+          @columns.each do |column|
+            yield column
+          end
+        end
+
+        def size
+          @columns.size
+        end
+
+        def [](index)
+          @columns[index]
+        end
+
         def parse_body(body)
           properties = body.first
           infos = body[1..-1]
-          infos.collect do |info|
+          @columns = infos.collect do |info|
             column = Column.new
             properties.each_with_index do |(name, _), i|
               column.send("#{name}=", info[i])
