@@ -3,6 +3,13 @@ class TestCommand < Test::Unit::TestCase
     @client = Groonga::Client.open(:protocol => :http)
   end
 
+  def test_column_list
+    mock(@client).execute_command("column_list", :table => :Test) do
+      Object.new
+    end
+    @client.column_list(:table => :Test)
+  end
+
   def test_select
     mock(@client).execute_command("select", :table => :Test) do
       Object.new
