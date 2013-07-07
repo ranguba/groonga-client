@@ -45,10 +45,6 @@ module Groonga
           @tables[index]
         end
 
-        def []=(index, value)
-          @tables[index] = value
-        end
-
         private
         def parse_body(body)
           properties = body.first
