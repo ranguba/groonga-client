@@ -10,7 +10,7 @@ class TestResponseColumnList < Test::Unit::TestCase
     body = [[["id","UInt32"],["name","ShortText"],["path","ShortText"],["type","ShortText"],["flags","ShortText"],["domain","ShortText"],["range","ShortText"],["source","ShortText"]],
       [256,"Text","/tmp/test.db.0000100","var","COLUMN_SCALAR|PERSISTENT","TestTable","ShortText",[]]]
 
-    connection = Groonga::Client::Protocol::HTTP.new({})
+    connection = Object.new
     stub(connection).send.with_any_args.yields([header, body].to_json) do
       request = Object.new
       stub(request).wait do
