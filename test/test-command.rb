@@ -17,6 +17,19 @@ class TestCommand < Test::Unit::TestCase
     @client.column_list(:table => :Test)
   end
 
+  def test_load
+    values = [
+      {
+        :_key => "Groonga",
+        :body => "It's very fast!!"
+      }
+    ]
+    mock(@client).execute_command("load", :table => :Test, :values => values.to_json) do
+      Object.new
+    end
+    @client.load(:table => :Test, :values => values.to_json)
+  end
+
   def test_select
     mock(@client).execute_command("select", :table => :Test) do
       Object.new
