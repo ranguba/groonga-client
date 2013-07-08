@@ -128,6 +128,7 @@ module Groonga
     end
 
     def table_create(parameters)
+      execute_command("table_create", parameters)
     end
 
     def table_list(parameters={})

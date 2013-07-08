@@ -24,6 +24,13 @@ class TestCommand < Test::Unit::TestCase
     @client.select(:table => :Test)
   end
 
+  def test_table_create
+    mock(@client).execute_command("table_create", :name => :Test) do
+      Object.new
+    end
+    @client.table_create(:name => :Test)
+  end
+
   def test_table_list
     mock(@client).execute_command("table_list", {}) do
       Object.new
