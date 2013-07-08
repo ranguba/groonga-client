@@ -4,15 +4,17 @@ class TestCommand < Test::Unit::TestCase
   end
 
   def test_column_create
+    response = Object.new
     mock(@client).execute_command("column_create", :table => :Test, :name => :Body, :type => :ShortText) do
-      Object.new
+      response
     end
     @client.column_create(:table => :Test, :name => :Body, :type => :ShortText)
   end
 
   def test_column_list
+    response = Object.new
     mock(@client).execute_command("column_list", :table => :Test) do
-      Object.new
+      response
     end
     @client.column_list(:table => :Test)
   end
@@ -24,29 +26,33 @@ class TestCommand < Test::Unit::TestCase
         :body => "It's very fast!!"
       }
     ]
+    response = Object.new
     mock(@client).execute_command("load", :table => :Test, :values => values.to_json) do
-      Object.new
+      response
     end
     @client.load(:table => :Test, :values => values.to_json)
   end
 
   def test_select
+    response = Object.new
     mock(@client).execute_command("select", :table => :Test) do
-      Object.new
+      response
     end
     @client.select(:table => :Test)
   end
 
   def test_table_create
+    response = Object.new
     mock(@client).execute_command("table_create", :name => :Test) do
-      Object.new
+      response
     end
     @client.table_create(:name => :Test)
   end
 
   def test_table_list
+    response = Object.new
     mock(@client).execute_command("table_list", {}) do
-      Object.new
+      response
     end
     @client.table_list
   end
