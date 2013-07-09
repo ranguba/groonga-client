@@ -38,7 +38,7 @@ module Groonga
               yield(body)
             end
           end
-          Request.new(thread)
+          ThreadRequest.new(thread)
         end
       end
     end
