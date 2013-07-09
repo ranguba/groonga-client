@@ -22,6 +22,8 @@ require "erb"
 require "gqtp"
 require "json"
 
+require "groonga/client/connection/request"
+
 module Groonga
   class Client
     module Connection
@@ -38,6 +40,45 @@ module Groonga
             raw_response.body = body
             response = raw_response.to_groonga_command_compatible_response
             yield(response)
+          end
+        end
+
+        # @return [Boolean] true if the current connection is opened,
+        #   false otherwise.
+        def connected?
+          not @client.nil?
+        end
+
+        # Closes the opened connection if the current connection is
+        # still opened. You can't send a new command after you call
+        # this method.
+        #
+        # @overload close
+        #   Closes synchronously.
+        #
+        #   @return [Boolean] true when the opened connection is closed.
+        #      false when there is no connection.
+        #
+        # @overload close {}
+        #   Closes asynchronously.
+        #
+        #   @yield [] Calls the block when the opened connection is closed.
+        #   @return [#wait] The request object. If you want to wait until
+        #      the request is processed. You can send #wait message to the
+        #      request.
+        def close(&block)
+          if connected?
+            begin
+              @client.close(&block)
+            else
+              @client = nil
+            end
+          else
+            if block
+              false
+            else
+              EmptyRequest.new
+            end
           end
         end
 
