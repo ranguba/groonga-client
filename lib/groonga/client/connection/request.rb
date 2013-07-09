@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
 # Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
@@ -17,28 +16,16 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "open-uri"
-
-require "groonga/client/connection/request"
-
 module Groonga
   class Client
     module Connection
-      class HTTP
-        def initialize(options)
-          @host = options[:host] || "127.0.0.1"
-          @port = options[:port] || 10041
+      class ThreadRequest
+        def initialize(thread)
+          @thread = thread
         end
 
-        def send(command)
-          url = "http://#{@host}:#{@port}#{command.to_uri_format}"
-          thread = Thread.new do
-            open(url) do |response|
-              body = response.read
-              yield(body)
-            end
-          end
-          Request.new(thread)
+        def wait
+          @thread.join
         end
       end
     end
