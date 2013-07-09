@@ -28,6 +28,14 @@ module Groonga
           @thread.join
         end
       end
+
+      class EmptyRequest
+        def initialize
+        end
+
+        def wait
+        end
+      end
     end
   end
 end
