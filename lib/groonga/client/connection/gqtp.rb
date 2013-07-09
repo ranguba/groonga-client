@@ -69,11 +69,9 @@ module Groonga
         def close(&block)
           sync = !block_given?
           if connected?
-            begin
-              @client.close(&block)
-            else
-              @client = nil
-            end
+            return_value = @client.close(&block)
+            @client = nil
+            return_value
           else
             if sync
               false
