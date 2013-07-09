@@ -65,7 +65,8 @@ module Groonga
         #      the request is processed. You can send #wait message to the
         #      request.
         def close(&block)
-          if block
+          sync = !block_given?
+          if sync
             false
           else
             EmptyRequest.new

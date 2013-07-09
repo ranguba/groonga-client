@@ -71,7 +71,7 @@ EOH
   end
 
   def teardown_connection
-    @connection.close {} if @connection
+    @connection.close if @connection
   end
 
   def connect(options={})
@@ -90,8 +90,8 @@ EOH
   class TestClose < self
     def test_twice
       @connection = connect
-      assert_false(@connection.close {})
-      assert_false(@connection.close {})
+      assert_false(@connection.close)
+      assert_false(@connection.close)
     end
   end
 end
