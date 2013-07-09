@@ -24,7 +24,7 @@ require "json"
 
 module Groonga
   class Client
-    module Protocol
+    module Connection
       class GQTP
         def initialize(options)
           @client = ::GQTP::Client.new(options)

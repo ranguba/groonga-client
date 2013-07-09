@@ -21,7 +21,7 @@ require "open-uri"
 
 module Groonga
   class Client
-    module Protocol
+    module Connection
       class Request
         def initialize(thread)
           @thread = thread
