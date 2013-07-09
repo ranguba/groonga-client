@@ -24,11 +24,35 @@ require "groonga/client/protocol/http"
 module Groonga
   class Client
     class << self
+      # @!macro [new] initialize_options
+      #   @param [Hash] options The options.
+      #   @option options [:gqtp or :http] :protocol The protocol that is
+      #     used by the client.
+      #
+      # @overload open(options={})
+      #   Opens a new client connection.
+      #
+      #   @macro initialize_options
+      #   @return [Client] The opened client.
+      #
+      # @overload open(options={}) {|client| }
+      #   Opens a new client connection while the block is evaluated.
+      #   The block is finished the opened client is closed.
+      #
+      #   @macro initialize_options
+      #   @yield [client] Gives a opened client to the block. The opened
+      #     client is closed automatically when the block is finished.
+      #   @yieldparam client [Client] The opened client.
+      #   @yieldreturn [Object] Any object.
+      #   @return [Object] Any object that is returned by the block.
       def open(options={}, &block)
         client = new(options)
         if block_given?
-          yield(client)
-          client.close
+          begin
+            yield(client)
+          ensure
+            client.close
+          end
         else
           client
         end
@@ -38,6 +62,7 @@ module Groonga
     attr_reader :protocol
     attr_reader :connection
 
+    # @macro initialize_options
     def initialize(options)
       @protocol = options.delete(:protocol) || :gqtp
 

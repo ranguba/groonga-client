@@ -213,6 +213,15 @@ JSON
     end
   end
 
+  module OpenTests
+    def test_return_value
+      response = open_client do |client|
+        "response"
+      end
+      assert_equal("response", response)
+    end
+  end
+
   module Tests
     include Utils
     include Assertions
@@ -220,6 +229,7 @@ JSON
     include OutputTypeTests
     include ColumnsTests
     include ParametersTests
+    include OpenTests
   end
 
   class TestGQTP < self
