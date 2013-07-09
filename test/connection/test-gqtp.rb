@@ -37,19 +37,11 @@ class TestConnectionGQTP < Test::Unit::TestCase
     @port = @server.addr[1]
     @protocol = :gqtp
 
-    @response_body = [].to_json
     @thread = Thread.new do
       client = @server.accept
       @server.close
 
-      header = GQTP::Header.parse(client.read(GQTP::Header.size))
-      client.read(header.size)
-
-      response_header = GQTP::Header.new
-      response_header.size = @response_body.bytesize
-
-      client.write(response_header.pack)
-      client.write(@response_body)
+      process_client_close(client)
 
       client.close
     end
@@ -67,12 +59,27 @@ class TestConnectionGQTP < Test::Unit::TestCase
     @connection.close {} if @connection
   end
 
+  private
   def connect(options={})
     default_options = {
       :host => @address,
       :port => @port,
     }
     Groonga::Client::Connection::GQTP.new(default_options.merge(options))
+  end
+
+  def process_client_close(client)
+    response_body = [].to_json
+    2.times do
+      header = GQTP::Header.parse(client.read(GQTP::Header.size))
+      client.read(header.size)
+
+      response_header = GQTP::Header.new
+      response_header.size = response_body.bytesize
+
+      client.write(response_header.pack)
+      client.write(response_body)
+    end
   end
 
   class TestConnected < self
@@ -83,8 +90,7 @@ class TestConnectionGQTP < Test::Unit::TestCase
 
     def test_closed
       @connection = connect
-      @connection.close do
-      end
+      @connection.close
       assert_false(@connection.connected?)
     end
   end
@@ -92,9 +98,8 @@ class TestConnectionGQTP < Test::Unit::TestCase
   class TestClose < self
     def test_twice
       @connection = connect
-      @connection.close do
-      end
-      assert_false(@connection.close {})
+      @connection.close
+      assert_false(@connection.close)
     end
   end
 end

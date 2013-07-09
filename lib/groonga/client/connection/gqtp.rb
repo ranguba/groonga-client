@@ -67,6 +67,7 @@ module Groonga
         #      the request is processed. You can send #wait message to the
         #      request.
         def close(&block)
+          sync = !block_given?
           if connected?
             begin
               @client.close(&block)
@@ -74,7 +75,7 @@ module Groonga
               @client = nil
             end
           else
-            if block
+            if sync
               false
             else
               EmptyRequest.new
