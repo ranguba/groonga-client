@@ -40,6 +40,37 @@ module Groonga
           end
           ThreadRequest.new(thread)
         end
+
+        # @return [false] Always returns false because the current
+        #   implementation doesn't support keep-alive.
+        def connected?
+          false
+        end
+
+        # Does nothing because the current implementation doesn't
+        # support keep-alive. If the implementation supports
+        # keep-alive, it close the opend connection.
+        #
+        # @overload close
+        #   Closes synchronously.
+        #
+        #   @return [false] It always returns false because there is always
+        #      no connectin.
+        #
+        # @overload close {}
+        #   Closes asynchronously.
+        #
+        #   @yield [] Calls the block when the opened connection is closed.
+        #   @return [#wait] The request object. If you want to wait until
+        #      the request is processed. You can send #wait message to the
+        #      request.
+        def close(&block)
+          if block
+            false
+          else
+            EmptyRequest.new
+          end
+        end
       end
     end
   end
