@@ -247,6 +247,7 @@ JSON
         client = @server.accept
         @server.close
 
+        loop do
         header = GQTP::Header.parse(client.read(GQTP::Header.size))
         client.read(header.size)
 
@@ -255,6 +256,7 @@ JSON
 
         client.write(response_header.pack)
         client.write(@response_body)
+        end
         client.close
       end
     end
