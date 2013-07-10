@@ -215,6 +215,7 @@ JSON
 
   module OpenTests
     def test_return_value
+      stub_response("['not-used']")
       response = open_client do |client|
         "response"
       end
