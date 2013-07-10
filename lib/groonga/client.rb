@@ -74,7 +74,43 @@ module Groonga
       end
     end
 
-    def close
+    # Closes the opened client connection if the current connection is
+    # still opened. You can't send a new command after you call this
+    # method.
+    #
+    # @overload close
+    #   Closes synchronously.
+    #
+    #   @return [Boolean] true when the opened connection is closed.
+    #      false when there is no connection.
+    #
+    # @overload close {}
+    #   Closes asynchronously.
+    #
+    #   @yield [] Calls the block when the opened connection is closed.
+    #   @return [#wait] The request object. If you want to wait until
+    #      the request is processed. You can send #wait message to the
+    #      request.
+    def close(&block)
+      sync = !block_given?
+      if @connection
+        close_request = @connection.close do
+          yield unless sync
+          @connection = nil
+        end
+        if sync
+          close_request.wait
+          true
+        else
+          close_request
+        end
+      else
+        if sync
+          false
+        else
+          Connection::EmptryReqest.new
+        end
+      end
     end
 
     def cache_limit(parameters)
