@@ -248,7 +248,10 @@ JSON
         @server.close
 
         loop do
-          header = GQTP::Header.parse(client.read(GQTP::Header.size))
+          raw_header = client.read(GQTP::Header.size)
+          break if raw_header.nil?
+
+          header = GQTP::Header.parse(raw_header)
           client.read(header.size)
 
           response_header = GQTP::Header.new
