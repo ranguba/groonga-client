@@ -57,6 +57,7 @@ TODO: use commands with parameters for examples
 ## Authors
 
 * Haruka Yoshihara \<yoshihara@clear-code.com\>
+* Kouhei Sutou \<kou@clear-code.com\>
 
 ## License
 
