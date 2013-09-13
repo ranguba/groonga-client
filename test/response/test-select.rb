@@ -18,6 +18,7 @@
 require "response/helper"
 
 class TestResponseSelect < Test::Unit::TestCase
+  class TestParseRawResponse < self
   include TestResponseHelper
 
   def test_select
@@ -27,6 +28,7 @@ class TestResponseSelect < Test::Unit::TestCase
 
     response = parse_raw_response("select", raw_response)
     assert_equal(Groonga::Client::Response::Select, response.class)
+  end
   end
 
   class TestBody < self
