@@ -29,6 +29,7 @@ class TestResponseSelect < Test::Unit::TestCase
     assert_equal(Groonga::Client::Response::Select, response.class)
   end
 
+  class TestBody < self
   class TestRecords < self
     def test_time
       updated_at = 1379040474
@@ -42,5 +43,6 @@ class TestResponseSelect < Test::Unit::TestCase
       response = Groonga::Client::Response::Select.new(header, body)
       response.records
     end
+  end
   end
 end
