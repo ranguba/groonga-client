@@ -43,14 +43,14 @@ module Groonga
         def parse_result(raw_result)
           n_hits = raw_result.first.first
           properties = raw_result[1]
-          infos = raw_result[2..-1]
+          infos = raw_result[2..-1] || []
           items = infos.collect do |info|
             item = {}
             properties.each_with_index do |(name, type), i|
               item[name] = convert_value(info[i], type)
             end
             item
-          end if infos
+          end
           [n_hits, items]
         end
 
@@ -68,10 +68,10 @@ module Groonga
         end
 
         def parse_drilldowns(raw_drilldowns)
-          raw_drilldowns.collect do |raw_drilldown|
+          (raw_drilldowns || []).collect do |raw_drilldown|
             n_hits, items = parse_result(raw_drilldown)
             Drilldown.new(n_hits, items)
-          end if raw_drilldowns
+          end
         end
 
         Drilldown = Struct.new(:n_hits, :items)
