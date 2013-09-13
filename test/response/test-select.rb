@@ -30,6 +30,12 @@ class TestResponseSelect < Test::Unit::TestCase
   end
 
   class TestBody < self
+    private
+    def parse(body)
+      header = [0, 1372430096.70991, 0.000522851943969727]
+      Groonga::Client::Response::Select.new(header, body)
+    end
+
     class TestRecords < self
       def test_time
         updated_at = 1379040474
@@ -39,9 +45,7 @@ class TestResponseSelect < Test::Unit::TestCase
 
       private
       def parse(body)
-        header = [0, 1372430096.70991, 0.000522851943969727]
-        response = Groonga::Client::Response::Select.new(header, body)
-        response.records
+        super(body).records
       end
     end
   end
