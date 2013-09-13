@@ -30,19 +30,19 @@ class TestResponseSelect < Test::Unit::TestCase
   end
 
   class TestBody < self
-  class TestRecords < self
-    def test_time
-      updated_at = 1379040474
-      assert_equal([{"updated_at" => Time.at(updated_at)}],
-                   parse([[[1], [["updated_at", "Time"]], [updated_at]]]))
-    end
+    class TestRecords < self
+      def test_time
+        updated_at = 1379040474
+        assert_equal([{"updated_at" => Time.at(updated_at)}],
+                     parse([[[1], [["updated_at", "Time"]], [updated_at]]]))
+      end
 
-    private
-    def parse(body)
-      header = [0, 1372430096.70991, 0.000522851943969727]
-      response = Groonga::Client::Response::Select.new(header, body)
-      response.records
+      private
+      def parse(body)
+        header = [0, 1372430096.70991, 0.000522851943969727]
+        response = Groonga::Client::Response::Select.new(header, body)
+        response.records
+      end
     end
-  end
   end
 end
