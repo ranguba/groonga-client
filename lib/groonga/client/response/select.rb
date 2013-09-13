@@ -23,7 +23,10 @@ module Groonga
       class Select < Base
         Response.register("select", self)
 
-        attr_accessor :records, :n_records
+        # @return [Integer] The number of records that match againt
+        #   a search condition.
+        attr_accessor :n_hits
+        attr_accessor :records
         attr_accessor :drilldowns
 
         def initialize(header, body)
@@ -32,13 +35,13 @@ module Groonga
 
         private
         def parse_body(body)
-          @n_records, @records = parse_match_records(body.first)
+          @n_hits, @records = parse_match_records(body.first)
           @drilldowns = parse_drilldowns(body[1..-1])
           body
         end
 
         def parse_result(raw_result)
-          n_items = raw_result.first.first
+          n_hits = raw_result.first.first
           properties = raw_result[1]
           infos = raw_result[2..-1]
           items = infos.collect do |info|
@@ -48,7 +51,7 @@ module Groonga
             end
             item
           end if infos
-          [n_items, items]
+          [n_hits, items]
         end
 
         def convert_value(value, type)

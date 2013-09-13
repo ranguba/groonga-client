@@ -38,6 +38,11 @@ class TestResponseSelect < Test::Unit::TestCase
       Groonga::Client::Response::Select.new(header, body)
     end
 
+    def test_n_hits
+      assert_equal(29,
+                   parse([[[29], [["_id", "UInt32"]]]]).n_hits)
+    end
+
     class TestRecords < self
       def test_time
         updated_at = 1379040474

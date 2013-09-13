@@ -10,8 +10,8 @@ class TestResultsSelect < Test::Unit::TestCase
       @select = Groonga::Client::Response::Select.new(header, body)
     end
 
-    def test_n_records
-      assert_equal(6, @select.n_records)
+    def test_n_hits
+      assert_equal(6, @select.n_hits)
     end
 
     def test_records
@@ -49,8 +49,8 @@ class TestResultsSelect < Test::Unit::TestCase
       @select = Groonga::Client::Response::Select.new(header, body)
     end
 
-    def test_n_records
-      assert_equal(6, @select.n_records)
+    def test_n_hits
+      assert_equal(6, @select.n_hits)
     end
 
     def test_records
