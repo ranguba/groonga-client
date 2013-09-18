@@ -56,5 +56,30 @@ class TestResponseSelect < Test::Unit::TestCase
         super(body).records
       end
     end
+
+    class TestDrilldowns < self
+      def test_n_hits
+        drilldowns = parse([
+                             [[0], []],
+                             [
+                               [29],
+                               [
+                                 ["_key",      "ShortText"],
+                                 ["_nsubrecs", "Int32"],
+                               ],
+                               ["groonga", 29],
+                               ["Ruby",    19],
+                               ["rroonga",  9],
+                             ],
+                           ])
+        assert_equal([29],
+                     drilldowns.collect(&:n_hits))
+      end
+
+      private
+      def parse(body)
+        super(body).drilldowns
+      end
+    end
   end
 end
