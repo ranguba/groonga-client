@@ -51,11 +51,11 @@ class TestResponseSelect < Test::Unit::TestCase
       def test_time
         updated_at = 1379040474
         assert_equal([{"updated_at" => Time.at(updated_at)}],
-                     parse([[[1], [["updated_at", "Time"]], [updated_at]]]))
+                     records([[[1], [["updated_at", "Time"]], [updated_at]]]))
       end
 
       private
-      def parse(body)
+      def records(body)
         create_response(body).records
       end
     end
@@ -70,43 +70,43 @@ class TestResponseSelect < Test::Unit::TestCase
       end
 
       def test_key
-        drilldowns = parse([
-                             [[0], []],
-                             [
-                               [29],
-                               [
-                                 ["_key",      "ShortText"],
-                                 ["_nsubrecs", "Int32"],
-                               ],
-                               ["groonga", 29],
-                               ["Ruby",    19],
-                               ["rroonga",  9],
-                             ],
-                           ])
+        body = [
+          [[0], []],
+          [
+            [29],
+            [
+              ["_key",      "ShortText"],
+              ["_nsubrecs", "Int32"],
+            ],
+            ["groonga", 29],
+            ["Ruby",    19],
+            ["rroonga",  9],
+          ],
+        ]
         assert_equal(["_key"],
-                     drilldowns.collect(&:key))
+                     drilldowns(body).collect(&:key))
       end
 
       def test_n_hits
-        drilldowns = parse([
-                             [[0], []],
-                             [
-                               [29],
-                               [
-                                 ["_key",      "ShortText"],
-                                 ["_nsubrecs", "Int32"],
-                               ],
-                               ["groonga", 29],
-                               ["Ruby",    19],
-                               ["rroonga",  9],
-                             ],
-                           ])
+        body = [
+          [[0], []],
+          [
+            [29],
+            [
+              ["_key",      "ShortText"],
+              ["_nsubrecs", "Int32"],
+            ],
+            ["groonga", 29],
+            ["Ruby",    19],
+            ["rroonga",  9],
+          ],
+        ]
         assert_equal([29],
-                     drilldowns.collect(&:n_hits))
+                     drilldowns(body).collect(&:n_hits))
       end
 
       private
-      def parse(body)
+      def drilldowns(body)
         create_response(body).drilldowns
       end
     end
