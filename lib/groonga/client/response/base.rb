@@ -114,7 +114,22 @@ module Groonga
 
         # @return [Groonga::Command] The command for the request.
         attr_accessor :command
-        attr_accessor :header, :body
+        # @return [::Array<Integer, Float, Float>] The header of response.
+        #   It consists of `[return_code, start_time, elapsed_time_in_seconds]`
+        #   for success case.
+        #   It consists of
+        #   `[return_code, start_time, elapsed_time_in_seconds, error_message, error_location]`
+        #   for error case.
+        # @see http://groonga.org/docs/reference/command/output_format.html#header
+        #   Defails for header format.
+        attr_accessor :header
+        # @return [::Hash] The body of response. Its content is depends on
+        #   command.
+        # @see http://groonga.org/docs/reference/command.html
+        #   The list of built-in commands.
+        attr_accessor :body
+        # @return [String] The unparsed response. It may be JSON, XML or
+        #   groonga command format.
         attr_accessor :raw
 
         def initialize(command, header, body)
