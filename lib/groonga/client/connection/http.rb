@@ -20,6 +20,7 @@
 require "open-uri"
 
 require "groonga/client/connection/request"
+require "groonga/client/connection/error"
 
 module Groonga
   class Client
@@ -33,9 +34,13 @@ module Groonga
         def send(command)
           url = "http://#{@host}:#{@port}#{command.to_uri_format}"
           thread = Thread.new do
-            open(url) do |response|
-              body = response.read
-              yield(body)
+            begin
+              open(url) do |response|
+                body = response.read
+                yield(body)
+              end
+            rescue OpenURI::HTTPError
+              raise Error.new($!)
             end
           end
           ThreadRequest.new(thread)
