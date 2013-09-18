@@ -133,10 +133,10 @@ module Groonga
         attr_accessor :raw
 
         def initialize(command, header, body)
-          @command = command
-          @header = header
-          @body = body
-          @raw = nil
+          self.command = command
+          self.header = header
+          self.body = body
+          self.raw = nil
         end
       end
     end
