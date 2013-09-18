@@ -39,7 +39,7 @@ module Groonga
                 body = response.read
                 yield(body)
               end
-            rescue OpenURI::HTTPError
+            rescue OpenURI::HTTPError, Timeout::Error
               raise Error.new($!)
             end
           end
