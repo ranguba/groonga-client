@@ -41,8 +41,8 @@ class TestResultsSelect < Test::Unit::TestCase
       assert_equal(expected_drilldowns, @select.drilldowns)
     end
 
-    def drilldown(name, n_hits, items)
-      Groonga::Client::Response::Select::Drilldown.new(name, n_hits, items)
+    def drilldown(key, n_hits, items)
+      Groonga::Client::Response::Select::Drilldown.new(key, n_hits, items)
     end
   end
 

@@ -69,7 +69,7 @@ class TestResponseSelect < Test::Unit::TestCase
         @command = Groonga::Command::Select.new("select", pair_arguments)
       end
 
-      def test_name
+      def test_key
         drilldowns = parse([
                              [[0], []],
                              [
@@ -84,7 +84,7 @@ class TestResponseSelect < Test::Unit::TestCase
                              ],
                            ])
         assert_equal(["_key"],
-                     drilldowns.collect(&:name))
+                     drilldowns.collect(&:key))
       end
 
       def test_n_hits
