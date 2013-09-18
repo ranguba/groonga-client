@@ -37,12 +37,12 @@ class TestResponseSelect < Test::Unit::TestCase
     end
 
     def test_n_hits
-      assert_equal(29,
-                   parse([[[29], [["_id", "UInt32"]]]]).n_hits)
+      response = create_response([[[29], [["_id", "UInt32"]]]])
+      assert_equal(29, response.n_hits)
     end
 
     private
-    def parse(body)
+    def create_response(body)
       header = [0, 1372430096.70991, 0.000522851943969727]
       Groonga::Client::Response::Select.new(@command, header, body)
     end
@@ -56,7 +56,7 @@ class TestResponseSelect < Test::Unit::TestCase
 
       private
       def parse(body)
-        super(body).records
+        create_response(body).records
       end
     end
 
@@ -107,7 +107,7 @@ class TestResponseSelect < Test::Unit::TestCase
 
       private
       def parse(body)
-        super(body).drilldowns
+        create_response(body).drilldowns
       end
     end
   end
