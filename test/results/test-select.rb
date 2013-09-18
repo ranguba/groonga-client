@@ -3,11 +3,12 @@ require "test/unit/rr"
 class TestResultsSelect < Test::Unit::TestCase
   class TestResults < self
     def setup
+      command = nil
       header = [0,1372430096.70991,0.000522851943969727]
       body = [[[6],[["_id","UInt32"],["country","Country"],["domain","Domain"]],[1,"japan",".com"],[2,"brazil",".com"],[3,"japan",".org"],[4,"usa",".com"],[5,"japan",".org"],[6,"usa",".com"]],
         [[3],[["_key","ShortText"],["_nsubrecs","Int32"]],["japan",3],["brazil",1],["usa",2]],
         [[2],[["_key","ShortText"],["_nsubrecs","Int32"]],[".com",4],[".org",2]]]
-      @select = Groonga::Client::Response::Select.new(header, body)
+      @select = Groonga::Client::Response::Select.new(command, header, body)
     end
 
     def test_n_hits
@@ -44,9 +45,10 @@ class TestResultsSelect < Test::Unit::TestCase
 
   class TestNoRecordsBody < self
     def setup
+      command = nil
       header = [0,1372430096.70991,0.000522851943969727]
       body = [[[6],[["_id","UInt32"],["country","Country"]]]]
-      @select = Groonga::Client::Response::Select.new(header, body)
+      @select = Groonga::Client::Response::Select.new(command, header, body)
     end
 
     def test_n_hits

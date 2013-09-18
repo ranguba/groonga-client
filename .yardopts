@@ -1,4 +1,5 @@
 --output-dir doc/reference/en
+--markup markdown
 lib/**/*.rb
 -
 doc/text/**/*

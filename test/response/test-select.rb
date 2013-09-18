@@ -34,8 +34,9 @@ class TestResponseSelect < Test::Unit::TestCase
   class TestBody < self
     private
     def parse(body)
+      command = nil
       header = [0, 1372430096.70991, 0.000522851943969727]
-      Groonga::Client::Response::Select.new(header, body)
+      Groonga::Client::Response::Select.new(command, header, body)
     end
 
     def test_n_hits

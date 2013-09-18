@@ -3,12 +3,13 @@ require "test/unit/rr"
 class TestResultsColumnList < Test::Unit::TestCase
   class TestResults < self
     def setup
+      command = nil
       header = [0,1372430096.70991,0.000522851943969727]
       body = [[["id","UInt32"],["name","ShortText"],["path","ShortText"],["type","ShortText"],["flags","ShortText"],["domain","ShortText"],["range","ShortText"],["source","ShortText"]],
         [259,"_key","","","COLUMN_SCALAR","Bigram","ShortText",[]],
         [278,"comment_index","/tmp/db.db.0000116","index","COLUMN_INDEX|WITH_POSITION|PERSISTENT","Bigram","Comments",["Comments.comment"]],
         [277,"users_index","/tmp/db.db.0000115","index","COLUMN_INDEX|WITH_SECTION|WITH_POSITION|PERSISTENT","Bigram","Users",["Users.name","Users.location_str","Users.description"]]]
-      @column_list = Groonga::Client::Response::ColumnList.new(header, body)
+      @column_list = Groonga::Client::Response::ColumnList.new(command, header, body)
     end
 
     def test_column_list

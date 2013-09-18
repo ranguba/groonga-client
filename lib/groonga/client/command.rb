@@ -46,8 +46,7 @@ module Groonga
 
       private
       def parse_raw_response(raw_response)
-        response_class = Groonga::Client::Response.find(@command.name)
-        response_class.parse(raw_response, @command.output_type)
+        Groonga::Client::Response.parse(@command, raw_response)
       end
     end
   end

@@ -33,12 +33,24 @@ module Groonga
         def find(name)
           @@registered_commands[name] || Base
         end
+
+        # Parses the response for the request of the command and returns
+        # response object.
+        #
+        # @param [Groonga::Command::Base] The command of the request.
+        # @param [String] The raw (not parsed) response returned by groonga
+        #   server.
+        # @return [Base]
+        def parse(command, raw_response)
+          klass = find(command.name)
+          klass.parse(command, raw_response)
+        end
       end
 
       class Base
         class << self
-          def parse(raw_response, type)
-            case type
+          def parse(command, raw_response)
+            case command.output_type
             when :json
               header, body = JSON.parse(raw_response)
             when :xml
@@ -47,7 +59,7 @@ module Groonga
               header = nil
               body = raw_response
             end
-            response = new(header, body)
+            response = new(command, header, body)
             response.raw = raw_response
             response
           end
@@ -100,10 +112,13 @@ module Groonga
           end
         end
 
+        # @return [Groonga::Command] The command for the request.
+        attr_accessor :command
         attr_accessor :header, :body
         attr_accessor :raw
 
-        def initialize(header, body)
+        def initialize(command, header, body)
+          @command = command
           @header = header
           @body = body
           @raw = nil

@@ -2,12 +2,13 @@ require "test/unit/rr"
 
 class TestResultsTableList < Test::Unit::TestCase
   def setup
+    command = nil
     header = [0,1372430096.70991,0.000522851943969727]
     body = [[["id","UInt32"],["name","ShortText"],["path","ShortText"],["flags","ShortText"],["domain","ShortText"],["range","ShortText"],["default_tokenizer","ShortText"],["normalizer","ShortText"]],
       [257,"Ages","/tmp/test.db.0000101","TABLE_DAT_KEY|PERSISTENT","UInt32",nil,nil,nil],
       [256,"Lexicon","/tmp/test.db.0000100","TABLE_PAT_KEY|PERSISTENT","ShortText",nil,"TokenBigram","NormalizerAuto"],
       [258,"Logs","/tmp/test.db.0000102","TABLE_NO_KEY|PERSISTENT",nil,nil,nil,nil]]
-    @table_list = Groonga::Client::Response::TableList.new(header, body)
+    @table_list = Groonga::Client::Response::TableList.new(command, header, body)
   end
 
   def test_table_list
