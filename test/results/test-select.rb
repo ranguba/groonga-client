@@ -3,7 +3,8 @@ require "test/unit/rr"
 class TestResultsSelect < Test::Unit::TestCase
   class TestResults < self
     def setup
-      command = nil
+      command = Groonga::Command::Select.new("select",
+                                             {"drilldown" => "country,domain"})
       header = [0,1372430096.70991,0.000522851943969727]
       body = [[[6],[["_id","UInt32"],["country","Country"],["domain","Domain"]],[1,"japan",".com"],[2,"brazil",".com"],[3,"japan",".org"],[4,"usa",".com"],[5,"japan",".org"],[6,"usa",".com"]],
         [[3],[["_key","ShortText"],["_nsubrecs","Int32"]],["japan",3],["brazil",1],["usa",2]],
@@ -29,23 +30,25 @@ class TestResultsSelect < Test::Unit::TestCase
 
     def test_drilldowns
       expected_drilldowns = [
-        Drilldown.new(3, [
+        drilldown("country", 3, [
             {"_key"=>"japan", "_nsubrecs"=>3},
             {"_key"=>"brazil", "_nsubrecs"=>1},
             {"_key"=>"usa", "_nsubrecs"=>2},]),
-        Drilldown.new(2, [
+        drilldown("domain", 2, [
             {"_key"=>".com", "_nsubrecs"=>4},
             {"_key"=>".org", "_nsubrecs"=>2}]),
       ]
-      assert_equal(expected_drilldowns, @select.drilldowns.collect{|drilldown|
-          Drilldown.new(drilldown.n_hits, drilldown.items)
-        })
+      assert_equal(expected_drilldowns, @select.drilldowns)
+    end
+
+    def drilldown(name, n_hits, items)
+      Groonga::Client::Response::Select::Drilldown.new(name, n_hits, items)
     end
   end
 
   class TestNoRecordsBody < self
     def setup
-      command = nil
+      command = Groonga::Command::Select.new("select", {})
       header = [0,1372430096.70991,0.000522851943969727]
       body = [[[6],[["_id","UInt32"],["country","Country"]]]]
       @select = Groonga::Client::Response::Select.new(command, header, body)
@@ -59,7 +62,5 @@ class TestResultsSelect < Test::Unit::TestCase
       assert_equal([], @select.records)
     end
   end
-
-  Drilldown = Struct.new(:n_hits, :items)
 end
 

@@ -69,13 +69,15 @@ module Groonga
         end
 
         def parse_drilldowns(raw_drilldowns)
-          (raw_drilldowns || []).collect do |raw_drilldown|
+          (raw_drilldowns || []).collect.with_index do |raw_drilldown, i|
+            name = @command.drilldowns[i]
             n_hits, items = parse_result(raw_drilldown)
-            Drilldown.new(n_hits, items)
+            Drilldown.new(name, n_hits, items)
           end
         end
 
-        Drilldown = Struct.new(:n_hits, :items)
+        class Drilldown < Struct.new(:name, :n_hits, :items)
+        end
       end
     end
   end

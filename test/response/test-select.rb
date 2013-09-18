@@ -32,16 +32,19 @@ class TestResponseSelect < Test::Unit::TestCase
   end
 
   class TestBody < self
-    private
-    def parse(body)
-      command = nil
-      header = [0, 1372430096.70991, 0.000522851943969727]
-      Groonga::Client::Response::Select.new(command, header, body)
+    def setup
+      @command = Groonga::Command::Select.new("select", {})
     end
 
     def test_n_hits
       assert_equal(29,
                    parse([[[29], [["_id", "UInt32"]]]]).n_hits)
+    end
+
+    private
+    def parse(body)
+      header = [0, 1372430096.70991, 0.000522851943969727]
+      Groonga::Client::Response::Select.new(@command, header, body)
     end
 
     class TestRecords < self
@@ -58,6 +61,32 @@ class TestResponseSelect < Test::Unit::TestCase
     end
 
     class TestDrilldowns < self
+      def setup
+        pair_arguments = {
+          "drilldown" => "_key",
+          "drilldown_output_columns" => "_key,_nsubrecs",
+        }
+        @command = Groonga::Command::Select.new("select", pair_arguments)
+      end
+
+      def test_name
+        drilldowns = parse([
+                             [[0], []],
+                             [
+                               [29],
+                               [
+                                 ["_key",      "ShortText"],
+                                 ["_nsubrecs", "Int32"],
+                               ],
+                               ["groonga", 29],
+                               ["Ruby",    19],
+                               ["rroonga",  9],
+                             ],
+                           ])
+        assert_equal(["_key"],
+                     drilldowns.collect(&:name))
+      end
+
       def test_n_hits
         drilldowns = parse([
                              [[0], []],
