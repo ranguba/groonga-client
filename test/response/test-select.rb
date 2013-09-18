@@ -105,6 +105,30 @@ class TestResponseSelect < Test::Unit::TestCase
                      drilldowns(body).collect(&:n_hits))
       end
 
+      def test_items
+        body = [
+          [[0], []],
+          [
+            [29],
+            [
+              ["_key",      "ShortText"],
+              ["_nsubrecs", "Int32"],
+            ],
+            ["groonga", 29],
+            ["Ruby",    19],
+            ["rroonga",  9],
+          ],
+        ]
+        assert_equal([
+                       [
+                         {"_key" => "groonga", "_nsubrecs" => 29},
+                         {"_key" => "Ruby",    "_nsubrecs" => 19},
+                         {"_key" => "rroonga", "_nsubrecs" =>  9},
+                       ],
+                     ],
+                     drilldowns(body).collect(&:items))
+      end
+
       private
       def drilldowns(body)
         create_response(body).drilldowns
