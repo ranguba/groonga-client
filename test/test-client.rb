@@ -152,29 +152,28 @@ class TestClient < Test::Unit::TestCase
       XML
       response = client.table_list(:output_type => :xml)
       expected_body = [
-        table(256,
-              "Users",
-              "/tmp/db/db.0000100",
-              "TABLE_HASH_KEY|PERSISTENT",
-              nil,
-              nil,
-              nil,
-              nil),
+        [
+          ["id", "UInt32"],
+          ["name", "ShortText"],
+          ["path", "ShortText"],
+          ["flags", "ShortText"],
+          ["domain", "ShortText"],
+          ["range", "ShortText"],
+          ["default_tokenizer", "ShortText"],
+          ["normalizer", "ShortText"],
+        ],
+        [
+          256,
+          "Users",
+          "/tmp/db/db.0000100",
+          "TABLE_HASH_KEY|PERSISTENT",
+          nil,
+          nil,
+          nil,
+          nil,
+        ],
       ]
       assert_response(expected_body, response)
-    end
-
-    private
-    def table(id, name, path, flags, domain, range, default_tokenizer,
-              normalizer)
-      Groonga::Client::Response::TableList::Table.new(id,
-                                                      name,
-                                                      path,
-                                                      flags,
-                                                      domain,
-                                                      range,
-                                                      default_tokenizer,
-                                                      normalizer)
     end
   end
 

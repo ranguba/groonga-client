@@ -29,8 +29,9 @@ module Groonga
         attr_accessor :records
         attr_accessor :drilldowns
 
-        def initialize(command, header, body)
-          super(command, header, parse_body(body))
+        def body=(body)
+          super(body)
+          parse_body(body)
         end
 
         private

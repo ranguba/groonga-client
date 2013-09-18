@@ -27,8 +27,9 @@ module Groonga
 
         Response.register("table_list", self)
 
-        def initialize(command, header, body)
-          super(command, header, parse_body(body))
+        def body=(body)
+          super(body)
+          parse_body(body)
         end
 
         def each
