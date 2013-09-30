@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
@@ -23,6 +24,13 @@ module Groonga
     module Response
       class Status < Base
         Response.register("status", self)
+
+        # @return [Integer] The number of allocated memory blocks.
+        def alloc_count
+          @body["alloc_count"] || 0
+        end
+
+        alias_method :n_allocations, :alloc_count
       end
     end
   end
