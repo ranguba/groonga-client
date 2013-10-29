@@ -1,5 +1,13 @@
 # NEWS
 
+## 0.0.4 - 2013-10-29
+
+### Improvements
+
+  * http: Supported timeout error.
+  * status: Added {Groonga::Client::Response::Status#alloc_count} and
+    {Groonga::Client::Response::Status#n_allocations}.
+
 ## 0.0.3 - 2013-09-18
 
 ### Improvements
