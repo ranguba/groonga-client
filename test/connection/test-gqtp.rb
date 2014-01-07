@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2014  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -78,6 +78,18 @@ class TestConnectionGQTP < Test::Unit::TestCase
 
     client.write(response_header.pack)
     client.write(response_body)
+  end
+
+  class TestConnect < self
+    def test_no_server
+      server = TCPServer.new("127.0.0.1", 0)
+      free_port = server.addr[1]
+      server.close
+      assert_raise(Groonga::Client::Connection::Error) do
+        Groonga::Client::Connection::GQTP.new(:host => "127.0.0.1",
+                                              :port => free_port)
+      end
+    end
   end
 
   class TestConnected < self

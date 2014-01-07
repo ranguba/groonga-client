@@ -29,7 +29,11 @@ module Groonga
     module Connection
       class GQTP
         def initialize(options)
-          @client = ::GQTP::Client.new(options)
+          begin
+            @client = ::GQTP::Client.new(options)
+          rescue ::GQTP::ConnectionError
+            raise Error.new($!)
+          end
         end
 
         def send(command)
