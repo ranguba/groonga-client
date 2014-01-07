@@ -70,16 +70,14 @@ class TestConnectionGQTP < Test::Unit::TestCase
 
   def process_client_close(client)
     response_body = [].to_json
-    2.times do
-      header = GQTP::Header.parse(client.read(GQTP::Header.size))
-      client.read(header.size)
+    header = GQTP::Header.parse(client.read(GQTP::Header.size))
+    client.read(header.size)
 
-      response_header = GQTP::Header.new
-      response_header.size = response_body.bytesize
+    response_header = GQTP::Header.new
+    response_header.size = response_body.bytesize
 
-      client.write(response_header.pack)
-      client.write(response_body)
-    end
+    client.write(response_header.pack)
+    client.write(response_body)
   end
 
   class TestConnected < self
