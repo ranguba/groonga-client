@@ -17,66 +17,52 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "open-uri"
-
-require "groonga/client/empty-request"
-require "groonga/client/protocol/request"
 require "groonga/client/protocol/error"
 
 module Groonga
   class Client
     module Protocol
       class HTTP
+        class UnknownBackendError < Error
+          attr_reader :backend
+          def initialize(backend, detail)
+            @backend = backend
+            super("Unknown HTTP backend: <#{backend}>: #{detail}")
+          end
+        end
+
         def initialize(options)
           @host = options[:host] || "127.0.0.1"
           @port = options[:port] || 10041
+          @options = options
+          @backend = create_backend
         end
 
-        def send(command)
-          url = "http://#{@host}:#{@port}#{command.to_uri_format}"
-          thread = Thread.new do
-            begin
-              open(url) do |response|
-                body = response.read
-                yield(body)
-              end
-            rescue OpenURI::HTTPError, Timeout::Error
-              raise Error.new($!)
-            end
-          end
-          ThreadRequest.new(thread)
+        def send(command, &block)
+          @backend.send(command, &block)
         end
 
-        # @return [false] Always returns false because the current
-        #   implementation doesn't support keep-alive.
         def connected?
-          false
+          @backend.connected?
         end
 
-        # Does nothing because the current implementation doesn't
-        # support keep-alive. If the implementation supports
-        # keep-alive, it close the opend connection.
-        #
-        # @overload close
-        #   Closes synchronously.
-        #
-        #   @return [false] It always returns false because there is always
-        #      no connectin.
-        #
-        # @overload close {}
-        #   Closes asynchronously.
-        #
-        #   @yield [] Calls the block when the opened connection is closed.
-        #   @return [#wait] The request object. If you want to wait until
-        #      the request is processed. You can send #wait message to the
-        #      request.
         def close(&block)
-          sync = !block_given?
-          if sync
-            false
-          else
-            EmptyRequest.new
+          @backend.close(&block)
+        end
+
+        private
+        def create_backend
+          backend = @options[:backend] || :thread
+
+          begin
+            require "groonga/client/protocol/http/#{backend}"
+          rescue LoadError
+            raise UnknownBackendError.new(backend, $!.message)
           end
+
+          backend_name = backend.to_s.capitalize
+          backend_class = self.class.const_get(backend_name)
+          backend_class.new(@host, @port, @options)
         end
       end
     end

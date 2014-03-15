@@ -84,7 +84,7 @@ class TestProtocolGQTP < Test::Unit::TestCase
       server = TCPServer.new("127.0.0.1", 0)
       free_port = server.addr[1]
       server.close
-      assert_raise(Groonga::Client::Protocol::Error) do
+      assert_raise(Groonga::Client::Protocol::WrappedError) do
         Groonga::Client::Protocol::GQTP.new(:host => "127.0.0.1",
                                             :port => free_port)
       end
