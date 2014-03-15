@@ -84,6 +84,7 @@ module Groonga
             if sync
               false
             else
+              yield
               EmptyRequest.new
             end
           end
