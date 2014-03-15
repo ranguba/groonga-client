@@ -22,6 +22,9 @@ module Groonga
   class Client
     module Protocol
       class Error < Client::Error
+      end
+
+      class WrappedError < Error
         attr_reader :raw_error
         def initialize(raw_error)
           @raw_error = raw_error

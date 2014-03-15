@@ -33,7 +33,7 @@ module Groonga
           begin
             @client = ::GQTP::Client.new(options)
           rescue ::GQTP::ConnectionError
-            raise Error.new($!)
+            raise WrappedError.new($!)
           end
         end
 
