@@ -111,96 +111,96 @@ module Groonga
       end
     end
 
-    def cache_limit(parameters)
-      execute_command("cache_limit", parameters)
+    def cache_limit(parameters, &block)
+      execute_command("cache_limit", parameters, &block)
     end
 
-    def check(parameters)
-      execute_command("check", parameters)
+    def check(parameters, &block)
+      execute_command("check", parameters, &block)
     end
 
-    def clearlock(parameters={})
-      execute_command("clearlock", parameters)
+    def clearlock(parameters={}, &block)
+      execute_command("clearlock", parameters, &block)
     end
 
-    def column_create(parameters)
-      execute_command("column_create", parameters)
+    def column_create(parameters, &block)
+      execute_command("column_create", parameters, &block)
     end
 
-    def column_list(parameters)
-      execute_command("column_list", parameters)
+    def column_list(parameters, &block)
+      execute_command("column_list", parameters, &block)
     end
 
-    def column_remove(parameters)
-      execute_command("column_remove", parameters)
+    def column_remove(parameters, &block)
+      execute_command("column_remove", parameters, &block)
     end
 
-    def column_rename(parameters)
-      execute_command("column_rename", parameters)
+    def column_rename(parameters, &block)
+      execute_command("column_rename", parameters, &block)
     end
 
-    def defrag(parameters={})
-      execute_command("defrag", parameters)
+    def defrag(parameters={}, &block)
+      execute_command("defrag", parameters, &block)
     end
 
-    def delete(parameters)
-      execute_command("delete", parameters)
+    def delete(parameters, &block)
+      execute_command("delete", parameters, &block)
     end
 
-    def dump(parameters={})
-      execute_command("dump", parameters)
+    def dump(parameters={}, &block)
+      execute_command("dump", parameters, &block)
     end
 
-    def load(parameters)
-      execute_command("load", parameters)
+    def load(parameters, &block)
+      execute_command("load", parameters, &block)
     end
 
-    def log_level(parameters)
-      execute_command("log_level", parameters)
+    def log_level(parameters, &block)
+      execute_command("log_level", parameters, &block)
     end
 
-    def log_put(parameters)
-      execute_command("log_put", parameters)
+    def log_put(parameters, &block)
+      execute_command("log_put", parameters, &block)
     end
 
-    def log_reopen(parameters={})
-      execute_command("log_reopen", parameters)
+    def log_reopen(parameters={}, &block)
+      execute_command("log_reopen", parameters, &block)
     end
 
-    def quit(parameters={})
-      execute_command("quit", parameters)
+    def quit(parameters={}, &block)
+      execute_command("quit", parameters, &block)
     end
 
-    def register(parameters)
-      execute_command("register", parameters)
+    def register(parameters, &block)
+      execute_command("register", parameters, &block)
     end
 
-    def select(parameters)
-      execute_command("select", parameters)
+    def select(parameters, &block)
+      execute_command("select", parameters, &block)
     end
 
-    def shutdown(parameters={})
+    def shutdown(parameters={}, &block)
     end
 
-    def status(parameters={})
-      execute_command("status", parameters)
+    def status(parameters={}, &block)
+      execute_command("status", parameters, &block)
     end
 
-    def table_create(parameters)
-      execute_command("table_create", parameters)
+    def table_create(parameters, &block)
+      execute_command("table_create", parameters, &block)
     end
 
-    def table_list(parameters={})
-      execute_command("table_list", parameters)
+    def table_list(parameters={}, &block)
+      execute_command("table_list", parameters, &block)
     end
 
-    def table_remove(parameters)
+    def table_remove(parameters, &block)
     end
 
-    def table_rename(parameters)
+    def table_rename(parameters, &block)
     end
 
-    def truncate(parameters)
+    def truncate(parameters, &block)
     end
 
     def execute(command, &block)
@@ -208,11 +208,11 @@ module Groonga
     end
 
     private
-    def execute_command(command_name, parameters={})
+    def execute_command(command_name, parameters={}, &block)
       parameters = normalize_parameters(parameters)
       command_class = Groonga::Command.find(command_name)
       command = command_class.new(command_name, parameters)
-      execute(command)
+      execute(command, &block)
     end
 
     def normalize_parameters(parameters)
