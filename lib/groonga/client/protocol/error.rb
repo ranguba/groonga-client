@@ -20,7 +20,7 @@ require "groonga/client/error"
 
 module Groonga
   class Client
-    module Connection
+    module Protocol
       class Error < Client::Error
         attr_reader :raw_error
         def initialize(raw_error)

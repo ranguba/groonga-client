@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2014  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,8 +18,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "groonga/client/command"
-require "groonga/client/connection/gqtp"
-require "groonga/client/connection/http"
+require "groonga/client/empty-request"
+require "groonga/client/protocol/gqtp"
+require "groonga/client/protocol/http"
 
 module Groonga
   class Client
@@ -59,18 +60,15 @@ module Groonga
       end
     end
 
-    attr_reader :protocol
-    attr_reader :connection
-
     # @macro initialize_options
     def initialize(options)
-      @protocol = options.delete(:protocol) || :gqtp
+      protocol = options.delete(:protocol) || :gqtp
 
       @connection = nil
-      if @protocol == :gqtp
-        @connection = Groonga::Client::Connection::GQTP.new(options)
+      if protocol == :gqtp
+        @connection = Groonga::Client::Protocol::GQTP.new(options)
       else
-        @connection = Groonga::Client::Connection::HTTP.new(options)
+        @connection = Groonga::Client::Protocol::HTTP.new(options)
       end
     end
 
@@ -108,7 +106,7 @@ module Groonga
         if sync
           false
         else
-          Connection::EmptryReqest.new
+          EmptryReqest.new
         end
       end
     end

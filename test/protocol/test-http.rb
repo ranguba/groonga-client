@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2014  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,16 +18,16 @@
 
 require "socket"
 
-require "groonga/client/connection/http"
+require "groonga/client/protocol/http"
 
-class TestConnectionHTTP < Test::Unit::TestCase
+class TestProtocolHTTP < Test::Unit::TestCase
   def setup
     setup_server
-    setup_connection
+    setup_client
   end
 
   def teardown
-    teardown_connection
+    teardown_client
     teardown_server
   end
 
@@ -35,7 +35,6 @@ class TestConnectionHTTP < Test::Unit::TestCase
     @address = "127.0.0.1"
     @server = TCPServer.new(@address, 0)
     @port = @server.addr[1]
-    @protocol = :http
 
     @response_body = nil
     @thread = Thread.new do
@@ -66,12 +65,12 @@ EOH
     @thread.kill
   end
 
-  def setup_connection
-    @connection = nil
+  def setup_client
+    @client = nil
   end
 
-  def teardown_connection
-    @connection.close if @connection
+  def teardown_client
+    @client.close if @client
   end
 
   def connect(options={})
@@ -79,19 +78,19 @@ EOH
       :host => @address,
       :port => @port,
     }
-    Groonga::Client::Connection::HTTP.new(default_options.merge(options))
+    Groonga::Client::Protocol::HTTP.new(default_options.merge(options))
   end
 
   def test_connected?
-    @connection = connect
-    assert_false(@connection.connected?)
+    @client = connect
+    assert_false(@client.connected?)
   end
 
   class TestClose < self
     def test_twice
-      @connection = connect
-      assert_false(@connection.close)
-      assert_false(@connection.close)
+      @client = connect
+      assert_false(@client.close)
+      assert_false(@client.close)
     end
   end
 end

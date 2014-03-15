@@ -18,16 +18,16 @@
 
 require "socket"
 
-require "groonga/client/connection/gqtp"
+require "groonga/client/protocol/gqtp"
 
-class TestConnectionGQTP < Test::Unit::TestCase
+class TestProtocolGQTP < Test::Unit::TestCase
   def setup
     setup_server
-    setup_connection
+    setup_client
   end
 
   def teardown
-    teardown_connection
+    teardown_client
     teardown_server
   end
 
@@ -35,7 +35,6 @@ class TestConnectionGQTP < Test::Unit::TestCase
     @address = "127.0.0.1"
     @server = TCPServer.new(@address, 0)
     @port = @server.addr[1]
-    @protocol = :gqtp
 
     @thread = Thread.new do
       client = @server.accept
@@ -51,12 +50,12 @@ class TestConnectionGQTP < Test::Unit::TestCase
     @thread.kill
   end
 
-  def setup_connection
-    @connection = nil
+  def setup_client
+    @client = nil
   end
 
-  def teardown_connection
-    @connection.close {} if @connection
+  def teardown_client
+    @client.close {} if @client
   end
 
   private
@@ -65,7 +64,7 @@ class TestConnectionGQTP < Test::Unit::TestCase
       :host => @address,
       :port => @port,
     }
-    Groonga::Client::Connection::GQTP.new(default_options.merge(options))
+    Groonga::Client::Protocol::GQTP.new(default_options.merge(options))
   end
 
   def process_client_close(client)
@@ -85,31 +84,31 @@ class TestConnectionGQTP < Test::Unit::TestCase
       server = TCPServer.new("127.0.0.1", 0)
       free_port = server.addr[1]
       server.close
-      assert_raise(Groonga::Client::Connection::Error) do
-        Groonga::Client::Connection::GQTP.new(:host => "127.0.0.1",
-                                              :port => free_port)
+      assert_raise(Groonga::Client::Protocol::Error) do
+        Groonga::Client::Protocol::GQTP.new(:host => "127.0.0.1",
+                                            :port => free_port)
       end
     end
   end
 
   class TestConnected < self
     def test_opened
-      @connection = connect
-      assert_true(@connection.connected?)
+      @client = connect
+      assert_true(@client.connected?)
     end
 
     def test_closed
-      @connection = connect
-      @connection.close
-      assert_false(@connection.connected?)
+      @client = connect
+      @client.close
+      assert_false(@client.connected?)
     end
   end
 
   class TestClose < self
     def test_twice
-      @connection = connect
-      @connection.close
-      assert_false(@connection.close)
+      @client = connect
+      @client.close
+      assert_false(@client.close)
     end
   end
 end

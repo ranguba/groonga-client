@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2014  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -22,11 +22,12 @@ require "erb"
 require "gqtp"
 require "json"
 
-require "groonga/client/connection/request"
+require "groonga/client/empty-request"
+require "groonga/client/protocol/error"
 
 module Groonga
   class Client
-    module Connection
+    module Protocol
       class GQTP
         def initialize(options)
           begin

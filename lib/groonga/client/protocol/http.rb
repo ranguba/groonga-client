@@ -19,12 +19,13 @@
 
 require "open-uri"
 
-require "groonga/client/connection/request"
-require "groonga/client/connection/error"
+require "groonga/client/empty-request"
+require "groonga/client/protocol/request"
+require "groonga/client/protocol/error"
 
 module Groonga
   class Client
-    module Connection
+    module Protocol
       class HTTP
         def initialize(options)
           @host = options[:host] || "127.0.0.1"
