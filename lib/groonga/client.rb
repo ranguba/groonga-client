@@ -61,7 +61,8 @@ module Groonga
     end
 
     # @macro initialize_options
-    def initialize(options)
+    def initialize(options={})
+      options = options.dup
       protocol = options.delete(:protocol) || :gqtp
 
       @connection = nil
