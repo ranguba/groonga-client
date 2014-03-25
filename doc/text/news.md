@@ -1,5 +1,12 @@
 # NEWS
 
+## 0.0.6 - 2014-03-25
+
+### Fixes
+
+  * HTTP, Cool.io: Fixed a bug that body is handled when body is
+    partially read.
+
 ## 0.0.5 - 2014-03-25
 
 ### Improvements
