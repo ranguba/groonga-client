@@ -1,5 +1,24 @@
 # NEWS
 
+## 0.0.5 - 2014-03-25
+
+### Improvements
+
+  * Wrapped internal connection errors by
+    `Groonga::Client::Connection::Error`.
+  * Supported asynchronous request by calling with block.
+  * Added Cool.io HTTP backend.
+
+### Changes
+
+  * Changed protocol implementation module/directory name to
+    `protocol` from `connection`.
+
+### Fixes
+
+  * Fixed a bug that options passed to `Groonga::Client.new` is
+    changed destructively.
+
 ## 0.0.4 - 2013-10-29
 
 ### Improvements
