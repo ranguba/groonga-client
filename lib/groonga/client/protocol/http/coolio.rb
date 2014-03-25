@@ -40,6 +40,7 @@ module Groonga
           class GroongaHTTPClient < ::Coolio::HttpClient
             def initialize(socket, callback)
               super(socket)
+              @body = ""
               @callback = callback
               @finished = false
             end
@@ -49,7 +50,11 @@ module Groonga
             end
 
             def on_body_data(data)
-              @callback.call(data)
+              @body << data
+            end
+
+            def on_request_complete
+              @callback.call(@body)
             end
 
             def on_close
