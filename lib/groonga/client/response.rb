@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+# Copyright (C) 2014  Kouhei Sutou <kou@clear-code.com>
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
@@ -26,6 +27,7 @@ require "groonga/client/response/column_rename"
 require "groonga/client/response/defrag"
 require "groonga/client/response/delete"
 require "groonga/client/response/dump"
+require "groonga/client/response/error"
 require "groonga/client/response/load"
 require "groonga/client/response/log_level"
 require "groonga/client/response/log_put"
