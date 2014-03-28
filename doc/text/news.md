@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.0.7 - 2014-03-28
+
+### Improvements
+
+  * Supported error response.
+
 ## 0.0.6 - 2014-03-25
 
 ### Fixes
