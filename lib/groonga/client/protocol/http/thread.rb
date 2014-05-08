@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "open-uri"
+require "net/http"
 
 require "groonga/client/empty-request"
 require "groonga/client/protocol/error"
@@ -45,11 +45,18 @@ module Groonga
             url = "http://#{@host}:#{@port}#{command.to_uri_format}"
             thread = ::Thread.new do
               begin
-                open(url) do |response|
-                  body = response.read
-                  yield(body)
+                Net::HTTP.start(@host, @port) do |http|
+                  response = http.get(command.to_uri_format)
+                  case response
+                  when Net::HTTPSuccess, Net::HTTPBadRequest
+                    yield(response.body)
+                  else
+                    message =
+                      "#{response.code} #{response.message}: #{response.body}"
+                    raise Error.new(message)
+                  end
                 end
-              rescue OpenURI::HTTPError, Timeout::Error
+              rescue SystemCallError, Timeout::Error
                 raise WrappedError.new($!)
               end
             end
