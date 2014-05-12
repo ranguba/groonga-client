@@ -51,9 +51,13 @@ module Groonga
                   when Net::HTTPSuccess, Net::HTTPBadRequest
                     yield(response.body)
                   else
-                    message =
-                      "#{response.code} #{response.message}: #{response.body}"
-                    raise Error.new(message)
+                    if response.body.start_with?("[[")
+                      yield(response.body)
+                    else
+                      message =
+                        "#{response.code} #{response.message}: #{response.body}"
+                      raise Error.new(message)
+                    end
                   end
                 end
               rescue SystemCallError, Timeout::Error
