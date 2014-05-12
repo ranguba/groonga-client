@@ -1,5 +1,12 @@
 # NEWS
 
+## 0.0.8 - 2014-05-12
+
+### Improvements
+
+  * HTTP, Thread: Supported "bad request" response.
+  * HTTP, Thread: Supported JSON body in "internal server error" response.
+
 ## 0.0.7 - 2014-03-28
 
 ### Improvements
