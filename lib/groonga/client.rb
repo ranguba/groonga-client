@@ -107,7 +107,7 @@ module Groonga
         if sync
           false
         else
-          EmptryReqest.new
+          EmptyRequest.new
         end
       end
     end
