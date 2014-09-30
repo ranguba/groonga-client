@@ -73,7 +73,21 @@ module Groonga
           def send(command, &block)
             client = GroongaHTTPClient.connect(@host, @port, block)
             client.attach(@loop)
-            client.request("GET", command.to_uri_format)
+            if command.name == "load"
+              raw_values = command[:values]
+              command[:values] = nil
+              path = command.to_uri_format
+              command[:values] = raw_values
+              options = {
+                :head => {
+                  "content-type" => "application/json",
+                },
+                :body => raw_values,
+              }
+              client.request("POST", path, options)
+            else
+              client.request("GET", command.to_uri_format)
+            end
             Request.new(client, @loop)
           end
 
