@@ -223,6 +223,20 @@ JSON
     end
   end
 
+  module LoadTests
+    def test_load
+      values = [
+        {"content" => "1st content"},
+        {"content" => "2nd content"},
+        {"content" => "3rd content"},
+      ]
+      stub_response("[#{values.size}]")
+      response = client.load(:table => "Memos",
+                             :values => JSON.generate(values))
+      assert_equal([values.size], response.body)
+    end
+  end
+
   module Tests
     include Utils
     include Assertions
@@ -231,6 +245,7 @@ JSON
     include ColumnsTests
     include ParametersTests
     include OpenTests
+    include LoadTests
   end
 
   class TestGQTP < self
@@ -281,9 +296,17 @@ JSON
       @port = @server.addr[1]
       @protocol = :http
 
+      @actual_method = nil
+      @actual_path = nil
+
       @response_body = nil
       @thread = Thread.new do
         client = @server.accept
+        first_line = client.gets
+        if /\A([\w]+) ([^ ]+) HTTP/ =~ first_line
+          @actual_method = $1
+          @actual_path = $2
+        end
         @server.close
         status = 0
         start = Time.now.to_f

@@ -45,7 +45,7 @@ module Groonga
             thread = ::Thread.new do
               begin
                 Net::HTTP.start(@host, @port) do |http|
-                  response = http.get(command.to_uri_format)
+                  response = send_request(http, command)
                   case response
                   when Net::HTTPSuccess, Net::HTTPBadRequest
                     yield(response.body)
@@ -96,6 +96,22 @@ module Groonga
             else
               yield
               EmptyRequest.new
+            end
+          end
+
+          private
+          def send_request(http, command)
+            if command.name == "load"
+              raw_values = command[:values]
+              command[:values] = nil
+              path = command.to_uri_format
+              command[:values] = raw_values
+              request = Net::HTTP::Post.new(path)
+              request.content_type = "application/json"
+              request.body = raw_values
+              http.request(request)
+            else
+              http.get(command.to_uri_format)
             end
           end
         end
