@@ -17,6 +17,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "groonga/client/version"
 require "groonga/client/protocol/error"
 
 module Groonga
@@ -34,7 +35,7 @@ module Groonga
         def initialize(options)
           @host = options[:host] || "127.0.0.1"
           @port = options[:port] || 10041
-          @options = options
+          @options = default_options.merge(options)
           @backend = create_backend
         end
 
@@ -51,6 +52,12 @@ module Groonga
         end
 
         private
+        def default_options
+          {
+            :user_agent => "groonga-client/#{VERSION}",
+          }
+        end
+
         def create_backend
           backend = @options[:backend] || :thread
 

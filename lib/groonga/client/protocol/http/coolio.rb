@@ -81,6 +81,7 @@ module Groonga
               options = {
                 :head => {
                   "content-type" => "application/json",
+                  "user-agent"   => @options[:user_agent],
                 },
                 :body => raw_values,
               }

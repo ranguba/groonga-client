@@ -17,6 +17,7 @@
 
 require "net/http"
 
+require "groonga/client/version"
 require "groonga/client/empty-request"
 require "groonga/client/protocol/error"
 
@@ -94,13 +95,19 @@ module Groonga
               command[:values] = nil
               path = command.to_uri_format
               command[:values] = raw_values
-              request = Net::HTTP::Post.new(path)
+              request = Net::HTTP::Post.new(path, headers)
               request.content_type = "application/json"
               request.body = raw_values
               http.request(request)
             else
-              http.get(command.to_uri_format)
+              http.get(command.to_uri_format, headers)
             end
+          end
+
+          def headers
+            {
+              "user-agent" => @options[:user_agent],
+            }
           end
         end
       end
