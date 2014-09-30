@@ -1,5 +1,12 @@
 # NEWS
 
+## 0.0.9 - 2014-09-30
+
+### Improvements
+
+  * HTTP: Supported "load" by POST.
+  * HTTP: Added synchronous backend.
+
 ## 0.0.8 - 2014-05-12
 
 ### Improvements
