@@ -42,7 +42,6 @@ module Groonga
           end
 
           def send(command)
-            url = "http://#{@host}:#{@port}#{command.to_uri_format}"
             thread = ::Thread.new do
               begin
                 Net::HTTP.start(@host, @port) do |http|
