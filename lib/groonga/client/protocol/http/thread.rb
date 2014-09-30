@@ -15,16 +15,15 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "net/http"
+require "thread"
 
-require "groonga/client/empty-request"
-require "groonga/client/protocol/error"
+require "groonga/client/protocol/http/synchronous"
 
 module Groonga
   class Client
     module Protocol
       class HTTP
-        class Thread
+        class Thread < Synchronous
           class Request
             def initialize(thread)
               @thread = thread
@@ -35,84 +34,11 @@ module Groonga
             end
           end
 
-          def initialize(host, port, options)
-            @host = host
-            @port = port
-            @options = options
-          end
-
           def send(command)
             thread = ::Thread.new do
-              begin
-                Net::HTTP.start(@host, @port) do |http|
-                  response = send_request(http, command)
-                  case response
-                  when Net::HTTPSuccess, Net::HTTPBadRequest
-                    yield(response.body)
-                  else
-                    if response.body.start_with?("[[")
-                      yield(response.body)
-                    else
-                      message =
-                        "#{response.code} #{response.message}: #{response.body}"
-                      raise Error.new(message)
-                    end
-                  end
-                end
-              rescue SystemCallError, Timeout::Error
-                raise WrappedError.new($!)
-              end
+              super
             end
             Request.new(thread)
-          end
-
-          # @return [false] Always returns false because the current
-          #   implementation doesn't support keep-alive.
-          def connected?
-            false
-          end
-
-          # Does nothing because the current implementation doesn't
-          # support keep-alive. If the implementation supports
-          # keep-alive, it close the opend connection.
-          #
-          # @overload close
-          #   Closes synchronously.
-          #
-          #   @return [false] It always returns false because there is always
-          #      no connection.
-          #
-          # @overload close {}
-          #   Closes asynchronously.
-          #
-          #   @yield [] Calls the block when the opened connection is closed.
-          #   @return [#wait] The request object. If you want to wait until
-          #      the request is processed. You can send #wait message to the
-          #      request.
-          def close(&block)
-            sync = !block_given?
-            if sync
-              false
-            else
-              yield
-              EmptyRequest.new
-            end
-          end
-
-          private
-          def send_request(http, command)
-            if command.name == "load"
-              raw_values = command[:values]
-              command[:values] = nil
-              path = command.to_uri_format
-              command[:values] = raw_values
-              request = Net::HTTP::Post.new(path)
-              request.content_type = "application/json"
-              request.body = raw_values
-              http.request(request)
-            else
-              http.get(command.to_uri_format)
-            end
           end
         end
       end
