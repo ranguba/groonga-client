@@ -1,5 +1,15 @@
 # NEWS
 
+## 0.1.0 - 2014-11-05
+
+### Improvements
+
+  * response: Added {Groonga::Client::Response::Error#message}.
+  * response: Added {Groonga::Client::Response::Base#status_code}.
+  * response: Added {Groonga::Client::Response::Base#start_time}.
+  * response: Added {Groonga::Client::Response::Base#elapsed_time}.
+  * response: Added {Groonga::Client::Response::Base#success?}.
+
 ## 0.0.9 - 2014-09-30
 
 ### Improvements
