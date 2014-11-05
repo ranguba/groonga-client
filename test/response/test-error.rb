@@ -36,4 +36,26 @@ class TestResponseError < Test::Unit::TestCase
       assert_equal(Groonga::Client::Response::Error, response.class)
     end
   end
+
+  class TestMessage < self
+    def test_have_header
+      header = [
+        -22,
+        1396012478.14975,
+        0.00050806999206543,
+        "invalid table name: <Nonexistent>",
+        [
+          ["grn_select", "proc.c", 897],
+        ],
+      ]
+      response = Groonga::Client::Response::Error.new(nil, header, nil)
+      assert_equal("invalid table name: <Nonexistent>",
+                   response.message)
+    end
+
+    def test_no_header
+      response = Groonga::Client::Response::Error.new(nil, nil, nil)
+      assert_equal("", response.message)
+    end
+  end
 end

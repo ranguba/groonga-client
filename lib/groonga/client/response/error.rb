@@ -20,6 +20,11 @@ module Groonga
   class Client
     module Response
       class Error < Base
+        # @return [String] The error message of the error response.
+        # @since 0.1.0
+        def message
+          (header || [0, 0, 0.0, ""])[3]
+        end
       end
     end
   end
