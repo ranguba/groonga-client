@@ -142,6 +142,31 @@ module Groonga
           self.body = body
           self.raw = nil
         end
+
+        # @return [Integer] The status code of the response.
+        # @since 0.1.0
+        def status_code
+          (header || [0])[0]
+        end
+
+        # @return [Time] The time of the request is accepted.
+        # @since 0.1.0
+        def start_time
+          Time.at((header || [0, 0])[1])
+        end
+
+        # @return [Time] The elapsed time of the request.
+        # @since 0.1.0
+        def elapsed_time
+          (header || [0, 0, 0.0])[2]
+        end
+
+        # @return [Boolean] `true` if the request is processed successfully,
+        #   `false` otherwise.
+        # @since 0.1.0
+        def success?
+          status_code.zero?
+        end
       end
     end
   end
