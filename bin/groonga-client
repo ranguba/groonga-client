@@ -1,0 +1,114 @@
+#!/usr/bin/env ruby
+# -*- mode: ruby -*-
+#
+# Copyright (C) 2015  Kouhei Sutou <kou@clear-code.com>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+require "ostruct"
+require "optparse"
+require "json"
+
+require "groonga/command/parser"
+
+require "groonga/client"
+
+def default_port(protocol)
+  case protocol
+  when :http
+    10041
+  when :gqtp
+    10043
+  end
+end
+
+def run_command(client, command)
+  response = client.execute(command)
+  case command.output_type
+  when :json
+    puts(JSON.pretty_generate([response.header, response.body]))
+  when :xml
+    puts(response.raw)
+  else
+    puts(response.body)
+  end
+end
+
+options = OpenStruct.new
+options.protocol = :http
+options.host     = "localhost"
+options.port     = nil
+
+parser = OptionParser.new
+parser.version = Groonga::Client::VERSION
+parser.banner += " GROONGA_COMMAND_FILE1 GROONGA_COMMAND_FILE2 ..."
+parser.separator("")
+parser.separator("Connection:")
+available_protocols = [:http, :gqtp]
+parser.on("--protocol=PROTOCOL", [:http, :gqtp],
+          "Protocol to connect to Groonga server.",
+          "[#{available_protocols.join(", ")}]",
+          "(#{options.protocol})") do |protocol|
+  options.protocol = protocol
+end
+parser.on("--host=HOST",
+          "Groonga server to be connected.",
+          "(#{options.host})") do |host|
+  options.host = host
+end
+parser.on("--port=PORT", Integer,
+          "Port number of Groonga server to be connected.",
+          "(auto)") do |port|
+  options.port = port
+end
+command_file_paths = parser.parse!(ARGV)
+
+options.port ||= default_port(options.protocol)
+
+client = Groonga::Client.new(:protocol => options.protocol,
+                             :host     => options.host,
+                             :port     => options.port,
+                             :backend  => :synchronous)
+parser = Groonga::Command::Parser.new
+parser.on_command do |command|
+  run_command(client, command)
+end
+
+parser.on_load_columns do |command, columns|
+  command[:columns] ||= columns.join(",")
+end
+values = []
+parser.on_load_value do |_, value|
+  values << value
+end
+parser.on_load_complete do |command|
+  command[:values] ||= Yajl::Encoder.encode(values)
+  run_command(client, command)
+  values.clear
+end
+
+if command_file_paths.empty?
+  $stdin.each_line do |line|
+    parser << line
+  end
+else
+  command_file_paths.each do |command_file_path|
+    File.open(command_file_path) do |command_file|
+      command_file.each_line do |line|
+        parser << line
+      end
+    end
+  end
+end
