@@ -86,17 +86,39 @@ parser.on_command do |command|
   run_command(client, command)
 end
 
+split_load = true
+parser.on_load_start do |command|
+  if command[:values]
+    split_load = false
+  else
+    split_load = true
+  end
+end
 parser.on_load_columns do |command, columns|
   command[:columns] ||= columns.join(",")
 end
 values = []
-parser.on_load_value do |_, value|
-  values << value
+consume_values = lambda do |load_command|
+  return if values.empty?
+
+  load_command[:values] = Yajl::Encoder.encode(values)
+  run_command(client, load_command)
+  load_command.original_source.clear
+  values.clear
+  load_command[:values] = nil
+end
+parser.on_load_value do |command, value|
+  if split_load
+    values << value
+    consume_values.call(command) if values.size == 10000
+  end
 end
 parser.on_load_complete do |command|
-  command[:values] ||= Yajl::Encoder.encode(values)
-  run_command(client, command)
-  values.clear
+  if split_load
+    consume_values.call(command)
+  else
+    run_command(client, command)
+  end
 end
 
 if command_file_paths.empty?
