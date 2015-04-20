@@ -1,5 +1,12 @@
 # NEWS
 
+## 0.1.1 - 2015-04-20
+
+### Improvements
+
+  * groonga-client: Add a command that sends Groonga commands to a
+    Groonga server.
+
 ## 0.1.0 - 2014-11-05
 
 ### Improvements
