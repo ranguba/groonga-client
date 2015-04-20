@@ -97,7 +97,8 @@ module Groonga
               command[:values] = raw_values
               request = Net::HTTP::Post.new(path, headers)
               request.content_type = "application/json"
-              request.body = raw_values
+              request.content_length = raw_values.bytesize
+              request.body_stream = StringIO.new(raw_values)
               http.request(request)
             else
               http.get(command.to_uri_format, headers)
