@@ -165,7 +165,7 @@ module Groonga
             return if @load_values.empty?
 
             load_command[:values] = Yajl::Encoder.encode(@load_values)
-            run_command(client, load_command)
+            run_command(load_command)
             @load_values.clear
             load_command[:values] = nil
           end
