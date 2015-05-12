@@ -35,6 +35,7 @@ module Groonga
           def send(command)
             begin
               Net::HTTP.start(@host, @port) do |http|
+                http.read_timeout = read_timeout
                 response = send_request(http, command)
                 case response
                 when Net::HTTPSuccess, Net::HTTPBadRequest
@@ -89,6 +90,15 @@ module Groonga
           end
 
           private
+          def read_timeout
+            timeout = @options[:read_timeout]
+            if timeout < 0
+              nil
+            else
+              timeout
+            end
+          end
+
           def send_request(http, command)
             if command.name == "load"
               raw_values = command[:values]

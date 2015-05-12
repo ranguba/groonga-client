@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013-2014  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2015  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "groonga/client/default"
 require "groonga/client/command"
 require "groonga/client/empty-request"
 require "groonga/client/protocol/gqtp"
@@ -64,6 +65,7 @@ module Groonga
     def initialize(options={})
       options = options.dup
       protocol = options.delete(:protocol) || :gqtp
+      options[:read_timeout] ||= Default::READ_TIMEOUT
 
       @connection = nil
       if protocol == :gqtp

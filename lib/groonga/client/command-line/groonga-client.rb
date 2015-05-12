@@ -31,6 +31,8 @@ module Groonga
           @host     = "localhost"
           @port     = nil
 
+          @read_timeout = Default::READ_TIMEOUT
+
           @runner_options = {
             :split_load_chunk_size => 10000,
           }
@@ -42,6 +44,7 @@ module Groonga
           @client = Groonga::Client.new(:protocol => @protocol,
                                         :host     => @host,
                                         :port     => @port,
+                                        :read_timeout => @read_timeout,
                                         :backend  => :synchronous)
           runner = Runner.new(@client, @runner_options)
 
@@ -90,6 +93,13 @@ module Groonga
                     "Port number of Groonga server to be connected.",
                     "(auto)") do |port|
             @port = port
+          end
+
+          parser.on("--read-timeout=TIMEOUT", Integer,
+                    "Timeout on reading response from Groonga server.",
+                    "You can disable timeout by specifying -1.",
+                    "(#{@read_timeout})") do |timeout|
+            @read_timeout = timeout
           end
 
           parser.on("--split-load-chunk-size=SIZE", Integer,
