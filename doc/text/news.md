@@ -4,7 +4,7 @@
 
 ### Improvements
 
-  * groonga-client: Add a command that sends Groonga commands to a
+  * groonga-client: Added a command that sends Groonga commands to a
     Groonga server.
 
 ## 0.1.0 - 2014-11-05
