@@ -1,5 +1,12 @@
 # NEWS
 
+## 0.1.2 - 2015-05-13
+
+### Improvements
+
+  * groonga-client: Supported split load.
+  * groonga-client: Added `--read-timeout` option.
+
 ## 0.1.1 - 2015-04-20
 
 ### Improvements
