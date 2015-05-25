@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.1.3 - 2015-05-25
+
+### Improvements
+
+  * Stopped to use yajl-ruby.
+
 ## 0.1.2 - 2015-05-13
 
 ### Improvements
