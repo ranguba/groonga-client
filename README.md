@@ -43,7 +43,7 @@ TODO: use commands with parameters for examples
 
 ## Dependencies
 
-* Ruby 1.9.3
+* Ruby
 
 ## Mailing list
 
