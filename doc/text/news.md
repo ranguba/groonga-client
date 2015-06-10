@@ -1,5 +1,12 @@
 # NEWS
 
+## 0.1.4 - 2015-06-10
+
+### Changes
+
+  * Moved `groonga-client` command to groonga-client-cli gem.
+    It's an incompatible change.
+
 ## 0.1.3 - 2015-05-25
 
 ### Improvements
