@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.1.6 - 2015-06-10
+
+### Fixes
+
+  * Re-added required file.
+
 ## 0.1.5 - 2015-06-10
 
 ### Fixes
