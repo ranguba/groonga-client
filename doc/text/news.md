@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.1.5 - 2015-06-10
+
+### Fixes
+
+  * Removed `require` for nonexistent file.
+
 ## 0.1.4 - 2015-06-10
 
 ### Changes
