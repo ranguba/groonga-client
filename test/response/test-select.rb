@@ -59,6 +59,7 @@ class TestResponseSelect < Test::Unit::TestCase
                        {
                          "html_escape"  => "content1",
                          "html_escape2" => "content2",
+                         "html_escape3" => "content3",
                        }
                      ],
                      records([
@@ -67,8 +68,13 @@ class TestResponseSelect < Test::Unit::TestCase
                                  [
                                    ["html_escape", nil],
                                    ["html_escape", nil],
+                                   ["html_escape", nil],
                                  ],
-                                 ["content1", "content2"],
+                                 [
+                                   "content1",
+                                   "content2",
+                                   "content3",
+                                 ],
                                ]
                              ]))
       end
