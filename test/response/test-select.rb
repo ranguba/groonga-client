@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2015  Kouhei Sutou <kou@clear-code.com>
 # Copyright (C) 2013  Kosuke Asami
 #
 # This library is free software; you can redistribute it and/or
@@ -52,6 +52,25 @@ class TestResponseSelect < Test::Unit::TestCase
         updated_at = 1379040474
         assert_equal([{"updated_at" => Time.at(updated_at)}],
                      records([[[1], [["updated_at", "Time"]], [updated_at]]]))
+      end
+
+      def test_duplicated_column_name
+        assert_equal([
+                       {
+                         "html_escape"  => "content1",
+                         "html_escape2" => "content2",
+                       }
+                     ],
+                     records([
+                               [
+                                 [1],
+                                 [
+                                   ["html_escape", nil],
+                                   ["html_escape", nil],
+                                 ],
+                                 ["content1", "content2"],
+                               ]
+                             ]))
       end
 
       private

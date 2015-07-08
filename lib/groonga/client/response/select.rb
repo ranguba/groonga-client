@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2015  Kouhei Sutou <kou@clear-code.com>
 # Copyright (C) 2013  Kosuke Asami
 #
 # This library is free software; you can redistribute it and/or
@@ -43,7 +43,17 @@ module Groonga
 
         def parse_result(raw_result)
           n_hits = raw_result.first.first
-          properties = raw_result[1]
+          column_names = {}
+          properties = raw_result[1].collect do |column_name, column_type|
+            base_column_name = column_name
+            suffix = 2
+            while column_names.key?(column_name)
+              column_name = "#{base_column_name}#{suffix}"
+              suffix += 1
+            end
+            column_names[column_name] = true
+            [column_name, column_type]
+          end
           infos = raw_result[2..-1] || []
           items = infos.collect do |info|
             item = {}
