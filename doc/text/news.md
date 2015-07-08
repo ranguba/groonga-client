@@ -1,5 +1,18 @@
 # NEWS
 
+## 0.1.7 - 2015-07-08
+
+### Improvements
+
+  * select: Avoided response value isn't accessible by response column
+    name duplication. Data access key for duplicated column name has
+    `2`, `3`, ... suffix such as `html_escape2` and `html_escape3`.
+    [groonga-dev,03348][Reported by Hiroyuki Sato]
+
+### Thanks
+
+  * Hiroyuki Sato
+
 ## 0.1.6 - 2015-06-10
 
 ### Fixes
