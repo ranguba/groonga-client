@@ -31,6 +31,10 @@ groonga_command_base_dir = base_dir.parent + "groonga-command"
 groonga_command_lib_dir = groonga_command_base_dir + "lib"
 $LOAD_PATH.unshift(groonga_command_lib_dir.to_s)
 
+groonga_command_parser_base_dir = base_dir.parent + "groonga-command-parser"
+groonga_command_parser_lib_dir = groonga_command_parser_base_dir + "lib"
+$LOAD_PATH.unshift(groonga_command_parser_lib_dir.to_s)
+
 lib_dir = base_dir + "lib"
 test_dir = base_dir + "test"
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2015  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,8 @@
 
 require "time"
 require "socket"
+require "groonga/command/parser"
+
 require "groonga/client"
 
 class TestClient < Test::Unit::TestCase
@@ -224,7 +226,7 @@ JSON
   end
 
   module LoadTests
-    def test_load
+    def test_load_json
       values = [
         {"content" => "1st content"},
         {"content" => "2nd content"},
@@ -234,6 +236,22 @@ JSON
       response = client.load(:table => "Memos",
                              :values => JSON.generate(values))
       assert_equal([values.size], response.body)
+      assert_equal([values],
+                   @actual_commands.collect(&:values))
+    end
+
+    def test_load_array
+      values = [
+        {"content" => "1st content"},
+        {"content" => "2nd content"},
+        {"content" => "3rd content"},
+      ]
+      stub_response("[#{values.size}]")
+      response = client.load(:table => "Memos",
+                             :values => values)
+      assert_equal([values.size], response.body)
+      assert_equal([values],
+                   @actual_commands.collect(&:values))
     end
   end
 
@@ -258,6 +276,7 @@ JSON
       @port = @server.addr[1]
       @protocol = :gqtp
 
+      @actual_commands = []
       @response_body = nil
       @thread = Thread.new do
         client = @server.accept
@@ -268,7 +287,8 @@ JSON
           break if raw_header.nil?
 
           header = GQTP::Header.parse(raw_header)
-          client.read(header.size)
+          body = client.read(header.size)
+          @actual_commands << Groonga::Command::Parser.parse(body)
 
           response_header = GQTP::Header.new
           response_header.size = @response_body.bytesize
@@ -296,18 +316,36 @@ JSON
       @port = @server.addr[1]
       @protocol = :http
 
-      @actual_method = nil
-      @actual_path = nil
-
+      @actual_commands = []
       @response_body = nil
       @thread = Thread.new do
         client = @server.accept
         first_line = client.gets
         if /\A([\w]+) ([^ ]+) HTTP/ =~ first_line
-          @actual_method = $1
-          @actual_path = $2
+          # http_method = $1
+          path = $2
+          headers = {}
+          client.each_line do |line|
+            case line
+            when "\r\n"
+              break
+            else
+              name, value = line.strip.split(/: */, 2)
+              headers[name.downcase] = value
+            end
+          end
+          content_length = headers["content-length"]
+          if content_length
+            body = client.read(Integer(content_length))
+          else
+            body = nil
+          end
+          command = Groonga::Command::Parser.parse(path)
+          command[:values] = body if body
+          @actual_commands << command
         end
         @server.close
+
         status = 0
         start = Time.now.to_f
         elapsed = rand

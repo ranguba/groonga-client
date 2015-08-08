@@ -17,6 +17,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "json"
+
 require "groonga/client/default"
 require "groonga/client/command"
 require "groonga/client/empty-request"
@@ -155,6 +157,20 @@ module Groonga
     end
 
     def load(parameters, &block)
+      values = parameters[:values]
+      if values.is_a?(Array)
+        json = "["
+        values.each_with_index do |value, i|
+          if i.zero?
+            json << "\n"
+          else
+            json << ",\n"
+          end
+          json << JSON.generate(value)
+        end
+        json << "\n]"
+        parameters[:values] = json
+      end
       execute_command("load", parameters, &block)
     end
 
