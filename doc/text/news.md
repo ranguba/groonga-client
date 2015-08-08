@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.1.8 - 2015-08-08
+
+### Improvements
+
+  * `load`: Supported `Array` as `values` value.
+
 ## 0.1.7 - 2015-07-08
 
 ### Improvements
