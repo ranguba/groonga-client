@@ -1,5 +1,13 @@
 # NEWS
 
+## 0.1.9 - 2015-09-04
+
+### Improvements
+
+  * {Groonga::Client::ScriptSyntax#format_string}: Added a method that
+    formats the given Ruby `String` as string
+    [in Groonga's script syntax](http://groonga.org/docs/reference/grn_expr/script_syntax.html#string).
+
 ## 0.1.8 - 2015-08-08
 
 ### Improvements
