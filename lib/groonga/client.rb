@@ -24,6 +24,7 @@ require "groonga/client/command"
 require "groonga/client/empty-request"
 require "groonga/client/protocol/gqtp"
 require "groonga/client/protocol/http"
+require "groonga/client/script-syntax"
 
 module Groonga
   class Client
