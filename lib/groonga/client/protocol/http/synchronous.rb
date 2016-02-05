@@ -112,6 +112,9 @@ module Groonga
             else
               request = Net::HTTP::Get.new(path, headers)
             end
+            if do_authenticate?
+              request.basic_auth @options[:auth_user], @options[:auth_password]
+            end
             http.request(request)
           end
 
