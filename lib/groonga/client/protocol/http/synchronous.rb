@@ -109,11 +109,10 @@ module Groonga
               request.content_type = "application/json"
               request.content_length = raw_values.bytesize
               request.body_stream = StringIO.new(raw_values)
-              http.request(request)
             else
               request = Net::HTTP::Get.new(path, headers)
-              http.request(request)
             end
+              http.request(request)
           end
 
           def headers
