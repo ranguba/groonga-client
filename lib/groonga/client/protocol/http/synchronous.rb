@@ -120,6 +120,10 @@ module Groonga
               "user-agent" => @options[:user_agent],
             }
           end
+
+          def do_authenticate?
+            @options[:auth_user] && @options[:auth_password]
+          end
         end
       end
     end
