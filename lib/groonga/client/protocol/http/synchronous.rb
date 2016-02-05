@@ -112,7 +112,7 @@ module Groonga
             else
               request = Net::HTTP::Get.new(path, headers)
             end
-              http.request(request)
+            http.request(request)
           end
 
           def headers
