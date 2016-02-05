@@ -111,7 +111,8 @@ module Groonga
               request.body_stream = StringIO.new(raw_values)
               http.request(request)
             else
-              http.get(path, headers)
+              request = Net::HTTP::Get.new(path, headers)
+              http.request(request)
             end
           end
 
