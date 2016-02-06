@@ -332,6 +332,7 @@ JSON
       @port = @server.addr[1]
       @protocol = :http
 
+      @request_headers = {}
       @actual_commands = []
       @response_body = nil
       @thread = Thread.new do
@@ -350,6 +351,7 @@ JSON
               headers[name.downcase] = value
             end
           end
+          @request_headers = headers
           content_length = headers["content-length"]
           if content_length
             body = client.read(Integer(content_length))
