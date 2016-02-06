@@ -100,7 +100,7 @@ module Groonga
           end
 
           def send_request(http, command)
-            path = command.to_uri_format
+              path = command.to_uri_format
             if command.name == "load"
               raw_values = command[:values]
               command[:values] = nil
