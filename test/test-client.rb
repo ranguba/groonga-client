@@ -394,7 +394,8 @@ EOH
       def test_request_header
         stub_response("[]")
         client.status
-        assert_equal("Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==", @request_headers["authorization"])
+        assert_equal("Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==",
+                     @request_headers["authorization"])
       end
     end
   end
