@@ -100,17 +100,17 @@ module Groonga
           end
 
           def send_request(http, command)
-              path = command.to_uri_format
             if command.name == "load"
               raw_values = command[:values]
               command[:values] = nil
+              path = command.to_uri_format
               command[:values] = raw_values
               request = Net::HTTP::Post.new(path, headers)
               request.content_type = "application/json"
               request.content_length = raw_values.bytesize
               request.body_stream = StringIO.new(raw_values)
             else
-              request = Net::HTTP::Get.new(path, headers)
+              request = Net::HTTP::Get.new(command.to_uri_format, headers)
             end
             setup_authentication(request)
             http.request(request)
