@@ -321,6 +321,7 @@ JSON
 
   class TestHTTP < self
     include Tests
+    include BasicAuthenticationTests
     include ClientFixture
 
     def setup
