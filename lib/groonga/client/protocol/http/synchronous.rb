@@ -125,7 +125,7 @@ module Groonga
           end
 
           def do_authenticate?
-            @options[:user] && @options[:password]
+            @options[:user] and @options[:password]
           end
         end
       end
