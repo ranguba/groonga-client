@@ -255,6 +255,19 @@ JSON
     end
   end
 
+  module BasicAuthenticationTests
+    def setup
+      @auth_user = 'Aladdin'
+      @auth_password = 'open sesame'
+    end
+
+    def test_request_header
+      stub_response('[]')
+      client.status
+      assert_equal 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', @request_headers['authorization']
+    end
+  end
+
   module Tests
     include Utils
     include Assertions
