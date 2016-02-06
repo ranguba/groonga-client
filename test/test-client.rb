@@ -50,7 +50,7 @@ class TestClient < Test::Unit::TestCase
     end
 
     def open_client(&block)
-      options = {:host => @address, :port => @port, :protocol => @protocol}
+      options = {:host => @address, :port => @port, :protocol => @protocol, :auth_user => @auth_user, :auth_password => @auth_password}
       Groonga::Client.open(options, &block)
     end
 
