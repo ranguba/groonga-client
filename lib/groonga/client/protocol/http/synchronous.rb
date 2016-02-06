@@ -113,7 +113,7 @@ module Groonga
               request = Net::HTTP::Get.new(path, headers)
             end
             if do_authenticate?
-              request.basic_auth @options[:auth_user], @options[:auth_password]
+              request.basic_auth @options[:user], @options[:password]
             end
             http.request(request)
           end
@@ -125,7 +125,7 @@ module Groonga
           end
 
           def do_authenticate?
-            @options[:auth_user] && @options[:auth_password]
+            @options[:user] && @options[:password]
           end
         end
       end

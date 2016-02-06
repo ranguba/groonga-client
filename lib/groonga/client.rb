@@ -33,10 +33,10 @@ module Groonga
       #   @param [Hash] options The options.
       #   @option options [:gqtp or :http] :protocol The protocol that is
       #     used by the client.
-      #   @option options [String] :auth_user User ID for HTTP Basic
-      #     Authentication.
-      #   @option options [String] :auth_password Password for HTTP Basic
-      #     Authentication.
+      #   @option options [String] :user User ID. Currently used for HTTP
+      #     Basic Authentication.
+      #   @option options [String] :password Password. Currently used for
+      #     HTTP Basic Authentication.
       #
       # @overload open(options={})
       #   Opens a new client connection.

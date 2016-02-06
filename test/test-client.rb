@@ -50,7 +50,7 @@ class TestClient < Test::Unit::TestCase
     end
 
     def open_client(&block)
-      options = {:host => @address, :port => @port, :protocol => @protocol, :auth_user => @auth_user, :auth_password => @auth_password}
+      options = {:host => @address, :port => @port, :protocol => @protocol, :user => @user, :password => @password}
       Groonga::Client.open(options, &block)
     end
 
@@ -257,8 +257,8 @@ JSON
 
   module BasicAuthenticationTests
     def setup
-      @auth_user = 'Aladdin'
-      @auth_password = 'open sesame'
+      @user = 'Aladdin'
+      @password = 'open sesame'
     end
 
     def test_request_header
@@ -289,8 +289,8 @@ JSON
       @port = @server.addr[1]
       @protocol = :gqtp
 
-      @auth_user = nil
-      @auth_password = nil
+      @user = nil
+      @password = nil
       @actual_commands = []
       @response_body = nil
       @thread = Thread.new do
@@ -334,8 +334,8 @@ JSON
       @port = @server.addr[1]
       @protocol = :http
 
-      @auth_user ||= nil
-      @auth_password ||= nil
+      @user ||= nil
+      @password ||= nil
       @request_headers = {}
       @actual_commands = []
       @response_body = nil
