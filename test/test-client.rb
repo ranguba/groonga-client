@@ -387,14 +387,14 @@ EOH
 
     class TestBasicAuthentication < self
       def setup_authentication
-        @user = 'Aladdin'
-        @password = 'open sesame'
+        @user = "Aladdin"
+        @password = "open sesame"
       end
 
       def test_request_header
-        stub_response('[]')
+        stub_response("[]")
         client.status
-        assert_equal 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', @request_headers['authorization']
+        assert_equal "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==", @request_headers["authorization"]
       end
     end
   end
