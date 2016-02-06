@@ -392,6 +392,14 @@ EOH
       @password = nil
     end
 
+    class TestLoadPath < self
+      def test_path
+        stub_response("[]")
+        client.load(:table => "Memos", :values => [])
+        assert_equal("/d/load?table=Memos", @request_path)
+      end
+    end
+
     class TestBasicAuthentication < self
       def setup_authentication
         @user = "Aladdin"
