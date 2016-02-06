@@ -255,19 +255,6 @@ JSON
     end
   end
 
-  module BasicAuthenticationTests
-    def setup
-      @user = 'Aladdin'
-      @password = 'open sesame'
-    end
-
-    def test_request_header
-      stub_response('[]')
-      client.status
-      assert_equal 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', @request_headers['authorization']
-    end
-  end
-
   module Tests
     include Utils
     include Assertions
@@ -323,19 +310,15 @@ JSON
 
   class TestHTTP < self
     include Tests
-    include BasicAuthenticationTests
     include ClientFixture
 
     def setup
-      super
-
       @address = "127.0.0.1"
       @server = TCPServer.new(@address, 0)
       @port = @server.addr[1]
       @protocol = :http
 
-      @user ||= nil
-      @password ||= nil
+      setup_authentication
       @request_headers = {}
       @actual_commands = []
       @response_body = nil
@@ -394,6 +377,24 @@ EOH
         client.write(header)
         client.write(body)
         client.close
+      end
+    end
+
+    def setup_authentication
+      @user = nil
+      @password = nil
+    end
+
+    class TestBasicAuthentication < self
+      def setup_authentication
+        @user = 'Aladdin'
+        @password = 'open sesame'
+      end
+
+      def test_request_header
+        stub_response('[]')
+        client.status
+        assert_equal 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', @request_headers['authorization']
       end
     end
   end
