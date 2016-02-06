@@ -325,6 +325,8 @@ JSON
     include ClientFixture
 
     def setup
+      super
+
       @address = "127.0.0.1"
       @server = TCPServer.new(@address, 0)
       @port = @server.addr[1]
