@@ -289,6 +289,8 @@ JSON
       @port = @server.addr[1]
       @protocol = :gqtp
 
+      @auth_user = nil
+      @auth_password = nil
       @actual_commands = []
       @response_body = nil
       @thread = Thread.new do
@@ -332,6 +334,8 @@ JSON
       @port = @server.addr[1]
       @protocol = :http
 
+      @auth_user ||= nil
+      @auth_password ||= nil
       @request_headers = {}
       @actual_commands = []
       @response_body = nil
