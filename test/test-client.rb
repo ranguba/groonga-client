@@ -326,6 +326,7 @@ JSON
 
       setup_authentication
       @request_headers = {}
+      @request_path = nil
       @actual_commands = []
       @response_body = nil
       @thread = Thread.new do
@@ -333,7 +334,7 @@ JSON
         first_line = client.gets
         if /\A([\w]+) ([^ ]+) HTTP/ =~ first_line
           # http_method = $1
-          path = $2
+          @request_path = $2
           headers = {}
           client.each_line do |line|
             case line
@@ -351,7 +352,7 @@ JSON
           else
             body = nil
           end
-          command = Groonga::Command::Parser.parse(path)
+          command = Groonga::Command::Parser.parse(@request_path)
           command[:values] = body if body
           @actual_commands << command
         end
@@ -389,6 +390,14 @@ EOH
     def setup_authentication
       @user = nil
       @password = nil
+    end
+
+    class TestLoadPath < self
+      def test_path
+        stub_response("[]")
+        client.load(:table => "Memos", :values => [])
+        assert_equal("/d/load?table=Memos", @request_path)
+      end
     end
 
     class TestBasicAuthentication < self
