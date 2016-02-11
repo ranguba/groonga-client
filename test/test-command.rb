@@ -56,4 +56,9 @@ class TestCommand < Test::Unit::TestCase
     end
     @client.table_list
   end
+
+  def test_table_remove
+    mock(@client).execute_command("table_remove", :name => "Test")
+    @client.table_remove(:name => "Test")
+  end
 end

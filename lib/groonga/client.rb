@@ -219,6 +219,7 @@ module Groonga
     end
 
     def table_remove(parameters, &block)
+      execute_command("table_remove", parameters, &block)
     end
 
     def table_rename(parameters, &block)
