@@ -34,7 +34,7 @@ module Groonga
 
           def send(command)
             begin
-              Net::HTTP.start(@host, @port) do |http|
+              Net::HTTP.start(@host, @port, @options) do |http|
                 http.read_timeout = read_timeout
                 response = send_request(http, command)
                 case response
