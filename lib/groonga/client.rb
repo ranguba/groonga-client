@@ -78,6 +78,7 @@ module Groonga
       if protocol == :gqtp
         @connection = Groonga::Client::Protocol::GQTP.new(options)
       else
+        options[:use_tls] = true if protocol == :https
         @connection = Groonga::Client::Protocol::HTTP.new(options)
       end
     end
