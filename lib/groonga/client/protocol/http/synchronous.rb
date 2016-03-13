@@ -33,10 +33,7 @@ module Groonga
 
           def send(command)
             begin
-              options = {
-                :use_ssl => @url.scheme == "https"
-              }
-              Net::HTTP.start(@url.host, @url.port, options) do |http|
+              Net::HTTP.start(@url.host, @url.port, start_options) do |http|
                 http.read_timeout = read_timeout
                 response = send_request(http, command)
                 case response
@@ -92,6 +89,23 @@ module Groonga
           end
 
           private
+          def start_options
+            tls_options = @options[:tls] || {}
+            case tls_options[:verify_mode]
+            when :none
+              tls_options[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
+            when :peer
+              tls_options[:verify_mode] = OpenSSL::SSL::VERIFY_PEER
+            end
+
+            {
+              :use_ssl => @url.scheme == "https",
+              :ca_file => tls_options[:ca_file],
+              :ca_path => tls_options[:ca_path],
+              :verify_mode => tls_options[:verify_mode],
+            }
+          end
+
           def read_timeout
             timeout = @options[:read_timeout]
             if timeout < 0
