@@ -32,9 +32,8 @@ module Groonga
           end
         end
 
-        def initialize(options)
-          @host = options[:host] || "127.0.0.1"
-          @port = options[:port] || 10041
+        def initialize(url, options)
+          @url = url
           @options = default_options.merge(options)
           @backend = create_backend
         end
@@ -69,7 +68,7 @@ module Groonga
 
           backend_name = backend.to_s.capitalize
           backend_class = self.class.const_get(backend_name)
-          backend_class.new(@host, @port, @options)
+          backend_class.new(@url, @options)
         end
       end
     end

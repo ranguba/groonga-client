@@ -17,6 +17,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "uri"
 require "json"
 
 require "groonga/client/default"
@@ -31,6 +32,8 @@ module Groonga
     class << self
       # @!macro [new] initialize_options
       #   @param [Hash] options The options.
+      #   @option options [String, URI::Generic, URI::HTTP, URI::HTTPS]
+      #     :url The URL of Groonga server.
       #   @option options [:gqtp, :http] :protocol The protocol that is
       #     used by the client.
       #   @option options [String] :user User ID. Currently used for HTTP
@@ -71,15 +74,21 @@ module Groonga
     # @macro initialize_options
     def initialize(options={})
       options = options.dup
-      protocol = options.delete(:protocol) || :gqtp
+      url = options[:url] || build_url(options)
+      url = URL.parse(url) unless url.is_a?(URI::Generic)
+      options[:url] = url
       options[:read_timeout] ||= Default::READ_TIMEOUT
 
       @connection = nil
-      if protocol == :gqtp
-        @connection = Groonga::Client::Protocol::GQTP.new(options)
+      case url.scheme
+      when "gqtp"
+        @connection = Groonga::Client::Protocol::GQTP.new(url, options)
+      when "http", "https"
+        @connection = Groonga::Client::Protocol::HTTP.new(url, options)
       else
-        options[:use_tls] = true if protocol == :https
-        @connection = Groonga::Client::Protocol::HTTP.new(options)
+        message = "unsupported scheme: <#{url.scheme}>: "
+        message << "supported: [gqtp, http, https]"
+        raise ArgumentError, message
       end
     end
 
@@ -234,6 +243,50 @@ module Groonga
     end
 
     private
+    def build_url(options)
+      scheme = (options.delete(:protocol) || "gqtp").to_s
+      host = options.delete(:host) || options.delete(:address) || "127.0.0.1"
+      port = options.delete(:port) || default_port(scheme)
+      user = options.delete(:user)
+      password = options.delete(:password)
+      if user and password
+        userinfo = "#{user}:#{password}"
+      else
+        userinfo = nil
+      end
+
+      arguments = [
+        scheme,
+        userinfo,
+        host,
+        port,
+        nil,
+        nil,
+        nil,
+        nil,
+        nil,
+      ]
+      case scheme
+      when "http"
+        URI::HTTP.new(*arguments)
+      when "https"
+        URI::HTTPS.new(*arguments)
+      else
+        URI::Generic.new(*arguments)
+      end
+    end
+
+    def default_port(scheme)
+      case scheme
+      when "gqtp"
+        10043
+      when "http", "https"
+        10041
+      else
+        nil
+      end
+    end
+
     def execute_command(command_name, parameters={}, &block)
       parameters = normalize_parameters(parameters)
       command_class = Groonga::Command.find(command_name)

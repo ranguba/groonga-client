@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013-2014  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -29,9 +27,10 @@ module Groonga
   class Client
     module Protocol
       class GQTP
-        def initialize(options)
+        def initialize(url, options={})
           begin
-            @client = ::GQTP::Client.new(options)
+            @client = ::GQTP::Client.new(:host => url.host,
+                                         :port => url.port)
           rescue ::GQTP::ConnectionError
             raise WrappedError.new($!)
           end

@@ -1,5 +1,5 @@
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013-2014  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -26,15 +26,17 @@ module Groonga
     module Protocol
       class HTTP
         class Synchronous
-          def initialize(host, port, options)
-            @host = host
-            @port = port
+          def initialize(url, options={})
+            @url = url
             @options = options
           end
 
           def send(command)
             begin
-              Net::HTTP.start(@host, @port, use_ssl: @options[:use_tls]) do |http|
+              options = {
+                :use_ssl => @url.scheme == "https"
+              }
+              Net::HTTP.start(@url.host, @url.port, options) do |http|
                 http.read_timeout = read_timeout
                 response = send_request(http, command)
                 case response
@@ -123,10 +125,12 @@ module Groonga
           end
 
           def setup_authentication(request)
-            user = @options[:user]
-            password = @options[:password]
-            return if user.nil? or password.nil?
+            userinfo = @url.userinfo
+            return if userinfo.nil?
 
+            user, password = userinfo.split(/:/, 2).collect do |component|
+              URI.decode_www_form_component(component)
+            end
             request.basic_auth(user, password)
           end
         end

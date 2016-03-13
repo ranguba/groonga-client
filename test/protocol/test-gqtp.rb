@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2013-2014  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -60,11 +58,10 @@ class TestProtocolGQTP < Test::Unit::TestCase
 
   private
   def connect(options={})
-    default_options = {
-      :host => @address,
-      :port => @port,
-    }
-    Groonga::Client::Protocol::GQTP.new(default_options.merge(options))
+    url = URI::Generic.build(:scheme => "gqtp",
+                             :host => @address,
+                             :port => @port)
+    Groonga::Client::Protocol::GQTP.new(url, options)
   end
 
   def process_client_close(client)
@@ -84,9 +81,11 @@ class TestProtocolGQTP < Test::Unit::TestCase
       server = TCPServer.new("127.0.0.1", 0)
       free_port = server.addr[1]
       server.close
+      url = URI::Generic.build(:scheme => "gqtp",
+                               :host => "127.0.0.1",
+                               :port => free_port)
       assert_raise(Groonga::Client::Protocol::WrappedError) do
-        Groonga::Client::Protocol::GQTP.new(:host => "127.0.0.1",
-                                            :port => free_port)
+        Groonga::Client::Protocol::GQTP.new(url, {})
       end
     end
   end

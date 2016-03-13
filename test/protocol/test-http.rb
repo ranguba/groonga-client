@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2013-2014  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -74,11 +72,9 @@ EOH
   end
 
   def connect(options={})
-    default_options = {
-      :host => @address,
-      :port => @port,
-    }
-    Groonga::Client::Protocol::HTTP.new(default_options.merge(options))
+    url = URI::HTTP.build(:host => @address,
+                          :port => @port)
+    Groonga::Client::Protocol::HTTP.new(url, options)
   end
 
   def test_connected?

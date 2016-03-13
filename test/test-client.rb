@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013-2015  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -50,13 +48,15 @@ class TestClient < Test::Unit::TestCase
     end
 
     def open_client(&block)
-      options = {
-        :host => @address,
-        :port => @port,
-        :protocol => @protocol,
-        :user => @user,
-        :password => @password,
-      }
+      url = "#{@protocol}://"
+      if @user and @password
+        url << URI.encode_www_form_component(@user)
+        url << ":"
+        url << URI.encode_www_form_component(@password)
+        url << "@"
+      end
+      url << "#{@address}:#{@port}"
+      options = {:url => URI.parse(url)}
       Groonga::Client.open(options, &block)
     end
 
@@ -228,6 +228,19 @@ JSON
         "response"
       end
       assert_equal("response", response)
+    end
+
+    def test_open_components
+      stub_response("[29]")
+      options = {
+        :host => @address,
+        :port => @port,
+        :protocol => @protocol,
+      }
+      response = Groonga::Client.open(options) do |client|
+        client.status
+      end
+      assert_equal([29], response.body)
     end
   end
 
@@ -409,6 +422,22 @@ EOH
       def test_request_header
         stub_response("[]")
         client.status
+        assert_equal("Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==",
+                     @request_headers["authorization"])
+      end
+
+      def test_open_components
+        stub_response("[]")
+        options = {
+          :host => @address,
+          :port => @port,
+          :protocol => @protocol,
+          :user => @user,
+          :password => @password,
+        }
+        Groonga::Client.open(options) do |client|
+          client.status
+        end
         assert_equal("Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==",
                      @request_headers["authorization"])
       end
