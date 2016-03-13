@@ -405,7 +405,7 @@ EOH
       @password = nil
     end
 
-    class TestLoadPath < self
+    class TestLoad < self
       def test_path
         stub_response("[]")
         client.load(:table => "Memos", :values => [])
