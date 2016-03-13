@@ -31,7 +31,7 @@ module Groonga
     class << self
       # @!macro [new] initialize_options
       #   @param [Hash] options The options.
-      #   @option options [:gqtp or :http] :protocol The protocol that is
+      #   @option options [:gqtp, :http] :protocol The protocol that is
       #     used by the client.
       #   @option options [String] :user User ID. Currently used for HTTP
       #     Basic Authentication.
