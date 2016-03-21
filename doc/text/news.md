@@ -1,5 +1,13 @@
 # NEWS
 
+## 0.2.1 - 2016-03-21
+
+### Improvements
+
+  * HTTP: Supported path.
+
+  * HTTP: Accepted `nil` as `:read_timeout` value.
+
 ## 0.2.0 - 2016-03-21
 
 ### Improvements
