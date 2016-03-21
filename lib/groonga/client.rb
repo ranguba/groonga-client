@@ -165,7 +165,7 @@ module Groonga
     end
 
     def execute(command_or_name, parameters={}, &block)
-      if command_or_name.is_a?(Command)
+      if command_or_name.is_a?(Groonga::Command::Base)
         command = command_or_name
       else
         command_name = command_or_name
