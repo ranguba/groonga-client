@@ -20,12 +20,15 @@ require "net/http"
 require "groonga/client/version"
 require "groonga/client/empty-request"
 require "groonga/client/protocol/error"
+require "groonga/client/protocol/http/path-resolvable"
 
 module Groonga
   class Client
     module Protocol
       class HTTP
         class Synchronous
+          include PathResolvable
+
           def initialize(url, options={})
             @url = url
             @options = options
@@ -119,14 +122,15 @@ module Groonga
             if command.is_a?(Groonga::Command::Load)
               raw_values = command[:values]
               command[:values] = nil
-              path = command.to_uri_format
+              path = resolve_path(@url, command.to_uri_format)
               command[:values] = raw_values
               request = Net::HTTP::Post.new(path, headers)
               request.content_type = "application/json"
               request.content_length = raw_values.bytesize
               request.body_stream = StringIO.new(raw_values)
             else
-              request = Net::HTTP::Get.new(command.to_uri_format, headers)
+              path = resolve_path(@url, command.to_uri_format)
+              request = Net::HTTP::Get.new(path, headers)
             end
             setup_authentication(request)
             http.request(request)

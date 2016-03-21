@@ -1,4 +1,4 @@
-# Copyright (C) 2014  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2014-2016  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@ require "coolio"
 
 require "groonga/client/empty-request"
 require "groonga/client/protocol/error"
+require "groonga/client/protocol/http/path-resolvable"
 
 module Groonga
   class Client
@@ -38,6 +39,8 @@ module Groonga
           end
 
           class GroongaHTTPClient < ::Coolio::HttpClient
+            include PathResolvable
+
             def initialize(socket, callback)
               super(socket)
               @body = ""
@@ -73,10 +76,11 @@ module Groonga
           def send(command, &block)
             client = GroongaHTTPClient.connect(@host, @port, block)
             client.attach(@loop)
+            url = URI("http://#{@host}:#{@port}")
             if command.is_a?(Groonga::Command::Load)
               raw_values = command[:values]
               command[:values] = nil
-              path = command.to_uri_format
+              path = resolve_path(url, command.to_uri_format)
               command[:values] = raw_values
               options = {
                 :head => {
@@ -87,7 +91,8 @@ module Groonga
               }
               client.request("POST", path, options)
             else
-              client.request("GET", command.to_uri_format)
+              path = resolve_path(url, command.to_uri_format)
+              client.request("GET", path)
             end
             Request.new(client, @loop)
           end

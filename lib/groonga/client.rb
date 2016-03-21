@@ -197,6 +197,7 @@ module Groonga
       scheme = (options.delete(:protocol) || "gqtp").to_s
       host = options.delete(:host) || options.delete(:address) || "127.0.0.1"
       port = options.delete(:port) || default_port(scheme)
+      path = options.delete(:path)
       user = options.delete(:user)
       password = options.delete(:password)
       if user and password
@@ -211,7 +212,7 @@ module Groonga
         host,
         port,
         nil,
-        nil,
+        path,
         nil,
         nil,
         nil,

@@ -469,5 +469,33 @@ EOH
                      @request_headers["authorization"])
       end
     end
+
+    class TestPath < self
+      def component_based_open_options
+        {
+          :protocol => @protocol,
+          :host => @address,
+          :port => @port,
+        }
+      end
+
+      def test_with_trailing_slash
+        stub_response("[]")
+        options = component_based_open_options.merge(:path => "/sub_path/")
+        Groonga::Client.open(options) do |client|
+          client.status
+        end
+        assert_equal("/sub_path/d/status", @request_path)
+      end
+
+      def test_without_trailing_slash
+        stub_response("[]")
+        options = component_based_open_options.merge(:path => "/sub_path")
+        Groonga::Client.open(options) do |client|
+          client.status
+        end
+        assert_equal("/sub_path/d/status", @request_path)
+      end
+    end
   end
 end
