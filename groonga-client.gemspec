@@ -1,7 +1,7 @@
-# -*- mode: ruby; coding: utf-8 -*-
+# -*- mode: ruby -*-
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2014-2015  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2014-2016  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
   spec.test_files += Dir.glob("test/**/*")
 
   spec.add_runtime_dependency("gqtp", ">= 1.0.4")
-  spec.add_runtime_dependency("groonga-command", ">= 1.0.8")
+  spec.add_runtime_dependency("groonga-command", ">= 1.1.8")
 
   spec.add_development_dependency("bundler")
   spec.add_development_dependency("rake")
