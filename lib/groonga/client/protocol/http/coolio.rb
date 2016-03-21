@@ -73,7 +73,7 @@ module Groonga
           def send(command, &block)
             client = GroongaHTTPClient.connect(@host, @port, block)
             client.attach(@loop)
-            if command.name == "load"
+            if command.is_a?(Groonga::Command::Load)
               raw_values = command[:values]
               command[:values] = nil
               path = command.to_uri_format

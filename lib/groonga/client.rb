@@ -129,46 +129,6 @@ module Groonga
       end
     end
 
-    def cache_limit(parameters, &block)
-      execute("cache_limit", parameters, &block)
-    end
-
-    def check(parameters, &block)
-      execute("check", parameters, &block)
-    end
-
-    def clearlock(parameters={}, &block)
-      execute("clearlock", parameters, &block)
-    end
-
-    def column_create(parameters, &block)
-      execute("column_create", parameters, &block)
-    end
-
-    def column_list(parameters, &block)
-      execute("column_list", parameters, &block)
-    end
-
-    def column_remove(parameters, &block)
-      execute("column_remove", parameters, &block)
-    end
-
-    def column_rename(parameters, &block)
-      execute("column_rename", parameters, &block)
-    end
-
-    def defrag(parameters={}, &block)
-      execute("defrag", parameters, &block)
-    end
-
-    def delete(parameters, &block)
-      execute("delete", parameters, &block)
-    end
-
-    def dump(parameters={}, &block)
-      execute("dump", parameters, &block)
-    end
-
     def load(parameters, &block)
       values = parameters[:values]
       if values.is_a?(Array)
@@ -184,50 +144,7 @@ module Groonga
         json << "\n]"
         parameters[:values] = json
       end
-      execute("load", parameters, &block)
-    end
-
-    def log_level(parameters, &block)
-      execute("log_level", parameters, &block)
-    end
-
-    def log_put(parameters, &block)
-      execute("log_put", parameters, &block)
-    end
-
-    def log_reopen(parameters={}, &block)
-      execute("log_reopen", parameters, &block)
-    end
-
-    def quit(parameters={}, &block)
-      execute("quit", parameters, &block)
-    end
-
-    def register(parameters, &block)
-      execute("register", parameters, &block)
-    end
-
-    def select(parameters, &block)
-      execute("select", parameters, &block)
-    end
-
-    def shutdown(parameters={}, &block)
-    end
-
-    def status(parameters={}, &block)
-      execute("status", parameters, &block)
-    end
-
-    def table_create(parameters, &block)
-      execute("table_create", parameters, &block)
-    end
-
-    def table_list(parameters={}, &block)
-      execute("table_list", parameters, &block)
-    end
-
-    def table_remove(parameters, &block)
-      execute("table_remove", parameters, &block)
+      execute(:load, parameters, &block)
     end
 
     def execute(command_or_name, parameters={}, &block)
