@@ -1,5 +1,38 @@
 # NEWS
 
+## 0.2.0 - 2016-03-21
+
+### Improvements
+
+  * HTTP: Supported basic authentication.
+    [GitHub#4][Patch by KITAITI Makoto]
+
+  * response: Supported `table_remove`.
+    [GitHub#7][Patch by Masafumi Yokoyama]
+
+  * HTTP: Supported HTTPS by passing `:use_tls => true` option to
+    {Groonga::Client.new}.
+    [GitHub#8][Patch by KITAITI Makoto]
+
+  * Supported URI as server information in {Groonga::Client.new}.
+
+  * Required groonga-command 1.2.0 or later.
+
+  * Accepted `Symbol` as registered command name.
+
+  * Supported dynamic command execution. Now, you can use commands
+    that aren't supported in groonga-client yet.
+
+  * Added {Groonga::Client.default_options}.
+
+  * Added {Groonga::Client.default_options=}.
+
+### Thanks
+
+  * KITAITI Makoto
+
+  * Masafumi Yokoyama
+
 ## 0.1.9 - 2015-09-04
 
 ### Improvements
