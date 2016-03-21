@@ -50,10 +50,6 @@ TODO: use commands with parameters for examples
 * English: [groonga-talk@lists.sourceforge.net](https://lists.sourceforge.net/lists/listinfo/groonga-talk)
 * Japanese: [groonga-dev@lists.sourceforge.jp](http://lists.sourceforge.jp/mailman/listinfo/groonga-dev)
 
-## Thanks
-
-* ...
-
 ## Authors
 
 * Haruka Yoshihara \<yoshihara@clear-code.com\>
