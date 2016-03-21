@@ -111,7 +111,7 @@ module Groonga
 
           def read_timeout
             timeout = @options[:read_timeout]
-            if timeout < 0
+            if timeout.nil? or timeout < 0
               nil
             else
               timeout
