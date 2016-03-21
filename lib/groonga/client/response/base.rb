@@ -42,7 +42,7 @@ module Groonga
         #   server.
         # @return [Base]
         def parse(command, raw_response)
-          klass = find(command.name)
+          klass = find(command.command_name)
           klass.parse(command, raw_response)
         end
       end
