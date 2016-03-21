@@ -47,7 +47,7 @@ class TestClient < Test::Unit::TestCase
       @client ||= open_client
     end
 
-    def open_client(&block)
+    def open_options
       url = "#{@protocol}://"
       if @user and @password
         url << URI.encode_www_form_component(@user)
@@ -56,8 +56,11 @@ class TestClient < Test::Unit::TestCase
         url << "@"
       end
       url << "#{@address}:#{@port}"
-      options = {:url => URI.parse(url)}
-      Groonga::Client.open(options, &block)
+      {:url => URI.parse(url)}
+    end
+
+    def open_client(&block)
+      Groonga::Client.open(open_options, &block)
     end
 
     def stub_response(body, output_type=:json)
@@ -274,6 +277,29 @@ JSON
     end
   end
 
+  module DefaultOptionsTests
+    def test_default_options
+      change_default_options(open_options) do
+        expected_response = {"key" => "value"}
+        stub_response(expected_response.to_json)
+        response = Groonga::Client.open do |client|
+          client.status
+        end
+        assert_equal(expected_response, response.body)
+      end
+    end
+
+    def change_default_options(options)
+      default_options = Groonga::Client.default_options
+      begin
+        Groonga::Client.default_options = options
+        yield
+      ensure
+        Groonga::Client.default_options = default_options
+      end
+    end
+  end
+
   module Tests
     include Utils
     include Assertions
@@ -283,6 +309,7 @@ JSON
     include ParametersTests
     include OpenTests
     include LoadTests
+    include DefaultOptionsTests
   end
 
   class TestGQTP < self

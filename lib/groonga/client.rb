@@ -28,6 +28,23 @@ require "groonga/client/script-syntax"
 module Groonga
   class Client
     class << self
+      @@deafult_options = {}
+
+      # @return [Hash] The default options for {Groonga::Client.new}.
+      #
+      # @since 0.2.0
+      def default_options
+        @@deafult_options
+      end
+
+      # @param [Hash] options The new default options for
+      #   {Groonga::Client.new}.
+      #
+      # @since 0.2.0
+      def default_options=(options)
+        @@deafult_options = options
+      end
+
       # @!macro [new] initialize_options
       #   @param [Hash] options The options.
       #   @option options [String, URI::Generic, URI::HTTP, URI::HTTPS]
@@ -71,7 +88,7 @@ module Groonga
 
     # @macro initialize_options
     def initialize(options={})
-      options = options.dup
+      options = self.class.default_options.merge(options)
       url = options[:url] || build_url(options)
       url = URL.parse(url) unless url.is_a?(URI::Generic)
       options[:url] = url
