@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
+# Copyright (C) 2016  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,7 +20,9 @@ require "groonga/client/response/base"
 module Groonga
   class Client
     module Response
-      class ClearLock < Base
+      class LockClear < Base
+        Response.register("lock_clear", self)
+        # For backward compatibility
         Response.register("clearlock", self)
       end
     end
