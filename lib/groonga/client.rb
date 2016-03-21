@@ -130,43 +130,43 @@ module Groonga
     end
 
     def cache_limit(parameters, &block)
-      execute_command("cache_limit", parameters, &block)
+      execute("cache_limit", parameters, &block)
     end
 
     def check(parameters, &block)
-      execute_command("check", parameters, &block)
+      execute("check", parameters, &block)
     end
 
     def clearlock(parameters={}, &block)
-      execute_command("clearlock", parameters, &block)
+      execute("clearlock", parameters, &block)
     end
 
     def column_create(parameters, &block)
-      execute_command("column_create", parameters, &block)
+      execute("column_create", parameters, &block)
     end
 
     def column_list(parameters, &block)
-      execute_command("column_list", parameters, &block)
+      execute("column_list", parameters, &block)
     end
 
     def column_remove(parameters, &block)
-      execute_command("column_remove", parameters, &block)
+      execute("column_remove", parameters, &block)
     end
 
     def column_rename(parameters, &block)
-      execute_command("column_rename", parameters, &block)
+      execute("column_rename", parameters, &block)
     end
 
     def defrag(parameters={}, &block)
-      execute_command("defrag", parameters, &block)
+      execute("defrag", parameters, &block)
     end
 
     def delete(parameters, &block)
-      execute_command("delete", parameters, &block)
+      execute("delete", parameters, &block)
     end
 
     def dump(parameters={}, &block)
-      execute_command("dump", parameters, &block)
+      execute("dump", parameters, &block)
     end
 
     def load(parameters, &block)
@@ -184,60 +184,78 @@ module Groonga
         json << "\n]"
         parameters[:values] = json
       end
-      execute_command("load", parameters, &block)
+      execute("load", parameters, &block)
     end
 
     def log_level(parameters, &block)
-      execute_command("log_level", parameters, &block)
+      execute("log_level", parameters, &block)
     end
 
     def log_put(parameters, &block)
-      execute_command("log_put", parameters, &block)
+      execute("log_put", parameters, &block)
     end
 
     def log_reopen(parameters={}, &block)
-      execute_command("log_reopen", parameters, &block)
+      execute("log_reopen", parameters, &block)
     end
 
     def quit(parameters={}, &block)
-      execute_command("quit", parameters, &block)
+      execute("quit", parameters, &block)
     end
 
     def register(parameters, &block)
-      execute_command("register", parameters, &block)
+      execute("register", parameters, &block)
     end
 
     def select(parameters, &block)
-      execute_command("select", parameters, &block)
+      execute("select", parameters, &block)
     end
 
     def shutdown(parameters={}, &block)
     end
 
     def status(parameters={}, &block)
-      execute_command("status", parameters, &block)
+      execute("status", parameters, &block)
     end
 
     def table_create(parameters, &block)
-      execute_command("table_create", parameters, &block)
+      execute("table_create", parameters, &block)
     end
 
     def table_list(parameters={}, &block)
-      execute_command("table_list", parameters, &block)
+      execute("table_list", parameters, &block)
     end
 
     def table_remove(parameters, &block)
-      execute_command("table_remove", parameters, &block)
+      execute("table_remove", parameters, &block)
     end
 
-    def table_rename(parameters, &block)
+    def execute(command_or_name, parameters={}, &block)
+      if command_or_name.is_a?(Command)
+        command = command_or_name
+      else
+        command_name = command_or_name
+        parameters = normalize_parameters(parameters)
+        command_class = Groonga::Command.find(command_name)
+        command = command_class.new(command_name, parameters)
+      end
+      execute_command(command, &block)
     end
 
-    def truncate(parameters, &block)
+    def method_missing(name, *args, **kwargs, &block)
+      if groonga_command_name?(name)
+        execute(name, *args, **kwargs, &block)
+      else
+        super
+      end
     end
 
-    def execute(command, &block)
-      Client::Command.new(command).execute(@connection, &block)
+    def respond_to_missing?(name, include_private)
+      if groonga_command_name?(name)
+        true
+      else
+        super
+      end
     end
 
     private
@@ -285,11 +303,8 @@ module Groonga
       end
     end
 
-    def execute_command(command_name, parameters={}, &block)
-      parameters = normalize_parameters(parameters)
-      command_class = Groonga::Command.find(command_name)
-      command = command_class.new(command_name, parameters)
-      execute(command, &block)
+    def groonga_command_name?(name)
+      /\A[a-zA-Z][a-zA-Z\d_]+\z/ === name.to_s
     end
 
     def normalize_parameters(parameters)
@@ -298,6 +313,10 @@ module Groonga
         normalized_parameters[key] = value.to_s
       end
       normalized_parameters
+    end
+
+    def execute_command(command, &block)
+      Client::Command.new(command).execute(@connection, &block)
     end
   end
 end
