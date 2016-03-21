@@ -1,5 +1,17 @@
 # NEWS
 
+## 0.2.2 - 2016-03-22
+
+### Improvements
+
+  * response: Supported `lock_clear` command.
+
+  * response: Supported `schema` command partially.
+
+### Fixes
+
+  * Fixed a bug that `Groonga::Command` isn't accepted.
+
 ## 0.2.1 - 2016-03-21
 
 ### Improvements
