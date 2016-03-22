@@ -45,6 +45,16 @@ module Groonga
           end
         end
 
+        # @return [Hash<String, Normalizer>] Key is normalizer name and
+        #   value is the definition of the normalizer.
+        #
+        # @since 0.2.3
+        def normalizers
+          @normalizers ||= HashValueConverter.convert(@body["normalizers"]) do |normalizer|
+            Normalizer[normalizer]
+          end
+        end
+
         # @return [Hash<String, Table>] Key is table name and value is the
         #   definition of the table.
         #
@@ -87,6 +97,10 @@ module Groonga
         end
 
         class Tokenizer < Hash
+          include Hashie::Extensions::MethodAccess
+        end
+
+        class Normalizer < Hash
           include Hashie::Extensions::MethodAccess
         end
 
@@ -175,6 +189,8 @@ module Groonga
               super(key, coerce_key_type(value))
             when :tokenizer
               super(key, coerce_tokenzer(value))
+            when :normalizer
+              super(key, coerce_normalizer(value))
             when :columns
               super(key, coerce_columns(value))
             when :indexes
@@ -200,6 +216,14 @@ module Groonga
               nil
             else
               @schema.tokenizers[raw_tokenizer["name"]]
+            end
+          end
+
+          def coerce_normalizer(raw_normalizer)
+            if raw_normalizer.nil?
+              nil
+            else
+              @schema.normalizers[raw_normalizer["name"]]
             end
           end
 

@@ -62,6 +62,26 @@ class TestResponseSchema < Test::Unit::TestCase
                      response.tables["Users"].key_type.name)
       end
 
+      def test_normalizer
+        body = {
+          "normalizers" => {
+            "NormalizerAuto" => {
+              "name" => "NormalizerAuto",
+            },
+          },
+          "tables" => {
+            "Users" => {
+              "normalizer" => {
+                "name" => "NormalizerAuto",
+              },
+            }
+          }
+        }
+        response = create_response(body)
+        assert_equal(response.normalizers["NormalizerAuto"],
+                     response.tables["Users"].normalizer)
+      end
+
       def test_columns
         body = {
           "tables" => {
