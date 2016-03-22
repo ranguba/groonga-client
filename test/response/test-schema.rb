@@ -62,6 +62,26 @@ class TestResponseSchema < Test::Unit::TestCase
                      response.tables["Users"].key_type.name)
       end
 
+      def test_tokenizer
+        body = {
+          "tokenizers" => {
+            "TokenBigram" => {
+              "name" => "TokenBigram",
+            },
+          },
+          "tables" => {
+            "Terms" => {
+              "tokenizer" => {
+                "name" => "TokenBigram",
+              },
+            }
+          }
+        }
+        response = create_response(body)
+        assert_equal(response.tokenizers["TokenBigram"],
+                     response.tables["Terms"].tokenizer)
+      end
+
       def test_normalizer
         body = {
           "normalizers" => {

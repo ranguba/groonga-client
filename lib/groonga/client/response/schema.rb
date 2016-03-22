@@ -202,7 +202,7 @@ module Groonga
             when :key_type
               super(key, coerce_key_type(value))
             when :tokenizer
-              super(key, coerce_tokenzer(value))
+              super(key, coerce_tokenizer(value))
             when :normalizer
               super(key, coerce_normalizer(value))
             when :columns
