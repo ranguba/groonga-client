@@ -1,12 +1,24 @@
 # NEWS
 
-## 0.2.2 - 2016-03-22
+## 0.2.3 - 2016-03-22
 
 ### Improvements
 
   * response: Supported `lock_clear` command.
 
   * response: Supported `schema` command partially.
+
+## 0.2.2 - 2016-03-22
+
+### Improvements
+
+  * response: `schema`: Supported index.
+
+  * response: `schema`: Supported normalizer.
+
+  * response: `schema`: Supported token filter.
+
+  * response: `schema`: Supported tokenizer.
 
 ### Fixes
 
