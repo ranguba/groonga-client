@@ -50,13 +50,24 @@ module Groonga
         #
         # @since 0.2.2
         def tables
-          @tables ||= HashValueConverter.convert(@body["tables"]) do |raw_table|
-            table = Table.new(self)
-            raw_table.each do |key, value|
-              table[key] = value
-            end
-            table
+          @tables ||= nil
+          return @tables if @tables
+
+          @tables = {}
+          @body["tables"].each do |key, _|
+            @tables[key] = Table.new(self)
           end
+          @body["tables"].each do |key, raw_table|
+            table = @tables[key]
+            raw_table.each do |table_key, table_value|
+              table[table_key] = table_value
+            end
+          end
+          @tables
+        end
+
+        private
+        def coerce_tables
         end
 
         module HashValueConverter
@@ -87,14 +98,65 @@ module Groonga
           include Hashie::Extensions::MethodAccess
         end
 
+        class Index < Hash
+          include Hashie::Extensions::MethodAccess
+
+          def initialize(schema, raw_index)
+            @schema = schema
+            super()
+            raw_index.each do |key, value|
+              self[key] = value
+            end
+          end
+
+          def []=(key, value)
+            case key.to_sym
+            when :table
+              super(key, coerce_table(value))
+            else
+              super
+            end
+          end
+
+          def column
+            column_name = name
+            if column_name.nil?
+              column_name
+            else
+              table.columns[column_name]
+            end
+          end
+
+          private
+          def coerce_table(table_name)
+            @schema.tables[table_name]
+          end
+        end
+
         class Column < Hash
           include Hashie::Extensions::MethodAccess
 
-          def initialize(schema, properties)
+          def initialize(schema, raw_column)
             @schema = schema
             super()
-            properties.each do |key, value|
+            raw_column.each do |key, value|
               self[key] = value
+            end
+          end
+
+          def []=(key, value)
+            case key.to_sym
+            when :indexes
+              super(key, coerce_indexes(value))
+            else
+              super
+            end
+          end
+
+          private
+          def coerce_indexes(raw_indexes)
+            raw_indexes.collect do |raw_index|
+              Index.new(@schema, raw_index)
             end
           end
         end
@@ -115,6 +177,8 @@ module Groonga
               super(key, coerce_tokenzer(value))
             when :columns
               super(key, coerce_columns(value))
+            when :indexes
+              super(key, coerce_indexes(value))
             else
               super
             end
@@ -142,6 +206,12 @@ module Groonga
           def coerce_columns(raw_columns)
             HashValueConverter.convert(raw_columns) do |raw_column|
               Column.new(@schema, raw_column)
+            end
+          end
+
+          def coerce_indexes(raw_indexes)
+            raw_indexes.collect do |raw_index|
+              Index.new(@schema, raw_index)
             end
           end
         end

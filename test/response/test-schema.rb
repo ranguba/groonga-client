@@ -78,6 +78,94 @@ class TestResponseSchema < Test::Unit::TestCase
         assert_equal("age",
                      response.tables["Users"].columns["age"].name)
       end
+
+      def test_indexes
+        body = {
+          "tables" => {
+            "Users" => {
+              "indexes" => [
+                {
+                  "full_name" => "Names.users"
+                }
+              ]
+            }
+          }
+        }
+        response = create_response(body)
+        assert_equal("Names.users",
+                     response.tables["Users"].indexes[0].full_name)
+      end
+    end
+
+    class TestColumn < self
+      def test_indexes
+        body = {
+          "tables" => {
+            "Users" => {
+              "columns" => {
+                "age" => {
+                  "indexes" => [
+                    {
+                      "full_name" => "Ages.users",
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+        response = create_response(body)
+        assert_equal("Ages.users",
+                     response.tables["Users"].columns["age"].indexes[0].full_name)
+      end
+    end
+
+    class TestIndex < self
+      def test_table
+        body = {
+          "tables" => {
+            "Names" => {
+              "name" => "Names",
+            },
+            "Users" => {
+              "indexes" => [
+                {
+                  "table" => "Names"
+                }
+              ]
+            }
+          }
+        }
+        response = create_response(body)
+        assert_equal(response.tables["Names"],
+                     response.tables["Users"].indexes[0].table)
+      end
+
+      def test_column
+        body = {
+          "tables" => {
+            "Names" => {
+              "name" => "Names",
+              "columns" => {
+                "users_key" => {
+                  "name" => "users_key",
+                },
+              },
+            },
+            "Users" => {
+              "indexes" => [
+                {
+                  "table" => "Names",
+                  "name" => "users_key",
+                }
+              ]
+            }
+          }
+        }
+        response = create_response(body)
+        assert_equal(response.tables["Names"].columns["users_key"],
+                     response.tables["Users"].indexes[0].column)
+      end
     end
   end
 end
