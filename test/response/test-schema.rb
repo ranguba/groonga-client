@@ -40,7 +40,7 @@ class TestResponseSchema < Test::Unit::TestCase
       Groonga::Client::Response::Schema.new(@command, header, body)
     end
 
-    class TestTables < self
+    class TestTable < self
       def test_key_type
         body = {
           "types" => {
@@ -80,6 +80,28 @@ class TestResponseSchema < Test::Unit::TestCase
         response = create_response(body)
         assert_equal(response.normalizers["NormalizerAuto"],
                      response.tables["Users"].normalizer)
+      end
+
+      def test_token_filters
+        body = {
+          "token_filters" => {
+            "TokenFilterStopWord" => {
+              "name" => "TokenFilterStopWord",
+            },
+          },
+          "tables" => {
+            "Names" => {
+              "token_filters" => [
+                {
+                  "name" => "TokenFilterStopWord",
+                },
+              ]
+            }
+          }
+        }
+        response = create_response(body)
+        assert_equal([response.token_filters["TokenFilterStopWord"]],
+                     response.tables["Names"].token_filters)
       end
 
       def test_columns

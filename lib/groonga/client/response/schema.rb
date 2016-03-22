@@ -55,6 +55,16 @@ module Groonga
           end
         end
 
+        # @return [Hash<String, TokenFilter>] Key is token filter name and
+        #   value is the definition of the token filter.
+        #
+        # @since 0.2.3
+        def token_filters
+          @token_filters ||= HashValueConverter.convert(@body["token_filters"]) do |token_filter|
+            TokenFilter[token_filter]
+          end
+        end
+
         # @return [Hash<String, Table>] Key is table name and value is the
         #   definition of the table.
         #
@@ -101,6 +111,10 @@ module Groonga
         end
 
         class Normalizer < Hash
+          include Hashie::Extensions::MethodAccess
+        end
+
+        class TokenFilter < Hash
           include Hashie::Extensions::MethodAccess
         end
 
@@ -224,6 +238,12 @@ module Groonga
               nil
             else
               @schema.normalizers[raw_normalizer["name"]]
+            end
+          end
+
+          def coerce_token_filters(raw_token_filters)
+            raw_token_filters.collect do |raw_token_filter|
+              TokenFilter[raw_token_filter]
             end
           end
 
