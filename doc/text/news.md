@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.2.4 - 2016-03-28
+
+### Improvements
+
+  * response: Added `Groonga::Client::Response::Base#error_message`.
+
 ## 0.2.3 - 2016-03-22
 
 ### Improvements
