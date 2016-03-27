@@ -172,6 +172,12 @@ module Groonga
           (header || [0, 0, 0.0])[2]
         end
 
+        # @return [String, nil] The error message of the response.
+        # @since 0.2.4
+        def error_message
+          (header || [0, 0, 0.0, nil])[3]
+        end
+
         # @return [Boolean] `true` if the request is processed successfully,
         #   `false` otherwise.
         # @since 0.1.0

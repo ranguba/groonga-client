@@ -71,6 +71,25 @@ class TestResponseBase < Test::Unit::TestCase
       end
     end
 
+    class TestErrorMessage < self
+      def test_have_header
+        error_message = "invalid argument"
+        header = [
+          -21,
+          1396012478.14975,
+          0.00050806999206543,
+          error_message,
+        ]
+        response = Groonga::Client::Response::Base.new(nil, header, nil)
+        assert_equal(error_message, response.error_message)
+      end
+
+      def test_no_header
+        response = Groonga::Client::Response::Error.new(nil, nil, nil)
+        assert_nil(response.error_message)
+      end
+    end
+
     class TestSuccess < self
       def test_have_header
         header = [
