@@ -56,7 +56,7 @@ class TestClient < Test::Unit::TestCase
         url << "@"
       end
       url << "#{@address}:#{@port}"
-      {:url => URI.parse(url)}
+      {:url => url}
     end
 
     def open_client(&block)
