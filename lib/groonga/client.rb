@@ -90,7 +90,7 @@ module Groonga
     def initialize(options={})
       options = self.class.default_options.merge(options)
       url = options[:url] || build_url(options)
-      url = URL.parse(url) unless url.is_a?(URI::Generic)
+      url = URI.parse(url) unless url.is_a?(URI::Generic)
       options[:url] = url
       options[:read_timeout] ||= Default::READ_TIMEOUT
 
