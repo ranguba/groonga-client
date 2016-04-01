@@ -1,5 +1,16 @@
 # NEWS
 
+## 0.2.5 - 2016-04-02
+
+### Fixes
+
+  * Fixed a bug that URL can't be specified by `String`.
+    [GitHub#9][Reported by KITAITI Makoto]
+
+### Thanks
+
+  * KITAITI Makoto
+
 ## 0.2.4 - 2016-03-28
 
 ### Improvements
