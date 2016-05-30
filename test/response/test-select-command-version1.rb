@@ -88,7 +88,7 @@ class TestResponseSelectCommandVersion1 < Test::Unit::TestCase
     class TestDrilldowns < self
       def setup
         pair_arguments = {
-          "drilldown" => "_key",
+          "drilldown" => "tag",
           "drilldown_output_columns" => "_key,_nsubrecs",
         }
         @command = Groonga::Command::Select.new("select", pair_arguments)
@@ -108,7 +108,7 @@ class TestResponseSelectCommandVersion1 < Test::Unit::TestCase
             ["rroonga",  9],
           ],
         ]
-        assert_equal(["_key"],
+        assert_equal(["tag"],
                      drilldowns(body).collect(&:key))
       end
 

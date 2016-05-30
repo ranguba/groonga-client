@@ -36,33 +36,42 @@ module Groonga
 
         private
         def parse_body(body)
-          @n_hits, @records = parse_match_records(body.first)
-          @drilldowns = parse_drilldowns(body[1..-1])
+          if body.is_a?(::Array)
+            @n_hits, @records = parse_match_records_v1(body.first)
+            @drilldowns = parse_drilldowns_v1(body[1..-1])
+          else
+            @n_hits, @records = parse_match_records_v3(body)
+            @drilldowns = parse_drilldowns_v3(body["drilldowns"])
+          end
           body
         end
 
-        def parse_result(raw_result)
-          n_hits = raw_result.first.first
+        def parse_records(raw_columns, raw_records)
           column_names = {}
-          properties = raw_result[1].collect do |column_name, column_type|
-            base_column_name = column_name
+          columns = raw_columns.collect do |column|
+            if column.is_a?(::Array)
+              name, type = column
+            else
+              name = column["name"]
+              type = column["type"]
+            end
+            base_column_name = name
             suffix = 2
-            while column_names.key?(column_name)
-              column_name = "#{base_column_name}#{suffix}"
+            while column_names.key?(name)
+              name = "#{base_column_name}#{suffix}"
               suffix += 1
             end
-            column_names[column_name] = true
-            [column_name, column_type]
+            column_names[name] = true
+            [name, type]
           end
-          infos = raw_result[2..-1] || []
-          items = infos.collect do |info|
-            item = {}
-            properties.each_with_index do |(name, type), i|
-              item[name] = convert_value(info[i], type)
+
+          (raw_records || []).collect do |raw_record|
+            record = {}
+            columns.each_with_index do |(name, type), i|
+              record[name] = convert_value(raw_record[i], type)
             end
-            item
+            record
           end
-          [n_hits, items]
         end
 
         def convert_value(value, type)
@@ -74,19 +83,38 @@ module Groonga
           end
         end
 
-        def parse_match_records(raw_records)
-          parse_result(raw_records)
+        def parse_match_records_v1(raw_records)
+          [
+            raw_records.first.first,
+            parse_records(raw_records[1], raw_records[2..-1]),
+          ]
         end
 
-        def parse_drilldowns(raw_drilldowns)
+        def parse_match_records_v3(raw_records)
+          [
+            raw_records["n_hits"],
+            parse_records(raw_records["columns"], raw_records["records"]),
+          ]
+        end
+
+        def parse_drilldowns_v1(raw_drilldowns)
           (raw_drilldowns || []).collect.with_index do |raw_drilldown, i|
             key = @command.drilldowns[i]
-            n_hits, items = parse_result(raw_drilldown)
-            Drilldown.new(key, n_hits, items)
+            n_hits, records = parse_match_records_v1(raw_drilldown)
+            Drilldown.new(key, n_hits, records)
           end
         end
 
-        class Drilldown < Struct.new(:key, :n_hits, :items)
+        def parse_drilldowns_v3(raw_drilldowns)
+          (raw_drilldowns || {}).collect do |(key, raw_drilldown)|
+            n_hits, records = parse_match_records_v3(raw_drilldown)
+            Drilldown.new(key, n_hits, records)
+          end
+        end
+
+        class Drilldown < Struct.new(:key, :n_hits, :records)
+          # @deprecated since 0.2.6. Use {#records} instead.
+          alias_method :items, :records
         end
       end
     end

@@ -61,22 +61,26 @@ module Groonga
       class Base
         class << self
           def parse(command, raw_response)
+            return_code = nil
             case command.output_type
             when :json
               response = JSON.parse(raw_response)
               if response.is_a?(::Array)
                 header, body = response
+                return_code = header[0] if header
               else
                 header = response["header"]
                 body = response["body"]
+                return_code = header["return_code"] if header
               end
             when :xml
               header, body = parse_xml(raw_response)
+              return_code = header[0] if header
             else
               header = nil
               body = raw_response
             end
-            if header.nil? or header[0].zero?
+            if header.nil? or return_code == 0
               response = new(command, header, body)
             else
               response = Error.new(command, header, body)
