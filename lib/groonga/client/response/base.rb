@@ -136,7 +136,7 @@ module Groonga
         #   `[return_code, start_time, elapsed_time_in_seconds, error_message, error_location]`
         #   for error case.
         # @see http://groonga.org/docs/reference/command/output_format.html#header
-        #   Defails for header format.
+        #   Details for header format.
         attr_accessor :header
         # @return [::Hash] The body of response. Its content is depends on
         #   command.
