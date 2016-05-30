@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
 # Copyright (C) 2013  Kosuke Asami
 #
 # This library is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
 
 require "response/helper"
 
-class TestResponseSelect < Test::Unit::TestCase
+class TestResponseSelectCommandVersion1 < Test::Unit::TestCase
   class TestParseRawResponse < self
     include TestResponseHelper
 
