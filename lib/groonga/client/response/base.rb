@@ -63,7 +63,13 @@ module Groonga
           def parse(command, raw_response)
             case command.output_type
             when :json
-              header, body = JSON.parse(raw_response)
+              response = JSON.parse(raw_response)
+              if response.is_a?(::Array)
+                header, body = response
+              else
+                header = response["header"]
+                body = response["body"]
+              end
             when :xml
               header, body = parse_xml(raw_response)
             else
@@ -154,35 +160,72 @@ module Groonga
           self.raw = nil
         end
 
+        # @return [Integer] The return code of the response.
+        # @since 0.2.6
+        def return_code
+          if header.nil?
+            0
+          elsif header_v1?
+            header[0]
+          else
+            header["return_code"] || 0
+          end
+        end
+
         # @return [Integer] The status code of the response.
         # @since 0.1.0
+        #
+        # @deprecated since 0.2.6. Use {return_code} instead.
         def status_code
-          (header || [0])[0]
+          return_code
         end
 
         # @return [Time] The time of the request is accepted.
         # @since 0.1.0
         def start_time
-          Time.at((header || [0, 0])[1])
+          if header.nil?
+            Time.at(0)
+          elsif header_v1?
+            Time.at(header[1])
+          else
+            Time.at(header["start_time"])
+          end
         end
 
-        # @return [Time] The elapsed time of the request.
+        # @return [Float] The elapsed time of the request.
         # @since 0.1.0
         def elapsed_time
-          (header || [0, 0, 0.0])[2]
+          if header.nil?
+            0.0
+          elsif header_v1?
+            header[2]
+          else
+            header["elapsed_time"]
+          end
         end
 
         # @return [String, nil] The error message of the response.
         # @since 0.2.4
         def error_message
-          (header || [0, 0, 0.0, nil])[3]
+          if header.nil?
+            nil
+          elsif header_v1?
+            header[3]
+          else
+            (header["error"] || {})["message"]
+          end
         end
 
         # @return [Boolean] `true` if the request is processed successfully,
         #   `false` otherwise.
         # @since 0.1.0
         def success?
-          status_code.zero?
+          return_code.zero?
+        end
+
+        private
+        def header_v1?
+          header.is_a?(::Array)
         end
       end
     end
