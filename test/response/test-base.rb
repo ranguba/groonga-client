@@ -18,6 +18,7 @@ require "response/helper"
 
 class TestResponseBase < Test::Unit::TestCase
   class TestHeader < self
+    class TestCommandVersion1 < self
     class TestStatusCode < self
       def test_have_header
         header = [
@@ -109,6 +110,7 @@ class TestResponseBase < Test::Unit::TestCase
           response.success?
         end
       end
+    end
     end
   end
 end
