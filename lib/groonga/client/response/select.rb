@@ -75,11 +75,18 @@ module Groonga
         end
 
         def convert_value(value, type)
-          case type
-          when "Time"
-            Time.at(value)
+          case value
+          when ::Array
+            value.collect do |element|
+              convert_value(element, type)
+            end
           else
-            value
+            case type
+            when "Time"
+              Time.at(value)
+            else
+              value
+            end
           end
         end
 

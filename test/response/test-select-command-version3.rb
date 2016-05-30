@@ -97,6 +97,33 @@ class TestResponseSelectCommandVersion3 < Test::Unit::TestCase
                              }))
       end
 
+      def test_time_vector
+        update1 = 1379040474
+        update2 = 1464598349
+        assert_equal([
+                       {
+                         "updates" => [
+                           Time.at(update1),
+                           Time.at(update2),
+                         ],
+                       },
+                     ],
+                     records({
+                               "n_hits" => 1,
+                               "columns" => [
+                                 {
+                                   "name" => "updates",
+                                   "type" => "Time",
+                                 },
+                               ],
+                               "records" => [
+                                 [
+                                   [update1, update2],
+                                 ],
+                               ],
+                             }))
+      end
+
       def test_duplicated_column_name
         assert_equal([
                        {
