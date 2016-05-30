@@ -41,7 +41,6 @@ test_dir = base_dir + "test"
 $LOAD_PATH.unshift(lib_dir.to_s)
 
 require "test-unit"
-require "test/unit/notify"
 
 Thread.abort_on_exception = true
 
