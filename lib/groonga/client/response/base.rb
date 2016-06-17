@@ -39,7 +39,7 @@ module Groonga
         # response object.
         #
         # @param [Groonga::Command::Base] The command of the request.
-        # @param [String] The raw (not parsed) response returned by groonga
+        # @param [String] The raw (not parsed) response returned by Groonga
         #   server.
         # @return [Base]
         def parse(command, raw_response)
@@ -154,7 +154,7 @@ module Groonga
         #   The list of built-in commands.
         attr_accessor :body
         # @return [String] The unparsed response. It may be JSON, XML or
-        #   groonga command format.
+        #   Groonga command format.
         attr_accessor :raw
 
         def initialize(command, header, body)
