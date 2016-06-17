@@ -1,5 +1,17 @@
 # NEWS
 
+## 0.2.6 - 2016-06-17
+
+### Improvements
+
+  * Supported command version 3.
+
+  * Added {Groonga::Client::Response#return_code}.
+    {Groonga::Client::Response#status_code} is deprecated. Use
+    `#return_code` instead.
+
+  * `select` response: Supported vector of `Time`.
+
 ## 0.2.5 - 2016-04-02
 
 ### Fixes
