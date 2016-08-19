@@ -1,5 +1,12 @@
 # NEWS
 
+## 0.2.7 - 2016-08-19
+
+### Improvements
+
+  * HTTP: Added `:chunk` option to use `Transfer-Encoding: chunked`
+    request.
+
 ## 0.2.6 - 2016-06-17
 
 ### Improvements
