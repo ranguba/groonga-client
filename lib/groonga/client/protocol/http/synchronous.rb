@@ -126,7 +126,11 @@ module Groonga
               command[:values] = raw_values
               request = Net::HTTP::Post.new(path, headers)
               request.content_type = "application/json"
-              request.content_length = raw_values.bytesize
+              if @options[:chunk]
+                request["Transfer-Encoding"] = "chunked"
+              else
+                request.content_length = raw_values.bytesize
+              end
               request.body_stream = StringIO.new(raw_values)
             else
               path = resolve_path(@url, command.to_uri_format)
