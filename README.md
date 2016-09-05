@@ -20,13 +20,9 @@ as the protocol using a client.
 ## Usage
 
 Grooga-client handles protocol transparently, so there is only one
-difference between HTTP and GQTP examples.
-
-If you want to use HTTP, specify correct port number to `:port` and
-`:protocol => :http` as parameters of `open` method.
-
-If you want to use GQTP, specify correct port number to `:port` and
-`:protocol => :gqtp` as parameters of `open` method.
+difference between HTTP and GQTP examples. It's `:protocol` parameter
+value of `Groonga::Client.open`. It's `:http` for HTTP and `:gqtp` for
+GQTP.
 
 ### HTTP
 
