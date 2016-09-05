@@ -7,11 +7,11 @@ groonga-client
 ## Description
 
 Groonga-client is a client for Groonga (http://groonga.org/)
-implemented with pure Ruby.
+implemented with pure Ruby. You can use it without Groonga.
 
 Groonga-client gem supports HTTP or
 [GQTP (Groonga Query Transfer Protocol)](http://groonga.org/docs/spec/gqtp.html)
-as the protocol using a client. You can use it without Groonga.
+as the protocol using a client.
 
 ## Install
 
