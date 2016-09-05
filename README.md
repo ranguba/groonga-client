@@ -20,7 +20,7 @@ package.
 
 ## Usage
 
-Grooga-client handles protocol transparently, so there is a one
+Grooga-client handles protocol transparently, so there is only one
 difference between GQTP and HTTP examples.
 
 If you want to use GQTP, specify correct port number to `:port` and
