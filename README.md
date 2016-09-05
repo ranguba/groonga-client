@@ -28,7 +28,11 @@ GQTP.
 
 Here is a sample to get list of tables via HTTP protocol.
 
-    Groonga::Client.open(:host => host, :port => port, :protocol => :http) do |client|
+    require "groonga/client"
+
+    host = "127.0.0.1"
+    protocol = :http
+    Groonga::Client.open(:host => host, :protocol => protocol) do |client|
       tables = client.table_list
       tables.each do |table|
         table.name
@@ -39,7 +43,11 @@ Here is a sample to get list of tables via HTTP protocol.
 
 Here is a sample to get list of tables via GQTP protocol.
 
-    Groonga::Client.open(:host => host, :port => port, :protocol => :gqtp) do |client|
+    require "groonga/client"
+
+    host = "127.0.0.1"
+    protocol = :gqtp
+    Groonga::Client.open(:host => host, :protocol => protocol) do |client|
       tables = client.table_list
       tables.each do |table|
         table.name
