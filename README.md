@@ -60,7 +60,11 @@ Here is a typical example to learn usage of groonga-client. In this
 example, it creates `User` table and `login_name` column. Then it
 loads sample data and selects a person which contains `bob` as a key.
 
-    Groonga::Client.open(:host => host, :port => port, :protocol => :http) do |client|
+    require "groonga/client"
+
+    host = "127.0.0.1"
+    protocol = :http
+    Groonga::Client.open(:host => host, :protocol => protocol) do |client|
       client.table_create(:name => "User",
                           :flags => "TABLE_PAT_KEY",
                           :key_type => "ShortText")
