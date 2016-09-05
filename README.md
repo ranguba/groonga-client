@@ -20,11 +20,14 @@ package.
 
 ## Usage
 
-Grooga-client handles protocol transparently, so there is a one difference between GQTP and HTTP examples.
+Grooga-client handles protocol transparently, so there is a one
+difference between GQTP and HTTP examples.
 
-If you want to use GQTP, specify correct port number to `:port` and `:protocol => :gqtp` as parameters of `open` method.
+If you want to use GQTP, specify correct port number to `:port` and
+`:protocol => :gqtp` as parameters of `open` method.
 
-If you want to use HTTP, specify correct port number to `:port` and `:protocol => :http` as parameters of `open` method.
+If you want to use HTTP, specify correct port number to `:port` and
+`:protocol => :http` as parameters of `open` method.
 
 ### GQTP
 
@@ -50,8 +53,9 @@ Here is a sample to get list of table via HTTP protocol.
 
 ### Typical example
 
-Here is a typical example to learn usage of groonga-client. In this example, it creates `User` table and
-`login_name` column. Then it loads sample data and selects a person which contains `bob` as a key.
+Here is a typical example to learn usage of groonga-client. In this
+example, it creates `User` table and `login_name` column. Then it
+loads sample data and selects a person which contains `bob` as a key.
 
     Groonga::Client.open(:host => host, :port => port, :protocol => :http) do |client|
       client.table_create(:name => "User",
