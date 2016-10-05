@@ -51,7 +51,7 @@ class TestCommand < Test::Unit::TestCase
 
   def test_table_list
     response = Object.new
-    mock(@client).execute(:table_list, {}) do
+    mock(@client).execute(:table_list) do
       response
     end
     @client.table_list
