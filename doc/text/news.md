@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.2.9 - 2016-10-05
+
+### Fixes
+
+  * `Groonga::Client#select`: Accepted symbol as parameter key again.
+
 ## 0.2.8 - 2016-10-05
 
 ### Improvements
