@@ -176,13 +176,9 @@ module Groonga
       execute_command(command, &block)
     end
 
-    def method_missing(name, *args, **kwargs, &block)
+    def method_missing(name, *args, &block)
       if groonga_command_name?(name)
-        if kwargs.empty?
-          execute(name, *args, &block)
-        else
-          execute(name, *args, **kwargs, &block)
-        end
+        execute(name, *args, &block)
       else
         super
       end
