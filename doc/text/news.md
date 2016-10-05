@@ -1,5 +1,15 @@
 # NEWS
 
+## 0.2.8 - 2016-10-05
+
+### Improvements
+
+  * Added more documents.
+
+### Fixes
+
+  * `Groonga::Client#select`: Accepted string as parameter key again.
+
 ## 0.2.7 - 2016-08-19
 
 ### Improvements
