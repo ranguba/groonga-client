@@ -178,7 +178,7 @@ module Groonga
 
     def method_missing(name, *args, **kwargs, &block)
       if groonga_command_name?(name)
-        execute(name, *args, **kwargs, &block)
+        execute(name, *args, &block)
       else
         super
       end
