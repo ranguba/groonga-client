@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
 # Copyright (C) 2013  Kosuke Asami
 #
 # This library is free software; you can redistribute it and/or
@@ -27,6 +27,14 @@ module Groonga
         #   a search condition.
         attr_accessor :n_hits
         attr_accessor :records
+
+        # @return [::Array<Groonga::Client::Response::Select::Drilldown>,
+        #          ::Hash<String, Groonga::Client::Response::Select::Drilldown>]
+        #   If labeled drilldowns are used or command version 3 or
+        #   later is used, `{"label1" => drilldown1, "label2" => drilldown2}`
+        #   is returned since 0.3.1.
+        #
+        #   Otherwise, `[drilldown1, drilldown2]` is returned.
         attr_accessor :drilldowns
 
         def body=(body)
@@ -105,18 +113,30 @@ module Groonga
         end
 
         def parse_drilldowns_v1(raw_drilldowns)
-          (raw_drilldowns || []).collect.with_index do |raw_drilldown, i|
-            key = @command.drilldowns[i]
-            n_hits, records = parse_match_records_v1(raw_drilldown)
-            Drilldown.new(key, n_hits, records)
+          request_drilldowns = @command.drilldowns
+          if request_drilldowns.empty? and !@command.labeled_drilldowns.empty?
+            drilldowns = {}
+            (raw_drilldowns[0] || {}).each do |label, raw_drilldown|
+              n_hits, records = parse_match_records_v1(raw_drilldown)
+              drilldowns[label] = Drilldown.new(label, n_hits, records)
+            end
+            drilldowns
+          else
+            (raw_drilldowns || []).collect.with_index do |raw_drilldown, i|
+              key = request_drilldowns[i]
+              n_hits, records = parse_match_records_v1(raw_drilldown)
+              Drilldown.new(key, n_hits, records)
+            end
           end
         end
 
         def parse_drilldowns_v3(raw_drilldowns)
-          (raw_drilldowns || {}).collect do |(key, raw_drilldown)|
+          drilldowns = {}
+          (raw_drilldowns || {}).each do |key, raw_drilldown|
             n_hits, records = parse_match_records_v3(raw_drilldown)
-            Drilldown.new(key, n_hits, records)
+            drilldowns[key] = Drilldown.new(key, n_hits, records)
           end
+          drilldowns
         end
 
         class Drilldown < Struct.new(:key, :n_hits, :records)

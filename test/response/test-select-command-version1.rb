@@ -183,5 +183,137 @@ class TestResponseSelectCommandVersion1 < Test::Unit::TestCase
         create_response(body).drilldowns
       end
     end
+
+    class TestLabeledDrilldowns < self
+      def setup
+        pair_arguments = {
+          "drilldowns[tag].keys" => "tag",
+          "drilldowns[tag].output_columns" => "_key,_nsubrecs",
+          "drilldowns[author].keys" => "author",
+          "drilldowns[author].output_columns" => "_key,_nsubrecs",
+        }
+        @command = Groonga::Command::Select.new("select", pair_arguments)
+      end
+
+      def test_key
+        body = [
+          [[0], []],
+          {
+            "tag" => [
+              [29],
+              [
+                ["_key",      "ShortText"],
+                ["_nsubrecs", "Int32"],
+              ],
+              ["Groonga", 2],
+              ["Ruby",    9],
+              ["Rroonga", 1],
+            ],
+            "author" => [
+              [4],
+              [
+                ["_key",      "ShortText"],
+                ["_nsubrecs", "Int32"],
+              ],
+              ["Alice", 2],
+              ["Bob",   1],
+              ["Chris", 4],
+            ],
+          },
+        ]
+        assert_equal({
+                       "tag" => "tag",
+                       "author" => "author",
+                     },
+                     collect_values(body, &:key))
+      end
+
+      def test_n_hits
+        body = [
+          [[0], []],
+          {
+            "tag" => [
+              [29],
+              [
+                ["_key",      "ShortText"],
+                ["_nsubrecs", "Int32"],
+              ],
+              ["Groonga", 2],
+              ["Ruby",    9],
+              ["Rroonga", 1],
+            ],
+            "author" => [
+              [4],
+              [
+                ["_key",      "ShortText"],
+                ["_nsubrecs", "Int32"],
+              ],
+              ["Alice", 2],
+              ["Bob",   1],
+              ["Chris", 4],
+            ],
+          },
+        ]
+        assert_equal({
+                       "tag" => 29,
+                       "author" => 4,
+                     },
+                     collect_values(body, &:n_hits))
+      end
+
+      def test_items
+        body = [
+          [[0], []],
+          {
+            "tag" => [
+              [29],
+              [
+                ["_key",      "ShortText"],
+                ["_nsubrecs", "Int32"],
+              ],
+              ["Groonga", 2],
+              ["Ruby",    9],
+              ["Rroonga", 1],
+            ],
+            "author" => [
+              [4],
+              [
+                ["_key",      "ShortText"],
+                ["_nsubrecs", "Int32"],
+              ],
+              ["Alice", 2],
+              ["Bob",   1],
+              ["Chris", 4],
+            ],
+          },
+        ]
+        assert_equal({
+                       "tag" => [
+                         {"_key" => "Groonga", "_nsubrecs" => 2},
+                         {"_key" => "Ruby",    "_nsubrecs" => 9},
+                         {"_key" => "Rroonga", "_nsubrecs" => 1},
+                       ],
+                       "author" => [
+                         {"_key" => "Alice", "_nsubrecs" => 2},
+                         {"_key" => "Bob",   "_nsubrecs" => 1},
+                         {"_key" => "Chris", "_nsubrecs" => 4},
+                       ],
+                     },
+                     collect_values(body, &:items))
+      end
+
+      private
+      def drilldowns(body)
+        create_response(body).drilldowns
+      end
+
+      def collect_values(body)
+        values = {}
+        drilldowns(body).each do |label, drilldown|
+          values[label] = yield(drilldown)
+        end
+        values
+      end
+    end
   end
 end

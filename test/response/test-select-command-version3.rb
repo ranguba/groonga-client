@@ -195,8 +195,8 @@ class TestResponseSelectCommandVersion3 < Test::Unit::TestCase
             },
           },
         }
-        assert_equal(["tag"],
-                     drilldowns(body).collect(&:key))
+        assert_equal({"tag" => "tag"},
+                     collect_values(body, &:key))
       end
 
       def test_n_hits
@@ -225,8 +225,8 @@ class TestResponseSelectCommandVersion3 < Test::Unit::TestCase
             },
           },
         }
-        assert_equal([29],
-                     drilldowns(body).collect(&:n_hits))
+        assert_equal({"tag" => 29},
+                     collect_values(body, &:n_hits))
       end
 
       def test_items
@@ -255,19 +255,27 @@ class TestResponseSelectCommandVersion3 < Test::Unit::TestCase
             },
           },
         }
-        assert_equal([
-                       [
+        assert_equal({
+                       "tag" => [
                          {"_key" => "groonga", "_nsubrecs" => 29},
                          {"_key" => "Ruby",    "_nsubrecs" => 19},
                          {"_key" => "rroonga", "_nsubrecs" =>  9},
                        ],
-                     ],
-                     drilldowns(body).collect(&:items))
+                     },
+                     collect_values(body, &:items))
       end
 
       private
       def drilldowns(body)
         create_response(body).drilldowns
+      end
+
+      def collect_values(body)
+        values = {}
+        drilldowns(body).each do |label, drilldown|
+          values[label] = yield(drilldown)
+        end
+        values
       end
     end
   end
