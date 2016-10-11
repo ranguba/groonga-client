@@ -1,5 +1,23 @@
 # NEWS
 
+## 0.3.1 - 2016-10-11
+
+### Improvements
+
+  * `Groonga::Client#select`: Supported labeled drilldowns.
+
+  * `Groonga::Client::Response::Select#drilldowns`: Changed return
+    type for the following cases:
+
+      * Labeled drilldowns are used.
+
+      * Command version 3 or later is used.
+
+    It returns `{"label1" => drilldown1, "label2" => drilldown2}`
+    instead of `[drilldown1, drilldown2]`. It's a backward
+    incompatibility change for command version 3 or later case. But we
+    did it because command version 3 is still experimental version.
+
 ## 0.3.0 - 2016-10-05
 
 ### Fixes
