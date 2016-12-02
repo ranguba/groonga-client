@@ -37,6 +37,9 @@ module Groonga
         #   Otherwise, `[drilldown1, drilldown2]` is returned.
         attr_accessor :drilldowns
 
+        # @return [::Hash<String, Groonga::Client::Response::Select>]
+        attr_accessor :slices
+
         def body=(body)
           super(body)
           parse_body(body)
@@ -46,10 +49,27 @@ module Groonga
         def parse_body(body)
           if body.is_a?(::Array)
             @n_hits, @records = parse_match_records_v1(body.first)
-            @drilldowns = parse_drilldowns_v1(body[1..-1])
+            body[1..-1].each do |record|
+              if record.is_a?(::Hash) &&
+                   record.first[1][1].none? {|key| key[0] == "_nsubrecs"}
+                @slices = {}
+                record.each do |key, slice_body|
+                  n_hits, body = parse_match_records_v1(slice_body)
+                  @slices[key] = body
+                end
+              else
+                @drilldowns = parse_drilldowns_v1([record])
+              end
+            end
           else
             @n_hits, @records = parse_match_records_v3(body)
             @drilldowns = parse_drilldowns_v3(body["drilldowns"])
+            @slices = {}
+            if body["slices"]
+              body["slices"].each do |key, records|
+                @slices[key] = parse_match_records_v3(records)
+              end
+            end
           end
           body
         end
