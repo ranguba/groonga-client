@@ -154,15 +154,6 @@ module Groonga
           end
         end
 
-        def parse_slices_v1(raw_slices)
-          slices = {}
-          (raw_slices || {}).each do |key, slice_body|
-            n_hits, body = parse_match_records_v1(slice_body)
-            slices[key] = body
-          end
-          slices
-        end
-
         def parse_drilldowns_v3(raw_drilldowns)
           drilldowns = {}
           (raw_drilldowns || {}).each do |key, raw_drilldown|
@@ -170,6 +161,15 @@ module Groonga
             drilldowns[key] = Drilldown.new(key, n_hits, records)
           end
           drilldowns
+        end
+
+        def parse_slices_v1(raw_slices)
+          slices = {}
+          (raw_slices || {}).each do |key, slice_body|
+            n_hits, body = parse_match_records_v1(slice_body)
+            slices[key] = body
+          end
+          slices
         end
 
         def parse_slices_v3(raw_slices)
