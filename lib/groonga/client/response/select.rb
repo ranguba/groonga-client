@@ -1,5 +1,6 @@
 # Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
 # Copyright (C) 2013  Kosuke Asami
+# Copyright (C) 2016  Masafumi Yokoyama <yokoyama@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -67,7 +68,8 @@ module Groonga
             @slices = {}
             if body["slices"]
               body["slices"].each do |key, records|
-                @slices[key] = parse_match_records_v3(records)
+                n_hits, body = parse_match_records_v3(records)
+                @slices[key] = body
               end
             end
           end
