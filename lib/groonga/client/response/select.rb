@@ -40,7 +40,7 @@ module Groonga
         #   Otherwise, `[drilldown1, drilldown2]` is returned.
         attr_accessor :drilldowns
 
-        # @return [::Hash<String, Groonga::Client::Response::Select>]
+        # @return [::Hash<String, ::Array<::Hash<String, Object>>]
         attr_accessor :slices
 
         def body=(body)
