@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
+# Copyright (C) 2016  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -23,8 +22,33 @@ module Groonga
     module Response
       class Load < Base
         Response.register("load", self)
+
+        # @return [Integer] The number of loaded records.
+        attr_accessor :n_loaded_records
+
+        # @return [::Array<Integer>] The IDs of loaded records. ID is
+        #   `0` if the corresponding record is failed to add.
+        #
+        #   If you don't specify `yes` to `output_ids` `load`
+        #   parameter, this is always an empty array.
+        attr_accessor :ids
+
+        def body=(body)
+          super(body)
+          parse_body(body)
+        end
+
+        private
+        def parse_body(body)
+          if body.is_a?(::Hash)
+            @n_loaded_records = body["n_loaded_records"]
+            @ids = body["ids"] || []
+          else
+            @n_loaded_records = body
+            @ids = []
+          end
+        end
       end
     end
   end
 end
-
