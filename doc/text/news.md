@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.3.3 - 2016-12-07
+
+### Improvements
+
+  * `Groonga::Load#loaded_ids`: Renamed from `Groonga::Load#ids`. Because it's renamed in Groonga.
+
 ## 0.3.2 - 2016-12-06
 
 ### Improvements
