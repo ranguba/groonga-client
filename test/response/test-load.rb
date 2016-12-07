@@ -43,12 +43,12 @@ class TestResponseLoad < Test::Unit::TestCase
     end
   end
 
-  sub_test_case("#ids") do
+  sub_test_case("#loaded_ids") do
     test("command_version=1") do
       command = Groonga::Command::Load.new("load",
                                            {"command_version" => "1"})
       response = create_response(command, 29)
-      assert_equal([], response.ids)
+      assert_equal([], response.loaded_ids)
     end
 
     sub_test_case("command_version=3") do
@@ -65,13 +65,13 @@ class TestResponseLoad < Test::Unit::TestCase
                                                "command_version" => "3",
                                                "output_ids" => "yes",
                                              })
-        ids = [1, 2, 0, 4, 3]
+        loaded_ids = [1, 2, 0, 4, 3]
         response = create_response(command,
                                    {
                                      "n_loaded_records" => 4,
-                                     "ids" => ids,
+                                     "loaded_ids" => loaded_ids,
                                    })
-        assert_equal(ids, response.ids)
+        assert_equal(loaded_ids, response.loaded_ids)
       end
     end
   end

@@ -24,6 +24,8 @@ module Groonga
         Response.register("load", self)
 
         # @return [Integer] The number of loaded records.
+        #
+        # @since 0.3.2
         attr_accessor :n_loaded_records
 
         # @return [::Array<Integer>] The IDs of loaded records. ID is
@@ -31,7 +33,9 @@ module Groonga
         #
         #   If you don't specify `yes` to `output_ids` `load`
         #   parameter, this is always an empty array.
-        attr_accessor :ids
+        #
+        # @since 0.3.3
+        attr_accessor :loaded_ids
 
         def body=(body)
           super(body)
@@ -42,10 +46,10 @@ module Groonga
         def parse_body(body)
           if body.is_a?(::Hash)
             @n_loaded_records = body["n_loaded_records"]
-            @ids = body["ids"] || []
+            @loaded_ids = body["loaded_ids"] || []
           else
             @n_loaded_records = body
-            @ids = []
+            @loaded_ids = []
           end
         end
       end
