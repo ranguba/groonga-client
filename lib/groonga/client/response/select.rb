@@ -41,6 +41,8 @@ module Groonga
         attr_accessor :drilldowns
 
         # @return [::Hash<String, ::Array<::Hash<String, Object>>]
+        #
+        # @since 0.3.4
         attr_accessor :slices
 
         def body=(body)
