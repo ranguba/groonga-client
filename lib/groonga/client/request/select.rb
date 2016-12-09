@@ -18,14 +18,20 @@ module Groonga
   class Client
     module Request
       class Select < Base
-        def initialize(table_or_parameters)
+        class << self
+          def command_name
+            "select"
+          end
+        end
+
+        def initialize(table_or_parameters, extensions=[])
           if table_or_parameters.respond_to?(:to_parameters)
             parameters = table_or_parameters
           else
             table_name = table_or_parameters
             parameters = RequestParameter.new(:table, table_name)
           end
-          super("select", parameters)
+          super(parameters, extensions)
         end
 
         def match_columns(value)
@@ -75,10 +81,6 @@ module Groonga
         end
 
         private
-        def create_request(parameters)
-          self.class.new(parameters)
-        end
-
         def create_response
           response = super
           if paginated? and defined?(Kaminari)
