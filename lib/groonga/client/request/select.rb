@@ -18,6 +18,8 @@ module Groonga
   class Client
     module Request
       class Select < Base
+        include Enumerable
+
         class << self
           def command_name
             "select"
@@ -78,6 +80,10 @@ module Groonga
             offset = per_page * (page - 1)
           end
           offset(offset).limit(per_page)
+        end
+
+        def each(&block)
+          response.records.each(&block)
         end
 
         private
