@@ -102,31 +102,31 @@ module Groonga
           end
         end
 
-        class Type < Hash
+        class Type < ::Hash
           include Hashie::Extensions::MethodAccess
         end
 
-        class Tokenizer < Hash
+        class Tokenizer < ::Hash
           include Hashie::Extensions::MethodAccess
         end
 
-        class Normalizer < Hash
+        class Normalizer < ::Hash
           include Hashie::Extensions::MethodAccess
         end
 
-        class TokenFilter < Hash
+        class TokenFilter < ::Hash
           include Hashie::Extensions::MethodAccess
         end
 
-        class KeyType < Hash
+        class KeyType < ::Hash
           include Hashie::Extensions::MethodAccess
         end
 
-        class ValueType < Hash
+        class ValueType < ::Hash
           include Hashie::Extensions::MethodAccess
         end
 
-        class Index < Hash
+        class Index < ::Hash
           include Hashie::Extensions::MethodAccess
 
           def initialize(schema, raw_index)
@@ -161,7 +161,7 @@ module Groonga
           end
         end
 
-        class Column < Hash
+        class Column < ::Hash
           include Hashie::Extensions::MethodAccess
 
           def initialize(schema, raw_column)
@@ -189,7 +189,7 @@ module Groonga
           end
         end
 
-        class Table < Hash
+        class Table < ::Hash
           include Hashie::Extensions::MethodAccess
 
           def initialize(schema)
