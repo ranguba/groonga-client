@@ -157,6 +157,112 @@ class TestResponseSchema < Test::Unit::TestCase
         assert_equal("Names.users",
                      response.tables["Users"].indexes[0].full_name)
       end
+
+      sub_test_case "#have_full_text_search_index" do
+        test "no tokenizer" do
+          body = {
+            "tables" => {
+              "Names" => {
+                "name" => "Names",
+                "columns" => {
+                  "users_key" => {
+                    "name" => "users_key",
+                    "position" => true,
+                  },
+                },
+                "tokenizer" => nil,
+              },
+              "Users" => {
+                "indexes" => [
+                  {
+                    "table" => "Names",
+                    "name" => "users_key",
+                  },
+                ],
+              },
+            },
+          }
+          response = create_response(body)
+          table = response.tables["Users"]
+          assert do
+            not table.have_full_text_search_index?
+          end
+        end
+
+        test "no position" do
+          body = {
+            "tokenizers" => {
+              "TokenDelimit" => {
+                "name" => "TokenDelimit",
+              },
+            },
+            "tables" => {
+              "Names" => {
+                "name" => "Names",
+                "columns" => {
+                  "users_key" => {
+                    "name" => "users_key",
+                    "position" => false,
+                  },
+                },
+                "tokenizer" => {
+                  "name" => "TokenDelimit",
+                },
+              },
+              "Users" => {
+                "indexes" => [
+                  {
+                    "table" => "Names",
+                    "name" => "users_key",
+                  },
+                ],
+              },
+            },
+          }
+          response = create_response(body)
+          table = response.tables["Users"]
+          assert do
+            not table.have_full_text_search_index?
+          end
+        end
+
+        test "have tokenizer and position" do
+          body = {
+            "tokenizers" => {
+              "TokenBigram" => {
+                "name" => "TokenBigram",
+              },
+            },
+            "tables" => {
+              "Names" => {
+                "name" => "Names",
+                "columns" => {
+                  "users_key" => {
+                    "name" => "users_key",
+                    "position" => true,
+                  },
+                },
+                "tokenizer" => {
+                  "name" => "TokenBigram",
+                },
+              },
+              "Users" => {
+                "indexes" => [
+                  {
+                    "table" => "Names",
+                    "name" => "users_key",
+                  },
+                ],
+              },
+            },
+          }
+          response = create_response(body)
+          table = response.tables["Users"]
+          assert do
+            table.have_full_text_search_index?
+          end
+        end
+      end
     end
 
     class TestColumn < self
@@ -179,6 +285,130 @@ class TestResponseSchema < Test::Unit::TestCase
         response = create_response(body)
         assert_equal("Ages.users",
                      response.tables["Users"].columns["age"].indexes[0].full_name)
+      end
+
+      sub_test_case "#have_full_text_search_index" do
+        test "no tokenizer" do
+          body = {
+            "tables" => {
+              "Names" => {
+                "name" => "Names",
+                "columns" => {
+                  "users_name" => {
+                    "name" => "users_names",
+                    "position" => true,
+                  },
+                },
+                "tokenizer" => nil,
+              },
+              "Users" => {
+                "columns" => {
+                  "names" => {
+                    "name" => "names",
+                    "type" => "vector",
+                    "indexes" => [
+                      {
+                        "table" => "Names",
+                        "name" => "users_names",
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          }
+          response = create_response(body)
+          column = response.tables["Users"].columns["names"]
+          assert do
+            not column.have_full_text_search_index?
+          end
+        end
+
+        test "no position" do
+          body = {
+            "tokenizers" => {
+              "TokenDelimit" => {
+                "name" => "TokenDelimit",
+              },
+            },
+            "tables" => {
+              "Names" => {
+                "name" => "Names",
+                "columns" => {
+                  "users_names" => {
+                    "name" => "users_names",
+                    "position" => false,
+                  },
+                },
+                "tokenizer" => {
+                  "name" => "TokenDelimit",
+                },
+              },
+              "Users" => {
+                "columns" => {
+                  "names" => {
+                    "name" => "names",
+                    "type" => "vector",
+                    "indexes" => [
+                      {
+                        "table" => "Names",
+                        "name" => "users_names",
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          }
+          response = create_response(body)
+          column = response.tables["Users"].columns["names"]
+          assert do
+            not column.have_full_text_search_index?
+          end
+        end
+
+        test "have tokenizer and position" do
+          body = {
+            "tokenizers" => {
+              "TokenBigram" => {
+                "name" => "TokenBigram",
+              },
+            },
+            "tables" => {
+              "Names" => {
+                "name" => "Names",
+                "columns" => {
+                  "users_name" => {
+                    "name" => "users_name",
+                    "position" => true,
+                  },
+                },
+                "tokenizer" => {
+                  "name" => "TokenBigram",
+                },
+              },
+              "Users" => {
+                "columns" => {
+                  "name" => {
+                    "name" => "name",
+                    "type" => "scalar",
+                    "indexes" => [
+                      {
+                        "table" => "Names",
+                        "name" => "users_name",
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          }
+          response = create_response(body)
+          column = response.tables["Users"].columns["name"]
+          assert do
+            column.have_full_text_search_index?
+          end
+        end
       end
     end
 
@@ -227,6 +457,118 @@ class TestResponseSchema < Test::Unit::TestCase
         response = create_response(body)
         assert_equal(response.tables["Names"].columns["users_key"],
                      response.tables["Users"].indexes[0].column)
+      end
+
+      sub_test_case("#full_text_searchable?") do
+        test "no tokenizer" do
+          body = {
+            "tables" => {
+              "Names" => {
+                "name" => "Names",
+                "columns" => {
+                  "users_names" => {
+                    "name" => "users_names",
+                    "position" => true,
+                  },
+                },
+                "tokenizer" => nil,
+              },
+              "Users" => {
+                "columns" => {
+                  "names" => {
+                    "name" => "names",
+                    "type" => "vector",
+                    "indexes" => [
+                      {
+                        "table" => "Names",
+                        "name" => "users_names",
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          }
+          response = create_response(body)
+          index = response.tables["Users"].columns["names"].indexes[0]
+          assert do
+            not index.full_text_searchable?
+          end
+        end
+
+        test "no position" do
+          body = {
+            "tokenizers" => {
+              "TokenBigram" => {
+                "name" => "TokenBigram",
+              },
+            },
+            "tables" => {
+              "Names" => {
+                "name" => "Names",
+                "columns" => {
+                  "users_key" => {
+                    "name" => "users_key",
+                    "position" => false,
+                  },
+                },
+                "tokenizer" => {
+                  "name" => "TokenBigram",
+                },
+              },
+              "Users" => {
+                "indexes" => [
+                  {
+                    "table" => "Names",
+                    "name" => "users_key",
+                  },
+                ]
+              }
+            },
+          }
+          response = create_response(body)
+          index = response.tables["Users"].indexes[0]
+          assert do
+            not index.full_text_searchable?
+          end
+        end
+
+        test "have tokenizer and position" do
+          body = {
+            "tokenizers" => {
+              "TokenBigram" => {
+                "name" => "TokenBigram",
+              },
+            },
+            "tables" => {
+              "Names" => {
+                "name" => "Names",
+                "columns" => {
+                  "users_key" => {
+                    "name" => "users_key",
+                    "position" => true,
+                  },
+                },
+                "tokenizer" => {
+                  "name" => "TokenBigram",
+                },
+              },
+              "Users" => {
+                "indexes" => [
+                  {
+                    "table" => "Names",
+                    "name" => "users_key",
+                  },
+                ],
+              },
+            },
+          }
+          response = create_response(body)
+          index = response.tables["Users"].indexes[0]
+          assert do
+            index.full_text_searchable?
+          end
+        end
       end
     end
   end

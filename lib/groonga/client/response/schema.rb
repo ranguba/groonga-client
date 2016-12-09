@@ -155,6 +155,10 @@ module Groonga
             end
           end
 
+          def full_text_searchable?
+            table.tokenizer and column.position
+          end
+
           private
           def coerce_table(table_name)
             @schema.tables[table_name]
@@ -178,6 +182,12 @@ module Groonga
               super(key, coerce_indexes(value))
             else
               super
+            end
+          end
+
+          def have_full_text_search_index?
+            indexes.any? do |index|
+              index.full_text_searchable?
             end
           end
 
@@ -211,6 +221,12 @@ module Groonga
               super(key, coerce_indexes(value))
             else
               super
+            end
+          end
+
+          def have_full_text_search_index?
+            indexes.any? do |index|
+              index.full_text_searchable?
             end
           end
 
