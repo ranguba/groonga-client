@@ -18,9 +18,13 @@ module Groonga
   class Client
     module Request
       class Base
-        def initialize(command_name, parameters=nil)
+        def initialize(command_name, parameters=nil, extensions=[])
           @command_name = command_name
           @parameters = parameters
+          @extensions = extensions
+          unless @extensions.empty?
+            Object.instance_method(:extend).bind(self).call(*@extensions)
+          end
         end
 
         def response
@@ -40,14 +44,23 @@ module Groonga
           end
         end
 
+        def extend(*modules, &block)
+          modules << Module.new(&block) if block
+          if modules.empty?
+            self
+          else
+            create_request(@parameters, @extensions | modules)
+          end
+        end
+
         private
         def add_parameter(merger_class, parameter)
           merger = merger_class.new(@parameters, parameter)
-          create_request(merger)
+          create_request(merger, @extensions)
         end
 
-        def create_request(parameters)
-          self.class.new(@command_name, parameters)
+        def create_request(parameters, extensions)
+          self.class.new(@command_name, parameters, extensions)
         end
 
         def create_response
