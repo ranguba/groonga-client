@@ -14,9 +14,26 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "groonga/client/script-syntax"
+require "groonga/client/error"
 
-require "groonga/client/request/base"
-require "groonga/client/request/error"
+module Groonga
+  class Client
+    module Request
+      class Error < Client::Error
+      end
 
-require "groonga/client/request/select"
+      class ErrorResponse < Error
+        attr_reader :response
+        def initialize(response)
+          @response = response
+          command = @response.command
+          status_code = @response.status_code
+          error_message = @response.error_message
+          message = "failed to execute: #{command.name}: #{status_code}: "
+          message << "<#{error_message}>"
+          super(message)
+        end
+      end
+    end
+  end
+end
