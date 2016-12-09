@@ -41,6 +41,7 @@ test_dir = base_dir + "test"
 $LOAD_PATH.unshift(lib_dir.to_s)
 
 require "test-unit"
+require "groonga/client"
 
 Thread.abort_on_exception = true
 

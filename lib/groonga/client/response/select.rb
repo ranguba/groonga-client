@@ -26,6 +26,8 @@ module Groonga
         # @return [Integer] The number of records that match againt
         #   a search condition.
         attr_accessor :n_hits
+        # For Kaminari
+        alias_method :total_count, :n_hits
         attr_accessor :records
 
         # @return [::Array<Groonga::Client::Response::Select::Drilldown>,
@@ -40,6 +42,16 @@ module Groonga
         def body=(body)
           super(body)
           parse_body(body)
+        end
+
+        # For Kaminari
+        def limit_value
+          (@command[:limit] || 10).to_i
+        end
+
+        # For Kaminari
+        def offset_value
+          (@command[:offset] || 0).to_i
         end
 
         private
@@ -74,7 +86,7 @@ module Groonga
           end
 
           (raw_records || []).collect do |raw_record|
-            record = {}
+            record = Record.new
             columns.each_with_index do |(name, type), i|
               record[name] = convert_value(raw_record[i], type)
             end
@@ -137,6 +149,10 @@ module Groonga
             drilldowns[key] = Drilldown.new(key, n_hits, records)
           end
           drilldowns
+        end
+
+        class Record < ::Hash
+          include Hashie::Extensions::MethodAccess
         end
 
         class Drilldown < Struct.new(:key, :n_hits, :records)
