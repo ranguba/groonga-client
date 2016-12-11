@@ -64,14 +64,14 @@ module Groonga
         def parse_body(body)
           if body.is_a?(::Array)
             @n_hits, @records = parse_match_records_v1(body.first)
-            body[1..-1].each do |record|
-              if record.is_a?(::Hash) &&
-                   record.first[1][1].none? {|key| key[0] == "_nsubrecs"}
-                @slices = parse_slices_v1(record)
-              else
-                @drilldowns = parse_drilldowns_v1([record])
-              end
+            if @command.slices.empty?
+              raw_slices = nil
+              raw_drilldowns = body[1..-1]
+            else
+              raw_slices, *raw_drilldowns = body[1..-1]
             end
+            @slices = parse_slices_v1(raw_slices)
+            @drilldowns = parse_drilldowns_v1(raw_drilldowns)
           else
             @n_hits, @records = parse_match_records_v3(body)
             @drilldowns = parse_drilldowns_v3(body["drilldowns"])
