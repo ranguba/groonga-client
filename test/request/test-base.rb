@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 class TestRequestBase < Test::Unit::TestCase
-  sub_test_case "#extend" do
+  sub_test_case "#extensions" do
     setup do
       @request = Groonga::Client::Request::Base.new("status")
     end
@@ -28,7 +28,7 @@ class TestRequestBase < Test::Unit::TestCase
         def new_method
         end
       end
-      extended_request = @request.extend(extension)
+      extended_request = @request.extensions(extension)
       assert do
         extended_request.respond_to?(:new_method)
       end
@@ -38,7 +38,7 @@ class TestRequestBase < Test::Unit::TestCase
       assert do
         not @request.respond_to?(:new_method)
       end
-      extended_request = @request.extend do
+      extended_request = @request.extensions do
         def new_method
         end
       end

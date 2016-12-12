@@ -21,9 +21,7 @@ module Groonga
         def initialize(parameters=nil, extensions=[])
           @parameters = parameters
           @extensions = extensions
-          unless @extensions.empty?
-            Object.instance_method(:extend).bind(self).call(*@extensions)
-          end
+          extend(*@extensions) unless @extensions.empty?
         end
 
         def response
@@ -43,7 +41,7 @@ module Groonga
           end
         end
 
-        def extend(*modules, &block)
+        def extensions(*modules, &block)
           modules << Module.new(&block) if block
           if modules.empty?
             self
