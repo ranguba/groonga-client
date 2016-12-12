@@ -1,5 +1,6 @@
 # Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
 # Copyright (C) 2013  Kosuke Asami
+# Copyright (C) 2016  Masafumi Yokoyama <yokoyama@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -39,6 +40,11 @@ module Groonga
         #   Otherwise, `[drilldown1, drilldown2]` is returned.
         attr_accessor :drilldowns
 
+        # @return [::Hash<String, ::Array<::Hash<String, Object>>]
+        #
+        # @since 0.3.4
+        attr_accessor :slices
+
         def body=(body)
           super(body)
           parse_body(body)
@@ -63,10 +69,18 @@ module Groonga
         def parse_body(body)
           if body.is_a?(::Array)
             @n_hits, @records = parse_match_records_v1(body.first)
-            @drilldowns = parse_drilldowns_v1(body[1..-1])
+            if @command.slices.empty?
+              raw_slices = nil
+              raw_drilldowns = body[1..-1]
+            else
+              raw_slices, *raw_drilldowns = body[1..-1]
+            end
+            @slices = parse_slices_v1(raw_slices)
+            @drilldowns = parse_drilldowns_v1(raw_drilldowns)
           else
             @n_hits, @records = parse_match_records_v3(body)
             @drilldowns = parse_drilldowns_v3(body["drilldowns"])
+            @slices = parse_slices_v3(body["slices"])
           end
           body
         end
@@ -154,6 +168,24 @@ module Groonga
             drilldowns[key] = Drilldown.new(key, n_hits, records)
           end
           drilldowns
+        end
+
+        def parse_slices_v1(raw_slices)
+          slices = {}
+          (raw_slices || {}).each do |key, slice_body|
+            n_hits, body = parse_match_records_v1(slice_body)
+            slices[key] = body
+          end
+          slices
+        end
+
+        def parse_slices_v3(raw_slices)
+          slices = {}
+          (raw_slices || {}).each do |key, records|
+            n_hits, body = parse_match_records_v3(records)
+            slices[key] = body
+          end
+          slices
         end
 
         class Record < ::Hash

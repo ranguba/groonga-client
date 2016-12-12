@@ -1,5 +1,6 @@
 # Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
 # Copyright (C) 2013  Kosuke Asami
+# Copyright (C) 2016  Masafumi Yokoyama <yokoyama@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -276,6 +277,67 @@ class TestResponseSelectCommandVersion3 < Test::Unit::TestCase
           values[label] = yield(drilldown)
         end
         values
+      end
+    end
+
+    class TestSlices < self
+      def setup
+        pair_arguments = {
+          "slices[groonga].filter" => 'tag @ "groonga"',
+        }
+        @command = Groonga::Command::Select.new("select", pair_arguments)
+        @body = {
+          "n_hits" => 3,
+          "columns" => [
+            {
+              "name" => "_id",
+              "type" => "UInt32"
+            },
+            {
+              "name" => "tag",
+              "type" => "ShortText"
+            }
+          ],
+          "records" => [
+            [1, "groonga"],
+            [2, "rroonga"],
+            [3, "groonga"],
+          ],
+          "slices" => {
+            "groonga" => {
+              "n_hits" => 2,
+              "columns" => [
+                {
+                  "name" => "_id",
+                  "type" => "UInt32"
+                },
+                {
+                  "name" => "tag",
+                  "type" => "ShortText"
+                }
+              ],
+              "records" => [
+                [1, "groonga"],
+                [3, "groonga"],
+              ]
+            }
+          }
+        }
+      end
+
+      def test_slices
+        assert_equal({
+                       "groonga" => [
+                         {"_id" => 1, "tag" => "groonga"},
+                         {"_id" => 3, "tag" => "groonga"},
+                       ]
+                     },
+                     slices(@body))
+      end
+
+      private
+      def slices(body)
+        create_response(body).slices
       end
     end
   end
