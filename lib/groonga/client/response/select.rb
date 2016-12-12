@@ -173,8 +173,8 @@ module Groonga
         def parse_slices_v1(raw_slices)
           slices = {}
           (raw_slices || {}).each do |key, raw_slice|
-            n_hits, body = parse_match_records_v1(raw_slice)
-            slices[key] = Slice.new(key, n_hits, body)
+            n_hits, records = parse_match_records_v1(raw_slice)
+            slices[key] = Slice.new(key, n_hits, records)
           end
           slices
         end
@@ -182,8 +182,8 @@ module Groonga
         def parse_slices_v3(raw_slices)
           slices = {}
           (raw_slices || {}).each do |key, raw_slice|
-            n_hits, body = parse_match_records_v3(raw_slice)
-            slices[key] = Slice.new(key, n_hits, body)
+            n_hits, records = parse_match_records_v3(raw_slice)
+            slices[key] = Slice.new(key, n_hits, records)
           end
           slices
         end
