@@ -54,6 +54,11 @@ module Groonga
           (@command[:offset] || 0).to_i
         end
 
+        # For Kaminari
+        def size
+          records.size
+        end
+
         private
         def parse_body(body)
           if body.is_a?(::Array)
