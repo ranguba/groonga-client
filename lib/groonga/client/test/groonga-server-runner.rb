@@ -49,7 +49,7 @@ module Groonga
 
         def stop
           if @using_running_server
-            Groonga::Client.open do |client|
+            Groonga::Client.open(url: @url) do |client|
               schema = client.schema
               schema.tables.each do |name, _|
                 client.delete(table: name,
@@ -58,7 +58,7 @@ module Groonga
             end
           else
             if @pid
-              Groonga::Client.open do |client|
+              Groonga::Client.open(url: @url) do |client|
                 client.shutdown
               end
               wait_groonga_shutdown
@@ -74,7 +74,9 @@ module Groonga
           default_options = Groonga::Client.default_options
           url = default_options[:url]
           if url.nil?
-            host = default_options[:host] || default_options[:address]
+            host = default_options[:host] ||
+              default_options[:address] ||
+              "127.0.0.1"
             port = default_options[:port] || 10041
             path = default_options[:path]
             url = URI("http://#{host}:#{port}#{path}")
