@@ -40,7 +40,7 @@ module Groonga
         #   Otherwise, `[drilldown1, drilldown2]` is returned.
         attr_accessor :drilldowns
 
-        # @return [::Hash<String, ::Array<::Hash<String, Object>>]
+        # @return [::Hash<String, Groonga::Client::Response::Select::Slice>]
         #
         # @since 0.3.4
         attr_accessor :slices
@@ -174,7 +174,7 @@ module Groonga
           slices = {}
           (raw_slices || {}).each do |key, slice_body|
             n_hits, body = parse_match_records_v1(slice_body)
-            slices[key] = body
+            slices[key] = Slice.new(key, n_hits, body)
           end
           slices
         end
@@ -183,7 +183,7 @@ module Groonga
           slices = {}
           (raw_slices || {}).each do |key, records|
             n_hits, body = parse_match_records_v3(records)
-            slices[key] = body
+            slices[key] = Slice.new(key, n_hits, body)
           end
           slices
         end
@@ -195,6 +195,9 @@ module Groonga
         class Drilldown < Struct.new(:key, :n_hits, :records)
           # @deprecated since 0.2.6. Use {#records} instead.
           alias_method :items, :records
+        end
+
+        class Slice < Struct.new(:key, :n_hits, :records)
         end
       end
     end

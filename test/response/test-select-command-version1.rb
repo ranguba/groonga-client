@@ -367,12 +367,20 @@ class TestResponseSelectCommandVersion1 < Test::Unit::TestCase
                          {"_id" => 3, "tag" => "groonga"},
                        ]
                      },
-                     slices(@body))
+                     collect_values(@body, &:records))
       end
 
       private
       def slices(body)
         create_response(body).slices
+      end
+
+      def collect_values(body)
+        values = {}
+        slices(body).each do |label, slice|
+          values[label] = yield(slice)
+        end
+        values
       end
     end
   end
