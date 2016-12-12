@@ -45,7 +45,6 @@ module Groonga
                          "-n", db_path.to_s)
             wait_groonga_ready
           end
-          sync_schema
         end
 
         def stop
@@ -94,13 +93,6 @@ module Groonga
           end
         end
 
-        def sync_schema
-          ::Rails.application.eager_load!
-          ObjectSpace.each_object(Class) do |klass|
-            klass.sync_schema if klass < Searcher
-          end
-        end
-
         def find_groonga
           paths = ENV["PATH"].split(File::PATH_SEPARATOR)
           exeext = RbConfig::CONFIG["EXEEXT"]
@@ -116,7 +108,7 @@ module Groonga
           if File.directory?(tmpfs_dir)
             base_tmp_dir = Pathname(tmpfs_dir)
           else
-            base_tmp_dir = ::Rails.root + "tmp"
+            base_tmp_dir = Pathname("tmp")
           end
           tmp_dir = base_tmp_dir + "groonga-client.#{Process.pid}"
           FileUtils.rm_rf(tmp_dir)
