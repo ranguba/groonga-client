@@ -82,9 +82,78 @@ module Groonga
         end
 
         def to_parameters
+          case @value
+          when Symbol
+            value = @value.to_s
+          when String
+            return {} if @value.empty?
+            value = @value
+          when NilClass
+            return {}
+          else
+            value = @value
+          end
           {
-            @name => @value,
+            @name => value,
           }
+        end
+      end
+
+      class ValuesParameter
+        def initialize(names, values)
+          @names = names
+          @values = values
+        end
+
+        def to_parameters
+          case @values
+          when ::Array
+            return {} if @values.empty?
+            values = @values.collect(&:to_s).join(", ")
+          when Symbol
+            values = @values.to_s
+          when String
+            return {} if /\A\s*\z/ === @values
+            values = @values
+          when NilClass
+            return {}
+          else
+            values = @values
+          end
+          parameters = {}
+          @names.each do |name|
+            parameters[name] = values
+          end
+          parameters
+        end
+      end
+
+      class FlagsParameter
+        def initialize(names, flags)
+          @names = names
+          @flags = flags
+        end
+
+        def to_parameters
+          case @flags
+          when ::Array
+            return {} if @flags.empty?
+            flags = @flags.collect(&:to_s).join("|")
+          when Symbol
+            flags = @flags.to_s
+          when String
+            return {} if /\A\s*\z/ === @flags
+            flags = @flags
+          when NilClass
+            return {}
+          else
+            flags = @flags
+          end
+          parameters = {}
+          @names.each do |name|
+            parameters[name] = flags
+          end
+          parameters
         end
       end
 

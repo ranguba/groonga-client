@@ -15,51 +15,60 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 class TestRequestSelectOutputColumnsParmater < Test::Unit::TestCase
-  def output_columns_parameter(output_columns)
-    Groonga::Client::Request::Select::OutputColumnsParameter.new(output_columns)
+  def output_columns_parameter(prefix, output_columns)
+    Groonga::Client::Request::Select::OutputColumnsParameter.new(prefix,
+                                                                 output_columns)
   end
 
   def test_nil
     assert_equal({},
-                 output_columns_parameter(nil).to_parameters)
+                 output_columns_parameter("", nil).to_parameters)
   end
 
   def test_string
     assert_equal({
                    :output_columns => "title",
                  },
-                 output_columns_parameter("title").to_parameters)
+                 output_columns_parameter("", "title").to_parameters)
   end
 
   def test_empty_string
     assert_equal({},
-                 output_columns_parameter("").to_parameters)
+                 output_columns_parameter("", "").to_parameters)
   end
 
   def test_symbol
     assert_equal({
                    :output_columns => "title",
                  },
-                 output_columns_parameter(:title).to_parameters)
+                 output_columns_parameter("", :title).to_parameters)
   end
 
   def test_array
     assert_equal({
                    :output_columns => "title, body",
                  },
-                 output_columns_parameter(["title", "body"]).to_parameters)
+                 output_columns_parameter("", ["title", "body"]).to_parameters)
   end
 
   def test_empty_array
     assert_equal({},
-                 output_columns_parameter([]).to_parameters)
+                 output_columns_parameter("", []).to_parameters)
   end
 
   def test_function
-    parameter = output_columns_parameter(["title", "snippet_html(body)"])
+    parameter = output_columns_parameter("", ["title", "snippet_html(body)"])
     assert_equal({
                    :output_columns => "title, snippet_html(body)",
                    :command_version => "2",
+                 },
+                 parameter.to_parameters)
+  end
+
+  def test_prefix
+    parameter = output_columns_parameter("drilldowns[title].", "title")
+    assert_equal({
+                   :"drilldowns[title].output_columns" => "title",
                  },
                  parameter.to_parameters)
   end

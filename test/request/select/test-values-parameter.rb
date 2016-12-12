@@ -14,44 +14,45 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-class TestRequestSelectMatchColumnsParmater < Test::Unit::TestCase
-  def match_columns_parameter(match_columns)
-    Groonga::Client::Request::Select::MatchColumnsParameter.new(match_columns)
+class TestRequestSelectValuesParmater < Test::Unit::TestCase
+  def values_parameter(values)
+    names = [:match_columns]
+    Groonga::Client::Request::ValuesParameter.new(names, values)
   end
 
   def test_nil
     assert_equal({},
-                 match_columns_parameter(nil).to_parameters)
+                 values_parameter(nil).to_parameters)
   end
 
   def test_string
     assert_equal({
                    :match_columns => "title",
                  },
-                 match_columns_parameter("title").to_parameters)
+                 values_parameter("title").to_parameters)
   end
 
   def test_empty_string
     assert_equal({},
-                 match_columns_parameter("").to_parameters)
+                 values_parameter("").to_parameters)
   end
 
   def test_symbol
     assert_equal({
                    :match_columns => "title",
                  },
-                 match_columns_parameter(:title).to_parameters)
+                 values_parameter(:title).to_parameters)
   end
 
   def test_array
     assert_equal({
                    :match_columns => "title, body",
                  },
-                 match_columns_parameter(["title", "body"]).to_parameters)
+                 values_parameter(["title", "body"]).to_parameters)
   end
 
   def test_empty_array
     assert_equal({},
-                 match_columns_parameter([]).to_parameters)
+                 values_parameter([]).to_parameters)
   end
 end

@@ -15,12 +15,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 class TestRequestSelectSortKeysParmater < Test::Unit::TestCase
-  def sort_keys_parameter(sort_keys)
-    Groonga::Client::Request::Select::SortKeysParameter.new(sort_keys)
+  def sort_keys_parameter(prefix, sort_keys)
+    Groonga::Client::Request::Select::SortKeysParameter.new(prefix, sort_keys)
   end
 
   def to_parameters(sort_keys)
-    sort_keys_parameter(sort_keys).to_parameters
+    sort_keys_parameter("", sort_keys).to_parameters
   end
 
   def test_nil
@@ -60,5 +60,15 @@ class TestRequestSelectSortKeysParmater < Test::Unit::TestCase
   def test_empty_array
     assert_equal({},
                  to_parameters([]))
+  end
+
+  def test_prefix
+    parameter = sort_keys_parameter("slices[tag].", "-_score, _id")
+
+    assert_equal({
+                   :"slices[tag].sort_keys" => "-_score, _id",
+                   :"slices[tag].sortby"    => "-_score, _id",
+                 },
+                 parameter.to_parameters)
   end
 end

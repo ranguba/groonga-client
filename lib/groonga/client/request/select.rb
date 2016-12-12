@@ -38,7 +38,7 @@ module Groonga
 
         def match_columns(value)
           add_parameter(OverwriteMerger,
-                        MatchColumnsParameter.new(value))
+                        ValuesParameter.new([:match_columns], value))
         end
 
         def query(value)
@@ -53,12 +53,12 @@ module Groonga
 
         def output_columns(value)
           add_parameter(OverwriteMerger,
-                        OutputColumnsParameter.new(value))
+                        OutputColumnsParameter.new("", value))
         end
 
         def sort_keys(value)
           add_parameter(OverwriteMerger,
-                        SortKeysParameter.new(value))
+                        SortKeysParameter.new("", value))
         end
         alias_method :sortby, :sort_keys
         alias_method :sort, :sort_keys
@@ -82,6 +82,10 @@ module Groonga
           offset(offset).limit(per_page)
         end
 
+        def drilldowns(label)
+          LabeledDrilldown.new(self, label)
+        end
+
         def each(&block)
           response.records.each(&block)
         end
@@ -99,6 +103,56 @@ module Groonga
         def paginated?
           parameters = to_parameters
           parameters.key?(:offset) and parameters.key?(:limit)
+        end
+
+        class LabeledDrilldown
+          def initialize(request, label)
+            @request = request
+            @label = label
+          end
+
+          def keys(value)
+            add_parameter(OverwriteMerger,
+                          ValuesParameter.new([:"#{prefix}keys"], value))
+          end
+
+          def sort_keys(value)
+            add_parameter(OverwriteMerger,
+                          SortKeysParameter.new(prefix, value))
+          end
+          alias_method :sortby, :sort_keys
+          alias_method :sort, :sort_keys
+
+          def output_columns(value)
+            add_parameter(OverwriteMerger,
+                          OutputColumnsParameter.new(prefix, value))
+          end
+
+          def offset(value)
+            @request.parameter(:"#{prefix}offset", value)
+          end
+
+          def limit(value)
+            @request.parameter(:"#{prefix}limit", value)
+          end
+
+          def calc_types(value)
+            add_parameter(OverwriteMerger,
+                          FlagsParameter.new([:"#{prefix}calc_types"], value))
+          end
+
+          def calc_target(value)
+            @request.parameter(:"#{prefix}calc_target", value)
+          end
+
+          private
+          def prefix
+            "drilldowns[#{@label}]."
+          end
+
+          def add_parameter(merger, parameter)
+            @request.__send__(:add_parameter, merger, parameter)
+          end
         end
 
         # @private
@@ -132,33 +186,6 @@ module Groonga
               params[:filter] = (filter1 || filter2)
             end
             params
-          end
-        end
-
-        # @private
-        class MatchColumnsParameter
-          def initialize(match_columns)
-            @match_columns = match_columns
-          end
-
-          def to_parameters
-            case @match_columns
-            when ::Array
-              return {} if @match_columns.empty?
-              match_columns = @match_columns.join(", ")
-            when Symbol
-              match_columns = @match_columns.to_s
-            when String
-              return {} if /\A\s*\z/ === @match_columns
-              match_columns = @match_columns
-            when NilClass
-              return {}
-            else
-              match_columns = @match_columns
-            end
-            {
-              match_columns: match_columns,
-            }
           end
         end
 
@@ -231,62 +258,32 @@ module Groonga
         end
 
         # @private
-        class OutputColumnsParameter
-          def initialize(output_columns)
-            @output_columns = output_columns
+        class OutputColumnsParameter < ValuesParameter
+          def initialize(prefix, output_columns)
+            super([:"#{prefix}output_columns"], output_columns)
           end
 
           def to_parameters
-            case @output_columns
-            when ::Array
-              return {} if @output_columns.empty?
-              output_columns = @output_columns.join(", ")
-            when Symbol
-              output_columns = @output_columns.to_s
-            when String
-              return {} if /\A\s*\z/ === @output_columns
-              output_columns = @output_columns
-            when NilClass
-              return {}
-            else
-              output_columns = @output_columns
-            end
-
-            parameters = {
-              output_columns: output_columns,
-            }
-            if output_columns.include?("(")
-              parameters[:command_version] = "2"
+            parameters = super
+            @names.each do |name|
+              output_columns = parameters[name]
+              if output_columns and output_columns.include?("(")
+                parameters[:command_version] = "2"
+                break
+              end
             end
             parameters
           end
         end
 
         # @private
-        class SortKeysParameter
-          def initialize(keys)
-            @keys = keys
-          end
-
-          def to_parameters
-            case @keys
-            when ::Array
-              return {} if @keys.empty?
-              keys = @keys.collect(&:to_s).join(", ")
-            when Symbol
-              keys = @keys.to_s
-            when String
-              return {} if /\A\s*\z/ === @keys
-              keys = @keys
-            when NilClass
-              return {}
-            else
-              keys = @keys
-            end
-            {
-              sort_keys: keys,
-              sortby: keys, # For backward compatibility
-            }
+        class SortKeysParameter < ValuesParameter
+          def initialize(prefix, output_columns)
+            names = [
+              :"#{prefix}sort_keys",
+              :"#{prefix}sortby", # for backward compatibility
+            ]
+            super(names, output_columns)
           end
         end
       end
