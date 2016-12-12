@@ -24,6 +24,8 @@ module Groonga
       class Select < Base
         Response.register("select", self)
 
+        include Enumerable
+
         # @return [Integer] The number of records that match againt
         #   a search condition.
         attr_accessor :n_hits
@@ -63,6 +65,10 @@ module Groonga
         # For Kaminari
         def size
           records.size
+        end
+
+        def each(&block)
+          records.each(&block)
         end
 
         private
