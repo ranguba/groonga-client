@@ -1,5 +1,18 @@
 # NEWS
 
+## 0.3.4 - 2016-12-13
+
+### Improvements
+
+  * Added request interface from groonga-client-rails.
+  * Added `Groonga::Client::Response::Schema::Index#full_text_searchable?`.
+  * Added `Groonga::Client::Response::Schema::Column#have_full_text_search_index?`.
+  * Added `Groonga::Client::Response::Schema::Table#have_full_text_search_index?`.
+  * Added `Groonga::Client::Response::Select#slices`.
+  * Added test helper from groonga-client-rails.
+  * Added `Groonga::Client::Response#size` for Kaminari.
+  * Added enumrable interface for `Groonga::Client::Response::Select`.
+
 ## 0.3.3 - 2016-12-07
 
 ### Improvements
