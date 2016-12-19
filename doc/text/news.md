@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.3.5 - 2016-12-19
+
+### Improvements
+
+  * `Groonga::Client::Response::Schema::Column#value_type`: Made `value_type` elements method accessable.
+
 ## 0.3.4 - 2016-12-13
 
 ### Improvements
