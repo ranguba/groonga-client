@@ -103,26 +103,32 @@ module Groonga
         end
 
         class Type < ::Hash
+          include Hashie::Extensions::MergeInitializer
           include Hashie::Extensions::MethodAccess
         end
 
         class Tokenizer < ::Hash
+          include Hashie::Extensions::MergeInitializer
           include Hashie::Extensions::MethodAccess
         end
 
         class Normalizer < ::Hash
+          include Hashie::Extensions::MergeInitializer
           include Hashie::Extensions::MethodAccess
         end
 
         class TokenFilter < ::Hash
+          include Hashie::Extensions::MergeInitializer
           include Hashie::Extensions::MethodAccess
         end
 
         class KeyType < ::Hash
+          include Hashie::Extensions::MergeInitializer
           include Hashie::Extensions::MethodAccess
         end
 
         class ValueType < ::Hash
+          include Hashie::Extensions::MergeInitializer
           include Hashie::Extensions::MethodAccess
         end
 
@@ -180,6 +186,8 @@ module Groonga
             case key.to_sym
             when :indexes
               super(key, coerce_indexes(value))
+            when :value_type
+              super(key, ValueType.new(value))
             else
               super
             end
