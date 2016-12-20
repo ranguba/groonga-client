@@ -26,7 +26,6 @@ module Groonga
         def initialize
           @pid = nil
           @using_running_server = false
-          @url = build_url
           @groonga = find_groonga
           @tmp_dir = nil
         end
@@ -34,7 +33,7 @@ module Groonga
         def run
           if groonga_server_running?
             @using_running_server = true
-            @dump = Groonga::Client.open(url: @url) do |client|
+            @dump = open_client do |client|
               client.dump.body
             end
           else
@@ -42,7 +41,7 @@ module Groonga
             @tmp_dir = create_tmp_dir
             db_path = @tmp_dir + "db"
             @pid = spawn(@groonga,
-                         "--port", @url.port.to_s,
+                         "--port", url.port.to_s,
                          "--log-path", (@tmp_dir + "groonga.log").to_s,
                          "--query-log-path", (@tmp_dir + "query.log").to_s,
                          "--protocol", "http",
@@ -54,13 +53,13 @@ module Groonga
 
         def stop
           if @using_running_server
-            Groonga::Client.open(url: @url) do |client|
+            open_client do |client|
               remove_all(client)
               restore(client)
             end
           else
             if @pid
-              Groonga::Client.open(url: @url) do |client|
+              open_client do |client|
                 client.shutdown
               end
               wait_groonga_shutdown
@@ -75,7 +74,15 @@ module Groonga
           @using_running_server
         end
 
+        def url
+          @url ||= build_url
+        end
+
         private
+        def open_client(&block)
+          Client.open(url: url, &block)
+        end
+
         def build_url
           default_options = Groonga::Client.default_options
           url = default_options[:url]
@@ -92,7 +99,7 @@ module Groonga
 
         def groonga_server_running?
           begin
-            TCPSocket.open(@url.host, @url.port) do
+            TCPSocket.open(url.host, url.port) do
             end
           rescue SystemCallError
             false
