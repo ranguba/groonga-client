@@ -1,5 +1,17 @@
 # NEWS
 
+## 0.3.6 - 2016-12-20
+
+### Improvements
+
+  * Added `Groonga::Client::Test::GroongaServerRunner#using_running_server?`.
+
+  * Merged groonga-client-cli. Now `groonga-client` command is available.
+
+  * `Groonga::Client::Response::Schema#plugins`: Supported method access.
+
+  * `Groonga::Client::Test::GroongaServerRunner`: Supported restoring DB for existing server.
+
 ## 0.3.5 - 2016-12-19
 
 ### Improvements
