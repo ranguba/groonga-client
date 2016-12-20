@@ -43,9 +43,13 @@ Gem::Specification.new do |spec|
   spec.files += Dir.glob("lib/**/*.rb")
   spec.files += Dir.glob("doc/text/*")
   spec.test_files += Dir.glob("test/**/*")
+  Dir.chdir("bin") do
+    spec.executables = Dir.glob("*")
+  end
 
   spec.add_runtime_dependency("gqtp", ">= 1.0.4")
   spec.add_runtime_dependency("groonga-command", ">= 1.2.8")
+  spec.add_runtime_dependency("groonga-command-parser", ">= 1.1.7")
   spec.add_runtime_dependency("hashie")
 
   spec.add_development_dependency("bundler")
@@ -54,5 +58,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency("test-unit-rr")
   spec.add_development_dependency("packnga")
   spec.add_development_dependency("redcarpet")
-  spec.add_development_dependency("groonga-command-parser")
 end
