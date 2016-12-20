@@ -17,6 +17,8 @@
 require "rbconfig"
 require "fileutils"
 
+require "groonga/command/parser"
+
 module Groonga
   class Client
     module Test
@@ -32,6 +34,9 @@ module Groonga
         def run
           if groonga_server_running?
             @using_running_server = true
+            @dump = Groonga::Client.open(url: @url) do |client|
+              client.dump.body
+            end
           else
             return if @groonga.nil?
             @tmp_dir = create_tmp_dir
@@ -50,11 +55,8 @@ module Groonga
         def stop
           if @using_running_server
             Groonga::Client.open(url: @url) do |client|
-              schema = client.schema
-              schema.tables.each do |name, _|
-                client.delete(table: name,
-                              filter: "true")
-              end
+              remove_all(client)
+              restore(client)
             end
           else
             if @pid
@@ -155,6 +157,57 @@ module Groonga
 
           Process.kill(:KILL, @pid)
           Process.waitpid(@pid)
+        end
+
+        def remove_all(client)
+          schema = client.schema
+          schema.tables.each_value do |table|
+            table.columns.each_value do |column|
+              client.column_remove(:table => table.name,
+                                   :name => column.name)
+            end
+          end
+          schema.tables.each_value do |table|
+            client.table_remove(:name => table.name)
+          end
+          schema.plugins.each_value do |plugin|
+            client.plugin_unregister(:name => plugin.name)
+          end
+        end
+
+        def restore(client)
+          return if @dump.empty?
+
+          parser = Groonga::Command::Parser.new
+
+          parser.on_command do |command|
+            client.execute(command)
+          end
+
+          parser.on_load_columns do |command, columns|
+            command[:columns] ||= columns.join(",")
+          end
+
+          load_values = []
+          parser.on_load_value do |command, value|
+            unless command[:values]
+              load_values << value
+            end
+            command.original_source.clear
+          end
+
+          parser.on_load_complete do |command|
+            unless command[:values]
+              command[:values] = JSON.generate(load_values)
+              load_values.clear
+            end
+            client.execute(command)
+          end
+
+          @dump.each_line do |line|
+            parser << line
+          end
+          parser.finish
         end
       end
     end
