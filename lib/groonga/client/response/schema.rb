@@ -25,6 +25,16 @@ module Groonga
       class Schema < Base
         Response.register("schema", self)
 
+        # @return [Hash<String, Plugin>] Key is plugin name and
+        #   value is the definition of the plugin.
+        #
+        # @since 0.3.6
+        def plugins
+          @plugins ||= HashValueConverter.convert(@body["plugins"]) do |raw_plugin|
+            Plugin[raw_plugin]
+          end
+        end
+
         # @return [Hash<String, Type>] Key is type name and
         #   value is the definition of the type.
         #
@@ -100,6 +110,11 @@ module Groonga
               converted
             end
           end
+        end
+
+        class Plugin < ::Hash
+          include Hashie::Extensions::MergeInitializer
+          include Hashie::Extensions::MethodAccess
         end
 
         class Type < ::Hash
