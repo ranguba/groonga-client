@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.3.7 - 2016-12-20
+
+### Improvements
+
+  * `Groonga::Client::Test::GroongaServerRunner`: Supported customizing Groonga server URL.
+
 ## 0.3.6 - 2016-12-20
 
 ### Improvements
