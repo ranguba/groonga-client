@@ -69,6 +69,10 @@ module Groonga
           end
         end
 
+        def using_running_server?
+          @using_running_server
+        end
+
         private
         def build_url
           default_options = Groonga::Client.default_options
