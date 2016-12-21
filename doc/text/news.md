@@ -62,15 +62,18 @@
 
 ### Improvements
 
-  * `Groonga::Load#loaded_ids`: Renamed from `Groonga::Load#ids`. Because it's renamed in Groonga.
+  * `Groonga::Load#loaded_ids`: Renamed from
+    `Groonga::Load#ids`. Because it's renamed in Groonga.
 
 ## 0.3.2 - 2016-12-06
 
 ### Improvements
 
-  * `Groonga::Load#n_loaded_records`: Added. It's a convenience method to get the number of loaded records.
+  * `Groonga::Load#n_loaded_records`: Added. It's a convenience method
+    to get the number of loaded records.
 
-  * `Groonga::Load#ids`: Added. It's for `load --output_ids yes --command_version 3` that can be used with Groonga 6.1.2 or later.
+  * `Groonga::Load#ids`: Added. It's for `load --output_ids yes
+    --command_version 3` that can be used with Groonga 6.1.2 or later.
 
 ## 0.3.1 - 2016-10-11
 
