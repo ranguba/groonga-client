@@ -14,35 +14,33 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-class TestRequestSelectFilterParmater < Test::Unit::TestCase
-  def filter_parameter(expression, values=nil)
-    Groonga::Client::Request::Select::FilterParameter.new(expression, values)
+class TestRequestSelectFilterEqualParmater < Test::Unit::TestCase
+  def filter_parameter(column_name, value)
+    Groonga::Client::Request::Select::FilterEqualParameter.new(column_name,
+                                                               value)
   end
 
-  def to_parameters(expression, values=nil)
-    filter_parameter(expression, values).to_parameters
+  def to_parameters(column_name, value)
+    filter_parameter(column_name, value).to_parameters
   end
 
-  sub_test_case("expression") do
-    def test_nil
-      assert_equal({},
-                   to_parameters(nil))
-    end
-
+  sub_test_case("column name") do
     def test_string
       assert_equal({
-                     :filter => "age <= 20",
+                     :filter => "_key == 29",
                    },
-                   to_parameters("age <= 20"))
+                   to_parameters("_key", 29))
     end
 
-    def test_empty_string
-      assert_equal({},
-                   to_parameters(""))
+    def test_symbol
+      assert_equal({
+                     :filter => "_key == 29",
+                   },
+                   to_parameters(:_key, 29))
     end
   end
 
-  sub_test_case("values") do
+  sub_test_case("value") do
     def test_string
       filter = <<-'FILTER'.strip
 title == "[\"He\\ llo\"]"
@@ -50,48 +48,35 @@ title == "[\"He\\ llo\"]"
       assert_equal({
                      :filter => filter,
                    },
-                   to_parameters("title == %{value}",
-                                 :value => "[\"He\\ llo\"]"))
+                   to_parameters("title", "[\"He\\ llo\"]"))
     end
 
     def test_symbol
       assert_equal({
                      :filter => "title == \"Hello\"",
                    },
-                   to_parameters("title == %{value}",
-                                 :value => :Hello))
+                   to_parameters("title", :Hello))
     end
 
     def test_number
       assert_equal({
-                     :filter => "age <= 29",
+                     :filter => "age == 29",
                    },
-                   to_parameters("age <= %{value}",
-                                 :value => 29))
+                   to_parameters("age", 29))
     end
 
     def test_true
       assert_equal({
                      :filter => "published == true",
                    },
-                   to_parameters("published == %{value}",
-                                 :value => true))
+                   to_parameters("published", true))
     end
 
     def test_false
       assert_equal({
                      :filter => "published == false",
                    },
-                   to_parameters("published == %{value}",
-                                 :value => false))
-    end
-
-    def test_nil
-      assert_equal({
-                     :filter => "function(null)",
-                   },
-                   to_parameters("function(%{value})",
-                                 :value => nil))
+                   to_parameters("published", false))
     end
   end
 end

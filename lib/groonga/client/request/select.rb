@@ -46,9 +46,49 @@ module Groonga
                         RequestParameter.new(:query, value))
         end
 
-        def filter(expression, values=nil)
-          add_parameter(FilterMerger,
-                        FilterParameter.new(expression, values))
+        # Adds a script syntax condition. If the request already has
+        # any filter condition, they are combined by AND.
+        #
+        # @example: Multiple filters
+        #    request.
+        #      filter("user", "alice").
+        #        # -> --filter 'user == "alice"'
+        #      filter("tags @ %{tag}", tag: "Ruby")
+        #        # -> --filter '(user == "alice") && (tags @ "Ruby")'
+        #
+        # @return [Groonga::Client::Request::Select]
+        #   The new request with the given condition.
+        #
+        # @overload filter(column_name, value)
+        #   @param [String, Symbol] column_name The target column name.
+        #   @param [Object] value The column value. It's escaped automatically.
+        #
+        #   Adds a `#{column_name} == #{value}` condition.
+        #
+        # @overload filter(expression, values=nil)
+        #   @param [String] expression The script syntax expression.
+        #      It can includes `%{name}`s as placeholder. They are expanded
+        #      by `String#%` with the given `values` argument.
+        #   @param [nil, ::Hash] values The values to be expanded.
+        #      If the given `expression` doesn't have placeholder, you
+        #      should specify `nil`.
+        #
+        #      Values are escaped automatically. Values passed from
+        #      external should be escaped.
+        #
+        #   Adds a `#{expression % values}` condition.
+        def filter(expression_or_column_name, values_or_value=nil)
+          if expression_or_column_name.is_a?(Symbol)
+            parameter = FilterEqualParameter.new(expression_or_column_name,
+                                                 values_or_value)
+          elsif values_or_value.nil? or values_or_value.is_a?(::Hash)
+            parameter = FilterExpressionParameter.new(expression_or_column_name,
+                                                      values_or_value)
+          else
+            parameter = FilterEqualParameter.new(expression_or_column_name,
+                                                 values_or_value)
+          end
+          add_parameter(FilterMerger, parameter)
         end
 
         def output_columns(value)
@@ -190,36 +230,7 @@ module Groonga
         end
 
         # @private
-        class FilterParameter
-          def initialize(expression, values)
-            @expression = expression
-            @values = values
-          end
-
-          def to_parameters
-            case @expression
-            when String
-              return {} if /\A\s*\z/ === @expression
-              expression = @expression
-            when NilClass
-              return {}
-            else
-              expression = @expression
-            end
-
-            if @values.is_a?(::Hash) and not @values.empty?
-              escaped_values = {}
-              @values.each do |key, value|
-                escaped_values[key] = escape_filter_value(value)
-              end
-              expression = expression % escaped_values
-            end
-
-            {
-              filter: expression,
-            }
-          end
-
+        module FilterValueEscapable
           private
           def escape_filter_value(value)
             case value
@@ -254,6 +265,56 @@ module Groonga
             else
               value
             end
+          end
+        end
+
+        # @private
+        class FilterExpressionParameter
+          include FilterValueEscapable
+
+          def initialize(expression, values)
+            @expression = expression
+            @values = values
+          end
+
+          def to_parameters
+            case @expression
+            when String
+              return {} if /\A\s*\z/ === @expression
+              expression = @expression
+            when NilClass
+              return {}
+            else
+              expression = @expression
+            end
+
+            if @values.is_a?(::Hash) and not @values.empty?
+              escaped_values = {}
+              @values.each do |key, value|
+                escaped_values[key] = escape_filter_value(value)
+              end
+              expression = expression % escaped_values
+            end
+
+            {
+              filter: expression,
+            }
+          end
+        end
+
+        # @private
+        class FilterEqualParameter
+          include FilterValueEscapable
+
+          def initialize(column_name, value)
+            @column_name = column_name
+            @value = value
+          end
+
+          def to_parameters
+            {
+              filter: "#{@column_name} == #{escape_filter_value(@value)}",
+            }
           end
         end
 
