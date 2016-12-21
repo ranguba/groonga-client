@@ -1,5 +1,13 @@
 # NEWS
 
+## 0.3.8 - 2016-12-21
+
+### Improvements
+
+  * `Groonga::Client::Request::Select#filter`: Supported
+    `filter(column_name, value)` usage. It's a shortcut of
+    `filter("#{column_name} == %{value}", value: value)`.
+
 ## 0.3.7 - 2016-12-20
 
 ### Improvements
