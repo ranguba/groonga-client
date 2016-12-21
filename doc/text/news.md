@@ -12,7 +12,8 @@
 
 ### Improvements
 
-  * `Groonga::Client::Test::GroongaServerRunner`: Supported customizing Groonga server URL.
+  * `Groonga::Client::Test::GroongaServerRunner`: Supported
+    customizing Groonga server URL.
 
 ## 0.3.6 - 2016-12-20
 
@@ -24,13 +25,15 @@
 
   * `Groonga::Client::Response::Schema#plugins`: Supported method access.
 
-  * `Groonga::Client::Test::GroongaServerRunner`: Supported restoring DB for existing server.
+  * `Groonga::Client::Test::GroongaServerRunner`: Supported restoring
+    DB for existing server.
 
 ## 0.3.5 - 2016-12-19
 
 ### Improvements
 
-  * `Groonga::Client::Response::Schema::Column#value_type`: Made `value_type` elements method accessable.
+  * `Groonga::Client::Response::Schema::Column#value_type`: Made
+    `value_type` elements method accessable.
 
 ## 0.3.4 - 2016-12-13
 
