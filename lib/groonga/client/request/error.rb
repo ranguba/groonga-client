@@ -29,8 +29,10 @@ module Groonga
           command = @response.command
           status_code = @response.status_code
           error_message = @response.error_message
-          message = "failed to execute: #{command.name}: #{status_code}: "
-          message << "<#{error_message}>"
+          message = "failed to execute: "
+          message << "#{command.command_name}: #{status_code}: "
+          message << "<#{error_message}>: "
+          message << command.to_command_format
           super(message)
         end
       end
