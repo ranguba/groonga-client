@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.3.9 - 2016-12-22
+
+### Improvements
+
+  * `Groonga::Client::Request::Error`: Added more information.
+
 ## 0.3.8 - 2016-12-21
 
 ### Improvements
