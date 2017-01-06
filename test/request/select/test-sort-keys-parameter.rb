@@ -1,4 +1,4 @@
-# Copyright (C) 2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2016-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,6 @@ class TestRequestSelectSortKeysParmater < Test::Unit::TestCase
   def test_string
     assert_equal({
                    :sort_keys => "-_score, _id",
-                   :sortby    => "-_score, _id",
                  },
                  to_parameters("-_score, _id"))
   end
@@ -44,7 +43,6 @@ class TestRequestSelectSortKeysParmater < Test::Unit::TestCase
   def test_symbol
     assert_equal({
                    :sort_keys => "_score",
-                   :sortby    => "_score",
                  },
                  to_parameters(:_score))
   end
@@ -52,7 +50,6 @@ class TestRequestSelectSortKeysParmater < Test::Unit::TestCase
   def test_array
     assert_equal({
                    :sort_keys => "-_score, _id",
-                   :sortby    => "-_score, _id",
                  },
                  to_parameters(["-_score", :_id]))
   end
@@ -67,7 +64,6 @@ class TestRequestSelectSortKeysParmater < Test::Unit::TestCase
 
     assert_equal({
                    :"slices[tag].sort_keys" => "-_score, _id",
-                   :"slices[tag].sortby"    => "-_score, _id",
                  },
                  parameter.to_parameters)
   end

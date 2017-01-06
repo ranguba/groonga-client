@@ -1,4 +1,4 @@
-# Copyright (C) 2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2016-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -125,6 +125,54 @@ class TestRequestSelect < Test::Unit::TestCase
                        :"drilldowns[label].calc_target" => "rank",
                      },
                      drilldown.calc_target(:rank).to_parameters)
+      end
+    end
+  end
+
+  sub_test_case("#columns") do
+    def column
+      @request.columns("label")
+    end
+
+    test "#stage" do
+      assert_equal({
+                     :table => "posts",
+                     :"columns[label].stage" => "output",
+                   },
+                   column.stage("output").to_parameters)
+    end
+
+    test "#type" do
+      assert_equal({
+                     :table => "posts",
+                     :"columns[label].type" => "Text",
+                   },
+                   column.type("Text").to_parameters)
+    end
+
+    test "#flags" do
+      assert_equal({
+                     :table => "posts",
+                     :"columns[label].flags" => "COLUMN_SCALAR|COMPRESS_LZ4",
+                   },
+                   column.flags(["COLUMN_SCALAR", "COMPRESS_LZ4"]).to_parameters)
+    end
+
+    test "#value" do
+      assert_equal({
+                     :table => "posts",
+                     :"columns[label].value" => "highlight_html(\"xxx\")",
+                   },
+                   column.value("highlight_html(%{text})", text: "xxx").to_parameters)
+    end
+
+    sub_test_case("#window") do
+      test "#sort_keys" do
+        assert_equal({
+                       :table => "posts",
+                       :"columns[label].window.sort_keys" => "_id",
+                     },
+                     column.window.sort_keys("_id").to_parameters)
       end
     end
   end

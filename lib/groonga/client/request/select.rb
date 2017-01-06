@@ -1,4 +1,4 @@
-# Copyright (C) 2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2016-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -98,7 +98,7 @@ module Groonga
 
         def sort_keys(value)
           add_parameter(OverwriteMerger,
-                        SortKeysParameter.new("", value))
+                        BackwardCompatibleSortKeysParameter.new("", value))
         end
         alias_method :sortby, :sort_keys
         alias_method :sort, :sort_keys
@@ -124,6 +124,10 @@ module Groonga
 
         def drilldowns(label)
           LabeledDrilldown.new(self, label)
+        end
+
+        def columns(label)
+          DynamicColumn.new(self, label)
         end
 
         def each(&block)
@@ -158,7 +162,7 @@ module Groonga
 
           def sort_keys(value)
             add_parameter(OverwriteMerger,
-                          SortKeysParameter.new(prefix, value))
+                          BackwardCompatibleSortKeysParameter.new(prefix, value))
           end
           alias_method :sortby, :sort_keys
           alias_method :sort, :sort_keys
@@ -188,6 +192,71 @@ module Groonga
           private
           def prefix
             "drilldowns[#{@label}]."
+          end
+
+          def add_parameter(merger, parameter)
+            @request.__send__(:add_parameter, merger, parameter)
+          end
+        end
+
+        class DynamicColumn
+          def initialize(request, label)
+            @request = request
+            @label = label
+          end
+
+          def stage(value)
+            add_parameter(OverwriteMerger,
+                          RequestParameter.new(:"#{prefix}stage", value))
+          end
+
+          def type(value)
+            add_parameter(OverwriteMerger,
+                          RequestParameter.new(:"#{prefix}type", value))
+          end
+
+          def flags(value)
+            add_parameter(OverwriteMerger,
+                          FlagsParameter.new([:"#{prefix}flags"], value))
+          end
+
+          def value(expression, values=nil)
+            add_parameter(OverwriteMerger,
+                          ScriptSyntaxExpressionParameter.new(:"#{prefix}value",
+                                                              expression,
+                                                              values))
+          end
+
+          def window
+            DynamicColumnWindow.new(@request, @label)
+          end
+
+          private
+          def prefix
+            "columns[#{@label}]."
+          end
+
+          def add_parameter(merger, parameter)
+            @request.__send__(:add_parameter, merger, parameter)
+          end
+        end
+
+        class DynamicColumnWindow
+          def initialize(request, label)
+            @request = request
+            @label = label
+          end
+
+          def sort_keys(value)
+            add_parameter(OverwriteMerger,
+                          SortKeysParameter.new(prefix, value))
+          end
+          alias_method :sortby, :sort_keys
+          alias_method :sort, :sort_keys
+
+          private
+          def prefix
+            "columns[#{@label}].window."
           end
 
           def add_parameter(merger, parameter)
@@ -230,9 +299,9 @@ module Groonga
         end
 
         # @private
-        module FilterValueEscapable
+        module ScriptSyntaxValueEscapable
           private
-          def escape_filter_value(value)
+          def escape_script_syntax_value(value)
             case value
             when Numeric
               value
@@ -269,10 +338,11 @@ module Groonga
         end
 
         # @private
-        class FilterExpressionParameter
-          include FilterValueEscapable
+        class ScriptSyntaxExpressionParameter
+          include ScriptSyntaxValueEscapable
 
-          def initialize(expression, values)
+          def initialize(name, expression, values)
+            @name = name
             @expression = expression
             @values = values
           end
@@ -288,23 +358,35 @@ module Groonga
               expression = @expression
             end
 
-            if @values.is_a?(::Hash) and not @values.empty?
+            case @values
+            when ::Hash
               escaped_values = {}
               @values.each do |key, value|
-                escaped_values[key] = escape_filter_value(value)
+                escaped_values[key] = escape_script_syntax_value(value)
+              end
+              expression = expression % escaped_values
+            when ::Array
+              escaped_values = @values.collect do |value|
+                escape_script_syntax_value(value)
               end
               expression = expression % escaped_values
             end
 
             {
-              filter: expression,
+              @name => expression,
             }
+          end
+        end
+
+        class FilterExpressionParameter < ScriptSyntaxExpressionParameter
+          def initialize(expression, values)
+            super(:filter, expression, values)
           end
         end
 
         # @private
         class FilterEqualParameter
-          include FilterValueEscapable
+          include ScriptSyntaxValueEscapable
 
           def initialize(column_name, value)
             @column_name = column_name
@@ -313,7 +395,7 @@ module Groonga
 
           def to_parameters
             {
-              filter: "#{@column_name} == #{escape_filter_value(@value)}",
+              filter: "#{@column_name} == #{escape_script_syntax_value(@value)}",
             }
           end
         end
@@ -339,6 +421,16 @@ module Groonga
 
         # @private
         class SortKeysParameter < ValuesParameter
+          def initialize(prefix, output_columns)
+            names = [
+              :"#{prefix}sort_keys",
+            ]
+            super(names, output_columns)
+          end
+        end
+
+        # @private
+        class BackwardCompatibleSortKeysParameter < ValuesParameter
           def initialize(prefix, output_columns)
             names = [
               :"#{prefix}sort_keys",
