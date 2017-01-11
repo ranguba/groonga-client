@@ -272,7 +272,7 @@ module Groonga
             params = params1.merge(params2)
             query1 = params1[:query]
             query2 = params2[:query]
-            if query1.present? and query2.present?
+            if query1 and query2
               params[:query] = "(#{query1}) (#{query2})"
             else
               params[:query] = (query1 || query2)
@@ -289,7 +289,7 @@ module Groonga
             params = params1.merge(params2)
             filter1 = params1[:filter]
             filter2 = params2[:filter]
-            if filter1.present? and filter2.present?
+            if filter1 and filter2
               params[:filter] = "(#{filter1}) && (#{filter2})"
             else
               params[:filter] = (filter1 || filter2)
