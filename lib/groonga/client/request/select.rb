@@ -304,9 +304,9 @@ module Groonga
           def escape_script_syntax_value(value)
             case value
             when Numeric
-              value
+              value.to_s
             when TrueClass, FalseClass
-              value
+              value.to_s
             when NilClass
               "null"
             when String
@@ -317,7 +317,7 @@ module Groonga
               escaped_value = "["
               value.each_with_index do |element, i|
                 escaped_value << ", " if i > 0
-                escaped_value << escape_filter_value(element)
+                escaped_value << escape_script_syntax_value(element)
               end
               escaped_value << "]"
               escaped_value
@@ -325,9 +325,9 @@ module Groonga
               escaped_value = "{"
               value.each_with_index do |(k, v), i|
                 escaped_value << ", " if i > 0
-                escaped_value << escape_filter_value(k.to_s)
+                escaped_value << escape_script_syntax_value(k.to_s)
                 escaped_value << ": "
-                escaped_value << escape_filter_value(v)
+                escaped_value << escape_script_syntax_value(v)
               end
               escaped_value << "}"
               escaped_value

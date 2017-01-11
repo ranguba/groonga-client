@@ -19,6 +19,80 @@ class TestRequestSelect < Test::Unit::TestCase
     @request = Groonga::Client::Request::Select.new("posts")
   end
 
+  sub_test_case("#filter") do
+    def filter(*args)
+      @request.filter(*args).to_parameters
+    end
+
+    test("Numeric") do
+      assert_equal({
+                     :table => "posts",
+                     :filter => "rate == 5",
+                   },
+                   filter("rate == %{rate}", :rate => 5))
+    end
+
+    test("true") do
+      assert_equal({
+                     :table => "posts",
+                     :filter => "published == true",
+                   },
+                   filter("published == %{published}", :published => true))
+    end
+
+    test("false") do
+      assert_equal({
+                     :table => "posts",
+                     :filter => "published == false",
+                   },
+                   filter("published == %{published}", :published => false))
+    end
+
+    test("nil") do
+      assert_equal({
+                     :table => "posts",
+                     :filter => "function(null)",
+                   },
+                   filter("function(%{arg})", :arg => nil))
+    end
+
+    test("String") do
+      assert_equal({
+                     :table => "posts",
+                     :filter => "title == \"Hello\"",
+                   },
+                   filter("title == %{title}", :title => "Hello"))
+    end
+
+    test("Symbol") do
+      assert_equal({
+                     :table => "posts",
+                     :filter => "title == \"Hello\"",
+                   },
+                   filter("title == %{title}", :title => :Hello))
+    end
+
+    test("Array") do
+      assert_equal({
+                     :table => "posts",
+                     :filter => "function([\"a\", 29])",
+                   },
+                   filter("function(%{arg})", :arg => ["a", 29]))
+    end
+
+    test("Hash") do
+      assert_equal({
+                     :table => "posts",
+                     :filter => "function({\"string\": \"value\", \"number\": 29})",
+                   },
+                   filter("function(%{options})",
+                          :options => {
+                            "string" => "value",
+                            "number" => 29
+                          }))
+    end
+  end
+
   sub_test_case("#drilldowns") do
     def drilldown
       @request.drilldowns("label")
