@@ -1,5 +1,19 @@
 # NEWS
 
+## 0.4.0 - 2016-01-12
+
+### Improvements
+
+  * `Groonga::Client::Request::Select#columns`: Supported
+    `columns[label]`.
+
+### Fixes
+
+  * Removed Active Support method use.
+
+  * `Groonga::Client::Request::Select#filter`: Fixed filter value
+    escape error.
+
 ## 0.3.9 - 2016-12-22
 
 ### Improvements
