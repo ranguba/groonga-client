@@ -37,6 +37,16 @@ module Groonga
         # @since 0.3.3
         attr_accessor :loaded_ids
 
+        # @return [::Array<Groonga::Client::Response::Load::Error>]
+        #   The errors of loaded records. `error.return_code` isn't
+        #   `0` if the corresponding record is failed to load.
+        #
+        #   If you don't specify `yes` to `output_errors` `load`
+        #   parameter, this is always an empty array.
+        #
+        # @since 0.4.1
+        attr_accessor :errors
+
         def body=(body)
           super(body)
           parse_body(body)
@@ -47,10 +57,18 @@ module Groonga
           if body.is_a?(::Hash)
             @n_loaded_records = body["n_loaded_records"]
             @loaded_ids = body["loaded_ids"] || []
+            @errors = (body["errors"] || []).collect do |error|
+              Error.new(error["return_code"] || 0,
+                        error["message"])
+            end
           else
             @n_loaded_records = body
             @loaded_ids = []
+            @errors = []
           end
+        end
+
+        class Error < Struct.new(:return_code, :message)
         end
       end
     end

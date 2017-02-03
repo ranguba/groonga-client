@@ -1,4 +1,4 @@
-# Copyright (C) 2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2016-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -52,7 +52,7 @@ class TestResponseLoad < Test::Unit::TestCase
     end
 
     sub_test_case("command_version=3") do
-      test("no output_ids") do
+      test("no output_*") do
         command = Groonga::Command::Load.new("load",
                                              {"command_version" => "3"})
         response = create_response(command, {"n_loaded_records" => 29})
@@ -72,6 +72,39 @@ class TestResponseLoad < Test::Unit::TestCase
                                      "loaded_ids" => loaded_ids,
                                    })
         assert_equal(loaded_ids, response.loaded_ids)
+      end
+
+      test("output_errors=yes") do
+        command = Groonga::Command::Load.new("load",
+                                             {
+                                               "command_version" => "3",
+                                               "output_errors" => "yes",
+                                             })
+        raw_errors = [
+          {
+            "return_code" => 0,
+            "message" => nil,
+          },
+          {
+            "return_code" => -22,
+            "message" => "invalid argument",
+          },
+          {
+            "return_code" => 0,
+            "message" => nil,
+          },
+        ]
+        errors = [
+          Groonga::Client::Response::Load::Error.new(0, nil),
+          Groonga::Client::Response::Load::Error.new(-22, "invalid argument"),
+          Groonga::Client::Response::Load::Error.new(0, nil),
+        ]
+        response = create_response(command,
+                                   {
+                                     "n_loaded_records" => 3,
+                                     "errors" => raw_errors,
+                                   })
+        assert_equal(errors, response.errors)
       end
     end
   end
