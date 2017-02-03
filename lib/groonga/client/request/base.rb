@@ -88,6 +88,8 @@ module Groonga
           when String
             return {} if @value.empty?
             value = @value
+          when Numeric
+            value = @value.to_s
           when NilClass
             return {}
           else

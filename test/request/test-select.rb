@@ -158,7 +158,7 @@ class TestRequestSelect < Test::Unit::TestCase
       test "Integer" do
         assert_equal({
                        :table => "posts",
-                       :"drilldowns[label].offset" => 29,
+                       :"drilldowns[label].offset" => "29",
                      },
                      drilldown.offset(29).to_parameters)
       end
@@ -168,7 +168,7 @@ class TestRequestSelect < Test::Unit::TestCase
       test "Integer" do
         assert_equal({
                        :table => "posts",
-                       :"drilldowns[label].limit" => 29,
+                       :"drilldowns[label].limit" => "29",
                      },
                      drilldown.limit(29).to_parameters)
       end
@@ -247,6 +247,50 @@ class TestRequestSelect < Test::Unit::TestCase
                        :"columns[label].window.sort_keys" => "_id",
                      },
                      column.window.sort_keys("_id").to_parameters)
+      end
+    end
+  end
+
+  sub_test_case("#paginate") do
+    def paginate(*args)
+      @request.paginate(*args).to_parameters
+    end
+
+    sub_test_case("page") do
+      test("0") do
+        assert_equal({
+                       :table  => "posts",
+                       :offset => "0",
+                       :limit  => "10",
+                     },
+                     paginate(0))
+      end
+
+      test("1") do
+        assert_equal({
+                       :table  => "posts",
+                       :offset => "0",
+                       :limit  => "10",
+                     },
+                     paginate(1))
+      end
+
+      test("positive") do
+        assert_equal({
+                       :table  => "posts",
+                       :offset => "80",
+                       :limit  => "10",
+                     },
+                     paginate(9))
+      end
+
+      test("negative") do
+        assert_equal({
+                       :table  => "posts",
+                       :offset => "0",
+                       :limit  => "10",
+                     },
+                     paginate(-1))
       end
     end
   end
