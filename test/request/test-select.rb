@@ -248,6 +248,14 @@ class TestRequestSelect < Test::Unit::TestCase
                      },
                      column.window.sort_keys("_id").to_parameters)
       end
+
+      test "#group_keys" do
+        assert_equal({
+                       :table => "posts",
+                       :"columns[label].window.group_keys" => "day, tag",
+                     },
+                     column.window.group_keys(["day", "tag"]).to_parameters)
+      end
     end
   end
 

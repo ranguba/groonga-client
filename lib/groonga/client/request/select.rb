@@ -257,6 +257,17 @@ module Groonga
           alias_method :sortby, :sort_keys
           alias_method :sort, :sort_keys
 
+          # Sets `columns[LABEL].window.group_keys` parameter.
+          #
+          # @return [Groonga::Client::Request::Select] The current
+          #   request object.
+          #
+          # @since 0.4.1
+          def group_keys(value)
+            add_parameter(OverwriteMerger,
+                          ValuesParameter.new([:"#{prefix}group_keys"], value))
+          end
+
           private
           def prefix
             "columns[#{@label}].window."
