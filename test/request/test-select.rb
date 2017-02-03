@@ -311,5 +311,70 @@ class TestRequestSelect < Test::Unit::TestCase
                      paginate("9"))
       end
     end
+
+    sub_test_case("paginate") do
+      test("default") do
+        assert_equal({
+                       :table  => "posts",
+                       :offset => "20",
+                       :limit  => "10",
+                     },
+                     paginate(3))
+      end
+
+      test("nil") do
+        assert_equal({
+                       :table  => "posts",
+                       :offset => "20",
+                       :limit  => "10",
+                     },
+                     paginate(3, per_page: nil))
+      end
+
+      test("0") do
+        assert_equal({
+                       :table  => "posts",
+                       :offset => "20",
+                       :limit  => "10",
+                     },
+                     paginate(3, per_page: 0))
+      end
+
+      test("1") do
+        assert_equal({
+                       :table  => "posts",
+                       :offset => "2",
+                       :limit  => "1",
+                     },
+                     paginate(3, per_page: 1))
+      end
+
+      test("positive") do
+        assert_equal({
+                       :table  => "posts",
+                       :offset => "58",
+                       :limit  => "29",
+                     },
+                     paginate(3, per_page: 29))
+      end
+
+      test("negative") do
+        assert_equal({
+                       :table  => "posts",
+                       :offset => "20",
+                       :limit  => "10",
+                     },
+                     paginate(3, per_page: -1))
+      end
+
+      test("string") do
+        assert_equal({
+                       :table  => "posts",
+                       :offset => "58",
+                       :limit  => "29",
+                     },
+                     paginate(3, per_page: "29"))
+      end
+    end
   end
 end
