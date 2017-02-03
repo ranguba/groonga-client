@@ -257,6 +257,15 @@ class TestRequestSelect < Test::Unit::TestCase
     end
 
     sub_test_case("page") do
+      test("nil") do
+        assert_equal({
+                       :table  => "posts",
+                       :offset => "0",
+                       :limit  => "10",
+                     },
+                     paginate(nil))
+      end
+
       test("0") do
         assert_equal({
                        :table  => "posts",
