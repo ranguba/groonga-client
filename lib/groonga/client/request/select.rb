@@ -114,6 +114,9 @@ module Groonga
         def paginate(page, per_page: 10)
           page ||= 1
           page = page.to_i
+          per_page = per_page.to_i
+          per_page = 10 if per_page <= 0
+
           if page <= 0
             offset = 0
           else

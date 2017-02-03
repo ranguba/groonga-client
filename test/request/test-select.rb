@@ -301,6 +301,15 @@ class TestRequestSelect < Test::Unit::TestCase
                      },
                      paginate(-1))
       end
+
+      test("string") do
+        assert_equal({
+                       :table  => "posts",
+                       :offset => "80",
+                       :limit  => "10",
+                     },
+                     paginate("9"))
+      end
     end
   end
 end
