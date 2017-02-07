@@ -1,5 +1,19 @@
 # NEWS
 
+## 0.4.1 - 2016-02-07
+
+### Improvements
+
+  * `Groonga::Client::Request::Base`: Supported number as parameter
+    value.
+
+  * `Groonga::Client::Response::Load#errors`: Added for `load
+    --output_errors yes --command_version 3`.
+
+  * `Groonga::Client::Request::Select::DynamicColumnWindow#group_keys`:
+    Added for `select --columns[LABEL].window.group_keys`. You can use
+    this method by `request.columns(LABEL).window.group_keys(KEYS)`.
+
 ## 0.4.0 - 2016-01-12
 
 ### Improvements
