@@ -172,7 +172,19 @@ module Groonga
 
       class OverwriteMerger < ParameterMerger
         def to_parameters
-          @parameters1.to_parameters.merge(@parameters2.to_parameters)
+          if @parameters1.nil?
+            if @parameters2.nil?
+              {}
+            else
+              @parameters2.to_parameters
+            end
+          else
+            if @parameters2.nil?
+              @parameters1.to_parameters
+            else
+              @parameters1.to_parameters.merge(@parameters2.to_parameters)
+            end
+          end
         end
       end
     end
