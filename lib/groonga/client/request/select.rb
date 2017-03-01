@@ -38,9 +38,8 @@ module Groonga
           super(parameters, extensions)
         end
 
-        def match_columns(value)
-          add_parameter(OverwriteMerger,
-                        ValuesParameter.new([:match_columns], value))
+        def match_columns(values)
+          values_parameter([:match_columns], values)
         end
 
         def query(value)
@@ -160,9 +159,8 @@ module Groonga
             @label = label
           end
 
-          def keys(value)
-            add_parameter(OverwriteMerger,
-                          ValuesParameter.new([:"#{prefix}keys"], value))
+          def keys(values)
+            @request.values_parameter([:"#{prefix}keys"], values)
           end
 
           def sort_keys(value)
@@ -186,8 +184,7 @@ module Groonga
           end
 
           def calc_types(value)
-            add_parameter(OverwriteMerger,
-                          FlagsParameter.new([:"#{prefix}calc_types"], value))
+            @request.flags_parameter(:"#{prefix}calc_types", value)
           end
 
           def calc_target(value)
@@ -221,8 +218,7 @@ module Groonga
           end
 
           def flags(value)
-            add_parameter(OverwriteMerger,
-                          FlagsParameter.new([:"#{prefix}flags"], value))
+            @request.flags_parameter(:"#{prefix}flags", value)
           end
 
           def value(expression, values=nil)
@@ -265,9 +261,8 @@ module Groonga
           #   request object.
           #
           # @since 0.4.1
-          def group_keys(value)
-            add_parameter(OverwriteMerger,
-                          ValuesParameter.new([:"#{prefix}group_keys"], value))
+          def group_keys(values)
+            @request.values_parameter([:"#{prefix}group_keys"], values)
           end
 
           private

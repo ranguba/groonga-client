@@ -37,6 +37,26 @@ module Groonga
                         RequestParameter.new(name, value))
         end
 
+        def flags_parameter(name_or_names, value)
+          if name_or_names.is_a?(Array)
+            names = name_or_names
+          else
+            names = [name_or_names]
+          end
+          add_parameter(OverwriteMerger,
+                        FlagsParameter.new(names, value))
+        end
+
+        def values_parameter(name_or_names, values)
+          if name_or_names.is_a?(Array)
+            names = name_or_names
+          else
+            names = [name_or_names]
+          end
+          add_parameter(OverwriteMerger,
+                        ValuesParameter.new(names, values))
+        end
+
         def to_parameters
           if @parameters.nil?
             {}
