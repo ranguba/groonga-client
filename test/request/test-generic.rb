@@ -1,4 +1,4 @@
-# Copyright (C) 2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2016-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -14,10 +14,10 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-class TestRequestBase < Test::Unit::TestCase
+class TestRequestGeneric < Test::Unit::TestCase
   sub_test_case "#extensions" do
     setup do
-      @request = Groonga::Client::Request::Base.new("status")
+      @request = Groonga::Client::Request::Generic.new("status")
     end
 
     test "Module" do

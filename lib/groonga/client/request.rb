@@ -16,7 +16,7 @@
 
 require "groonga/client/script-syntax"
 
-require "groonga/client/request/base"
 require "groonga/client/request/error"
+require "groonga/client/request/generic"
 
 require "groonga/client/request/select"

@@ -17,7 +17,7 @@
 module Groonga
   class Client
     module Request
-      class Base
+      class Generic
         def initialize(parameters=nil, extensions=[])
           @parameters = parameters
           @extensions = extensions
@@ -60,9 +60,13 @@ module Groonga
           self.class.new(parameters, extensions)
         end
 
+        def command_name
+          self.class.command_name
+        end
+
         def create_response
           open_client do |client|
-            response = client.execute(self.class.command_name, to_parameters)
+            response = client.execute(command_name, to_parameters)
             raise ErrorResponse.new(response) unless response.success?
             response
           end

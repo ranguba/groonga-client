@@ -17,7 +17,7 @@
 module Groonga
   class Client
     module Request
-      class Select < Base
+      class Select < Generic
         include Enumerable
 
         class << self
