@@ -14,6 +14,23 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+module Groonga
+  class Client
+    module Request
+      @@requests = {}
+      class << self
+        def register(request_class)
+          @@requests[request_class.command_name] = request_class
+        end
+
+        def find(name)
+          @@requests[name.to_s] || Generic
+        end
+      end
+    end
+  end
+end
+
 require "groonga/client/script-syntax"
 
 require "groonga/client/request/error"

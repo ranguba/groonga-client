@@ -1,5 +1,5 @@
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -300,6 +300,15 @@ JSON
     end
   end
 
+  module RequestTests
+    def test_generic
+      expected_response = {"key" => "value"}
+      stub_response(expected_response.to_json)
+      response = client.request(:status).response
+      assert_equal(expected_response, response.body)
+    end
+  end
+
   module Tests
     include Utils
     include Assertions
@@ -310,6 +319,7 @@ JSON
     include OpenTests
     include LoadTests
     include DefaultOptionsTests
+    include RequestTests
   end
 
   class TestGQTP < self

@@ -26,6 +26,8 @@ module Groonga
           end
         end
 
+        Request.register(self)
+
         def initialize(table_or_parameters, extensions=[])
           if table_or_parameters.respond_to?(:to_parameters)
             parameters = table_or_parameters

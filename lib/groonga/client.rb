@@ -176,6 +176,28 @@ module Groonga
       execute_command(command, &block)
     end
 
+    def request(name)
+      command_name_module = Module.new do
+        define_method :command_name do
+          name
+        end
+      end
+
+      client = self
+      open_client_module = Module.new do
+        define_method :open_client do |&block|
+          block.call(client)
+        end
+      end
+
+      extensions = [
+        command_name_module,
+        open_client_module,
+      ]
+      request_class = Request.find(name)
+      request_class.new(nil, extensions)
+    end
+
     def method_missing(name, *args, &block)
       if groonga_command_name?(name)
         execute(name, *args, &block)
