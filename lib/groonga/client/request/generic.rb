@@ -24,6 +24,10 @@ module Groonga
           extend(*@extensions) unless @extensions.empty?
         end
 
+        def command_name
+          self.class.command_name
+        end
+
         def response
           @reponse ||= create_response
         end
@@ -58,10 +62,6 @@ module Groonga
 
         def create_request(parameters, extensions)
           self.class.new(parameters, extensions)
-        end
-
-        def command_name
-          self.class.command_name
         end
 
         def create_response
