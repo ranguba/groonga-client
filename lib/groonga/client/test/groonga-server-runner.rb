@@ -140,7 +140,7 @@ module Groonga
               break
             else
               begin
-                pid = Process.waitpid(@pid, Process::WNOHANG)
+                Process.waitpid(@pid, Process::WNOHANG)
               rescue SystemCallError
                 @pid = nil
                 break
