@@ -150,10 +150,6 @@ module Groonga
         end
 
         def wait_groonga_shutdown
-          # TODO: Remove me when Groonga 6.0.1 has been released.
-          # Workaround to shutdown as soon as possible.
-          groonga_server_running?
-
           n_retried = 0
           while n_retried <= 20
             n_retried += 1
