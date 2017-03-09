@@ -1,5 +1,19 @@
 # NEWS
 
+## 0.4.2 - 2016-03-09
+
+### Improvements
+
+  * `Groonga::Client#request`: Added a new generic request method.
+
+  * `Groonga::Client::Request::Generic#flags_parameter`: Added a
+    convenience method to add a flags parameter such as
+    `table_create`'s `flags` parameter.
+
+  * `Groonga::Client::Request::Generic#values_parameter`: Added a
+    convenience method to add a parameter that takes multiple values
+    such as `select`'s `output_columns` parameter.
+
 ## 0.4.1 - 2016-02-07
 
 ### Improvements
