@@ -202,7 +202,8 @@ module Groonga
             when :indexes
               super(key, coerce_indexes(value))
             when :value_type
-              super(key, ValueType.new(value))
+              value = ValueType.new(value) unless value.nil?
+              super(key, value)
             else
               super
             end
