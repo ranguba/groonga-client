@@ -101,16 +101,16 @@ class TestRequestSelect < Test::Unit::TestCase
         assert_equal({
                        :table => "posts",
                        :filter => "in_values(ages, 2, 29)",
-                   },
-                   in_values("ages", 2, 29))
+                     },
+                     in_values("ages", 2, 29))
       end
 
       test("strings") do
         assert_equal({
                        :table => "posts",
                        :filter => "in_values(tags, \"groonga\", \"have \\\"double\\\" quote\")",
-                   },
-                   in_values("tags", "groonga", "have \"double\" quote"))
+                     },
+                     in_values("tags", "groonga", "have \"double\" quote"))
       end
     end
   end
