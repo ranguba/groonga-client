@@ -91,6 +91,28 @@ class TestRequestSelect < Test::Unit::TestCase
                             "number" => 29
                           }))
     end
+
+    sub_test_case("#in_values") do
+      def in_values(*args)
+        @request.filter.in_values(*args).to_parameters
+      end
+
+      test("numbers") do
+        assert_equal({
+                       :table => "posts",
+                       :filter => "in_values(ages, 2, 29)",
+                   },
+                   in_values("ages", 2, 29))
+      end
+
+      test("strings") do
+        assert_equal({
+                       :table => "posts",
+                       :filter => "in_values(tags, \"groonga\", \"have \\\"double\\\" quote\")",
+                   },
+                   in_values("tags", "groonga", "have \"double\" quote"))
+      end
+    end
   end
 
   sub_test_case("#drilldowns") do
@@ -382,28 +404,6 @@ class TestRequestSelect < Test::Unit::TestCase
                        :limit  => "29",
                      },
                      paginate(3, per_page: "29"))
-      end
-    end
-
-    sub_test_case("#in_values") do
-      def in_values(*args)
-        @request.filter.in_values(*args).to_parameters
-      end
-
-      test("numbers") do
-        assert_equal({
-                       :table => "posts",
-                       :filter => "in_values(ages, 2, 29)",
-                   },
-                   in_values("ages", 2, 29))
-      end
-
-      test("strings") do
-        assert_equal({
-                       :table => "posts",
-                       :filter => "in_values(tags, \"groonga\", \"have \\\"double\\\" quote\")",
-                   },
-                   in_values("tags", "groonga", "have \"double\" quote"))
       end
     end
   end
