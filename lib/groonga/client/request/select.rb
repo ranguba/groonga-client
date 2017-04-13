@@ -458,10 +458,9 @@ module Groonga
           end
 
           def to_parameters
-            escaped_values = []
-            @values.each{|value|
-              escaped_values << escape_script_syntax_value(value)
-            }
+            escaped_values = @values.collect do |value|
+              escape_script_syntax_value(value)
+            end
             {
               filter: "in_values(#{@column_name}, #{escaped_values.join(", ")})",
             }
