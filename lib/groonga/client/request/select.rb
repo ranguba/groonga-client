@@ -78,7 +78,11 @@ module Groonga
         #      external should be escaped.
         #
         #   Adds a `#{expression % values}` condition.
-        def filter(expression_or_column_name, values_or_value=nil)
+        def filter(expression_or_column_name=nil, values_or_value=nil)
+          if expression_or_column_name.nil? and values_or_value.nil?
+            return Filter.new(self)
+          end
+ 
           if expression_or_column_name.is_a?(Symbol)
             parameter = FilterEqualParameter.new(expression_or_column_name,
                                                  values_or_value)
@@ -151,6 +155,22 @@ module Groonga
         def paginated?
           parameters = to_parameters
           parameters.key?(:offset) and parameters.key?(:limit)
+        end
+
+        class Filter
+          def initialize(request)
+            @request = request
+          end
+
+          def in_values(column_name, *values)
+            add_parameter(FilterMerger,
+                          FilterInValuesParameters.new(column_name, *values))
+          end
+
+          private
+          def add_parameter(merger, parameter)
+            @request.__send__(:add_parameter, merger, parameter)
+          end
         end
 
         class LabeledDrilldown
@@ -396,6 +416,24 @@ module Groonga
         end
 
         # @private
+        class FilterInValuesParameters
+          include ScriptSyntaxValueEscapable
+          def initialize(column_name, *values)
+	    @column_name = column_name
+	    @values = values
+          end
+
+          def to_parameters
+            escaped_values = []
+            @values.each{|value|
+              escaped_values << escape_script_syntax_value(value)
+            }
+            {
+	      filter: "in_values(#{@column_name}, #{escaped_values.join(", ")})",
+            }
+          end
+        end
+
         class FilterEqualParameter
           include ScriptSyntaxValueEscapable
 
