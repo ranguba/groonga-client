@@ -38,9 +38,11 @@ module Groonga
         # Parses the response for the request of the command and returns
         # response object.
         #
-        # @param [Groonga::Command::Base] The command of the request.
-        # @param [String] The raw (not parsed) response returned by Groonga
-        #   server.
+        # @param command [Groonga::Command::Base] The command of the request.
+        #
+        # @param raw_response [String] The raw (not parsed) response
+        #   returned by Groonga server.
+        #
         # @return [Base]
         def parse(command, raw_response)
           klass = find(command.command_name)

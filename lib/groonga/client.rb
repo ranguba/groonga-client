@@ -37,7 +37,7 @@ module Groonga
         @@deafult_options
       end
 
-      # @param [Hash] options The new default options for
+      # @param options [Hash] The new default options for
       #   {Groonga::Client.new}.
       #
       # @since 0.2.0
@@ -46,7 +46,7 @@ module Groonga
       end
 
       # @!macro [new] initialize_options
-      #   @param [Hash] options The options.
+      #   @param options [Hash] The options.
       #   @option options [String, URI::Generic, URI::HTTP, URI::HTTPS]
       #     :url The URL of Groonga server.
       #   @option options [:gqtp, :http, :https] :protocol The
