@@ -187,17 +187,21 @@ module Groonga
           #
           # @param [String, Symbol] column_name The target column name.
           #
-          # @param [Object] values The column values that cover target
+          # @param [Object] value A column value that cover target
           #   column values.
+          #
+          # @param [Object] values The rest column values that cover
+          #   target column values.
           #
           # Adds a `in_values` condition then return a new `select`
           # request object.
           #
           # @return [Groonga::Client::Request::Select]
           #   The new request with the given condition.
-          def in_values(column_name, *values)
-            add_parameter(FilterMerger,
-                          FilterInValuesParameters.new(column_name, *values))
+          def in_values(column_name, value, *values)
+            parameters =
+              FilterInValuesParameters.new(column_name, value, *values)
+            add_parameter(FilterMerger, parameters)
           end
 
           private

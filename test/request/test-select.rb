@@ -112,6 +112,12 @@ class TestRequestSelect < Test::Unit::TestCase
                      },
                      in_values("tags", "groonga", "have \"double\" quote"))
       end
+
+      test("no values") do
+        assert_raise(ArgumentError) do
+          in_values("tags")
+        end
+      end
     end
   end
 
