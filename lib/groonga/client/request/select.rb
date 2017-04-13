@@ -201,8 +201,8 @@ module Groonga
           # @return [Groonga::Client::Request::Select]
           #   The new request with the given condition.
           def in_values(column_name, *values)
-            parameters = FilterInValuesParameters.new(column_name, *values)
-            add_parameter(FilterMerger, parameters)
+            parameter = FilterInValuesParameter.new(column_name, *values)
+            add_parameter(FilterMerger, parameter)
           end
 
           private
@@ -454,7 +454,7 @@ module Groonga
         end
 
         # @private
-        class FilterInValuesParameters
+        class FilterInValuesParameter
           include ScriptSyntaxValueEscapable
 
           def initialize(column_name, *values)
