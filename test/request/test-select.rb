@@ -114,9 +114,10 @@ class TestRequestSelect < Test::Unit::TestCase
       end
 
       test("no values") do
-        assert_raise(ArgumentError) do
-          in_values("tags")
-        end
+        assert_equal({
+                       :table => "posts",
+                     },
+                     in_values("tags"))
       end
     end
   end

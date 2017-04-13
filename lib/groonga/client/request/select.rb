@@ -178,29 +178,30 @@ module Groonga
             @request = request
           end
 
-          # @example: Use in_values function
+          # Adds a `in_values` condition then return a new `select`
+          # request object.
+          #
+          # @example: Multiple conditions
           #    request.
           #      filter.in_values("tags", "tag1", "tag2").
           #        # -> --filter 'in_values(tags, "tag1", "tag2")'
           #      filter("user", "alice")
           #        # -> --filter '(in_values(tags, "tag1", "tag2")) && (user == "alice")'
           #
+          # @example: Ignore no values case
+          #    request.
+          #      filter.in_values("tags")
+          #        # -> --filter ''
+          #
           # @param [String, Symbol] column_name The target column name.
           #
-          # @param [Object] value A column value that cover target
+          # @param [Object] values The column values that cover target
           #   column values.
-          #
-          # @param [Object] values The rest column values that cover
-          #   target column values.
-          #
-          # Adds a `in_values` condition then return a new `select`
-          # request object.
           #
           # @return [Groonga::Client::Request::Select]
           #   The new request with the given condition.
-          def in_values(column_name, value, *values)
-            parameters =
-              FilterInValuesParameters.new(column_name, value, *values)
+          def in_values(column_name, *values)
+            parameters = FilterInValuesParameters.new(column_name, *values)
             add_parameter(FilterMerger, parameters)
           end
 
@@ -359,7 +360,7 @@ module Groonga
             filter2 = params2[:filter]
             if filter1 and filter2
               params[:filter] = "(#{filter1}) && (#{filter2})"
-            else
+            elsif filter1 or filter2
               params[:filter] = (filter1 || filter2)
             end
             params
@@ -462,6 +463,8 @@ module Groonga
           end
 
           def to_parameters
+            return {} if @values.empty?
+
             escaped_values = @values.collect do |value|
               escape_script_syntax_value(value)
             end
