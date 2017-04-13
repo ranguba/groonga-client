@@ -449,8 +449,8 @@ module Groonga
         class FilterInValuesParameters
           include ScriptSyntaxValueEscapable
           def initialize(column_name, *values)
-	    @column_name = column_name
-	    @values = values
+            @column_name = column_name
+            @values = values
           end
 
           def to_parameters
@@ -459,7 +459,7 @@ module Groonga
               escaped_values << escape_script_syntax_value(value)
             }
             {
-	      filter: "in_values(#{@column_name}, #{escaped_values.join(", ")})",
+              filter: "in_values(#{@column_name}, #{escaped_values.join(", ")})",
             }
           end
         end
