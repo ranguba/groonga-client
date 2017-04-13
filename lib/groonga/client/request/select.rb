@@ -451,6 +451,7 @@ module Groonga
         # @private
         class FilterInValuesParameters
           include ScriptSyntaxValueEscapable
+
           def initialize(column_name, *values)
             @column_name = column_name
             @values = values
