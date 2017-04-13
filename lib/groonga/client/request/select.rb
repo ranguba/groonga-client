@@ -91,6 +91,8 @@ module Groonga
         #
         #   @return [Groonga::Client::Request::Select::Filter]
         #     The new request object for setting a filter condition.
+        #
+        #   @since 0.4.3
         def filter(expression_or_column_name=nil, values_or_value=nil)
           if expression_or_column_name.nil? and values_or_value.nil?
             return Filter.new(self)
@@ -170,17 +172,18 @@ module Groonga
           parameters.key?(:offset) and parameters.key?(:limit)
         end
 
+        # @since 0.4.3
         class Filter
           def initialize(request)
             @request = request
           end
 
-          #   @example: Use in_values function
-          #      request.
-          #        filter.in_values("tags", "tag1", "tag2").
-          #          # -> --filter 'in_values(tags, "tag1", "tag2")'
-          #        filter("user", "alice")
-          #          # -> --filter '(in_values(tags, "tag1", "tag2")) && (user == "alice")'
+          # @example: Use in_values function
+          #    request.
+          #      filter.in_values("tags", "tag1", "tag2").
+          #        # -> --filter 'in_values(tags, "tag1", "tag2")'
+          #      filter("user", "alice")
+          #        # -> --filter '(in_values(tags, "tag1", "tag2")) && (user == "alice")'
           #
           # @param [String, Symbol] column_name The target column name.
           #
