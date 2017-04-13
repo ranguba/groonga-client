@@ -78,6 +78,19 @@ module Groonga
         #      external should be escaped.
         #
         #   Adds a `#{expression % values}` condition.
+        #
+        # @overload filter
+        #
+        #   @example: Use in_values function
+        #      request.
+        #        filter.in_values("tags", "tag1", "tag2")
+        #          # -> --filter 'in_values(tags, "tag1", "tag2")'
+        #
+        #   Returns a request object for filter condition. It provides
+        #   convenient methods to add a popular filter condition.
+        #
+        #   @return [Groonga::Client::Request::Select::Filter]
+        #     The new request object for setting a filter condition.
         def filter(expression_or_column_name=nil, values_or_value=nil)
           if expression_or_column_name.nil? and values_or_value.nil?
             return Filter.new(self)
@@ -162,6 +175,23 @@ module Groonga
             @request = request
           end
 
+          #   @example: Use in_values function
+          #      request.
+          #        filter.in_values("tags", "tag1", "tag2").
+          #          # -> --filter 'in_values(tags, "tag1", "tag2")'
+          #        filter("user", "alice")
+          #          # -> --filter '(in_values(tags, "tag1", "tag2")) && (user == "alice")'
+          #
+          # @param [String, Symbol] column_name The target column name.
+          #
+          # @param [Object] values The column values that cover target
+          #   column values.
+          #
+          # Adds a `in_values` condition then return a new `select`
+          # request object.
+          #
+          # @return [Groonga::Client::Request::Select]
+          #   The new request with the given condition.
           def in_values(column_name, *values)
             add_parameter(FilterMerger,
                           FilterInValuesParameters.new(column_name, *values))
