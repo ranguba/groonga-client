@@ -82,7 +82,7 @@ module Groonga
           if expression_or_column_name.nil? and values_or_value.nil?
             return Filter.new(self)
           end
- 
+
           if expression_or_column_name.is_a?(Symbol)
             parameter = FilterEqualParameter.new(expression_or_column_name,
                                                  values_or_value)
