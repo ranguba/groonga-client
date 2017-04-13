@@ -61,15 +61,21 @@ module Groonga
         #   The new request with the given condition.
         #
         # @overload filter(column_name, value)
-        #   @param column_name [String, Symbol] The target column name.
-        #   @param value [Object] The column value. It's escaped automatically.
-        #
         #   Adds a `#{column_name} == #{value}` condition.
         #
+        #   @param column_name [String, Symbol] The target column name.
+        #
+        #   @param value [Object] The column value. It's escaped
+        #     automatically.
+        #
         # @overload filter(expression, values=nil)
+        #
+        #   Adds a `#{expression % values}` condition.
+        #
         #   @param expression [String] The script syntax expression.
         #      It can includes `%{name}`s as placeholder. They are expanded
         #      by `String#%` with the given `values` argument.
+        #
         #   @param values [nil, ::Hash] The values to be expanded.
         #      If the given `expression` doesn't have placeholder, you
         #      should specify `nil`.
@@ -77,17 +83,15 @@ module Groonga
         #      Values are escaped automatically. Values passed from
         #      external should be escaped.
         #
-        #   Adds a `#{expression % values}` condition.
-        #
         # @overload filter
+        #
+        #   Returns a request object for filter condition. It provides
+        #   convenient methods to add a popular filter condition.
         #
         #   @example: Use in_values function
         #      request.
         #        filter.in_values("tags", "tag1", "tag2")
         #          # -> --filter 'in_values(tags, "tag1", "tag2")'
-        #
-        #   Returns a request object for filter condition. It provides
-        #   convenient methods to add a popular filter condition.
         #
         #   @return [Groonga::Client::Request::Select::Filter]
         #     The new request object for setting a filter condition.
