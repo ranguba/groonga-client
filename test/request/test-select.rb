@@ -93,8 +93,8 @@ class TestRequestSelect < Test::Unit::TestCase
     end
 
     sub_test_case("#in_values") do
-      def in_values(*args)
-        @request.filter.in_values(*args).to_parameters
+      def in_values(column_name, *values)
+        @request.filter.in_values(column_name, *values).to_parameters
       end
 
       test("numbers") do
