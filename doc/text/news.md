@@ -6,7 +6,7 @@
 
   * `Groonga::Client::Request::Select::Filter#in_values`: Added a
     convenience method to add a popular filter condition. You can
-    use this method by 'filter.in_values("tags", "tag1", "tag2")'.
+    use this method by `filter.in_values("tags", "tag1", "tag2")`.
 
 ## 0.4.2 - 2016-03-09
 
