@@ -190,7 +190,7 @@ module Groonga
 
           parser.on_load_complete do |command|
             if command[:values]
-              run_command(client, command)
+              run_command(command)
             else
               consume_load_values(command)
             end
