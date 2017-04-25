@@ -93,20 +93,15 @@ module Groonga
         #        filter.in_values("tags", "tag1", "tag2")
         #          # -> --filter 'in_values(tags, "tag1", "tag2")'
         #
+        #   @example: Use between function
+        #      request.
+        #        filter.between("tags", 19, "include", 32, "include")
+        #          # -> --filter 'between(tags, 19, "include", 32, "include")'
+        #
         #   @return [Groonga::Client::Request::Select::Filter]
         #     The new request object for setting a filter condition.
         #
         #   @since 0.4.3
-        #
-        #   @example: Use between function
-        #      request.
-        #        filter.between("tags", "min", "min_border", "max", "max_border")
-        #          # -> --filter 'between(tags, min, "min_border", max, "max_border")'
-        #
-        #   @return [Groonga::Client::Request::Select::Filter]
-        #     The new request object for setting a filter condition.
-        #
-        #   @since 0.4.4
         def filter(expression_or_column_name=nil, values_or_value=nil)
           if expression_or_column_name.nil? and values_or_value.nil?
             return Filter.new(self)
@@ -195,25 +190,36 @@ module Groonga
           # Adds a `between` condition then return a new `select`
           # request object.
           #
-          # @example: Multiple conditions
+          # @example: Single condition
           #    request.
           #      filter.between("tags", "min", "min_border", "max", "max_border").
           #        # -> --filter 'between(tags, min, "min_border", max, "max_border")'
           #
-          # @example: Ignore no values case
+          # @example: Error no values case
           #    request.
           #      filter.between("tags")
-          #        # -> --filter ''
+          #        # -> ArgumentError
           #
-          # @param column_name_or_value [String, Symbol, Integer] The target column name
-          #   or target num.
+          # @param column_name [String, Symbol] The target column name.
           #
-          # @param values [Object] Range of values.
+          # @param min [Integer] Specifies the minimal border value of the range.
+          #
+          # @param min_border [String] Specifies whether the specified range contains the value
+          #                            of min or not.
+          #                            If it is "include", min value is include.
+          #                            If it is "exclude", min value is not include.
+          #
+          # @param max [Integer] Specifies the maximum border value of the range.
+          #
+          # @param max_border [String] Specifies whether the specified range contains the value
+          #                            of max or not.
+          #                            If it is "include", max value is include.
+          #                            If it is "exclude", max value is not include.
           #
           # @return [Groonga::Client::Request::Select]
           #   The new request with the given condition.
-          def between(column_name_or_value, *values)
-            parameter = FilterBetweenParameter.new(column_name_or_value, *values)
+          def between(column_name, min, min_border, max, max_border)
+            parameter = FilterBetweenParameter.new(column_name, min, min_border, max, max_border)
             add_parameter(FilterMerger, parameter)
           end
 
@@ -495,21 +501,20 @@ module Groonga
         # @private
         class FilterBetweenParameter
           include ScriptSyntaxValueEscapable
-          NUM_OF_ARGUMENTS = 4
 
-          def initialize(column_name_or_value, *values)
-            @column_name_or_value = column_name_or_value
+          def initialize(column_name, *values)
+            @column_name = column_name
             @values = values
           end
 
           def to_parameters
-            return {} if @values.empty? or @values.length != NUM_OF_ARGUMENTS
+            return {} if @values.empty?
 
             escaped_values = @values.collect do |value|
               escape_script_syntax_value(value)
             end
             {
-              filter: "between(#{@column_name_or_value}, #{escaped_values.join(", ")})",
+              filter: "between(#{@column_name}, #{escaped_values.join(", ")})",
             }
           end
         end

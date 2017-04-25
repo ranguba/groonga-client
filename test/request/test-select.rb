@@ -130,17 +130,11 @@ class TestRequestSelect < Test::Unit::TestCase
       end
 
       test("no values") do
-        assert_equal({
-                       :table => "posts",
-                     },
-                     between("tags"))
+        assert_raise(ArgumentError){ between("tags") }
       end
 
       test("too much values") do
-        assert_equal({
-                       :table => "posts",
-                     },
-                     between("ages", 2, "include", 29, "include", 3))
+        assert_raise(ArgumentError){ between("ages", 2, "include", 29, "include", 3) }
       end
     end
 
