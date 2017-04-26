@@ -92,6 +92,24 @@ class TestRequestSelect < Test::Unit::TestCase
                           }))
     end
 
+    sub_test_case("#geo_in_circle") do
+      def geo_in_circle(point,
+                        center, radious_or_point,
+                        approximate_type="rectangle")
+        @request.filter.geo_in_circle(point,
+                                      center, radious_or_point,
+                                      approximate_type).to_parameters
+      end
+
+      test("approximate type") do
+        assert_equal({
+                       :table => "posts",
+                       :filter => "geo_in_circle(\"100x100\", \"140x250\", 300, \"rectangle\")",
+                     },
+                     geo_in_circle("100x100", "140x250", 300, "rectangle"))
+      end
+    end
+
     sub_test_case("#between") do
       def between(column_name,
                   min, min_border,
