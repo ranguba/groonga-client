@@ -93,6 +93,11 @@ module Groonga
         #        filter.in_values("tags", "tag1", "tag2")
         #          # -> --filter 'in_values(tags, "tag1", "tag2")'
         #
+        #   @example: Use between function
+        #      request.
+        #        filter.between("tags", 19, "include", 32, "include")
+        #          # -> --filter 'between(tags, 19, "include", 32, "include")'
+        #
         #   @return [Groonga::Client::Request::Select::Filter]
         #     The new request object for setting a filter condition.
         #
@@ -180,6 +185,42 @@ module Groonga
         class Filter
           def initialize(request)
             @request = request
+          end
+
+          # Adds a `between` condition then return a new `select`
+          # request object.
+          #
+          # @example: Single condition
+          #    request.
+          #      filter.between("tags", "min", "min_border", "max", "max_border").
+          #        # -> --filter 'between(tags, min, "min_border", max, "max_border")'
+          #
+          # @example: Error no values case
+          #    request.
+          #      filter.between("tags")
+          #        # -> ArgumentError
+          #
+          # @param column_name [String, Symbol] The target column name.
+          #
+          # @param min [Integer] Specifies the minimal border value of the range.
+          #
+          # @param min_border [String] Specifies whether the specified range contains the value
+          #                            of min or not.
+          #                            If it is "include", min value is include.
+          #                            If it is "exclude", min value is not include.
+          #
+          # @param max [Integer] Specifies the maximum border value of the range.
+          #
+          # @param max_border [String] Specifies whether the specified range contains the value
+          #                            of max or not.
+          #                            If it is "include", max value is include.
+          #                            If it is "exclude", max value is not include.
+          #
+          # @return [Groonga::Client::Request::Select]
+          #   The new request with the given condition.
+          def between(column_name, min, min_border, max, max_border)
+            parameter = FilterBetweenParameter.new(column_name, min, min_border, max, max_border)
+            add_parameter(FilterMerger, parameter)
           end
 
           # Adds a `in_values` condition then return a new `select`
@@ -458,6 +499,26 @@ module Groonga
         end
 
         # @private
+        class FilterBetweenParameter
+          include ScriptSyntaxValueEscapable
+
+          def initialize(column_name, *values)
+            @column_name = column_name
+            @values = values
+          end
+
+          def to_parameters
+            return {} if @values.empty?
+
+            escaped_values = @values.collect do |value|
+              escape_script_syntax_value(value)
+            end
+            {
+              filter: "between(#{@column_name}, #{escaped_values.join(", ")})",
+            }
+          end
+        end
+
         class FilterInValuesParameter
           include ScriptSyntaxValueEscapable
 
