@@ -93,8 +93,12 @@ class TestRequestSelect < Test::Unit::TestCase
     end
 
     sub_test_case("#between") do
-      def between(column_name, *values)
-        @request.filter.between(column_name, *values).to_parameters
+      def between(column_name,
+                  min, min_border,
+                  max, max_border)
+        @request.filter.between(column_name,
+                                min, min_border,
+                                max, max_border).to_parameters
       end
 
       test("column_name_include") do
