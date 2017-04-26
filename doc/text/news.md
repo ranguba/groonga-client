@@ -185,8 +185,8 @@
 
   * Supported command version 3.
 
-  * Added {Groonga::Client::Response#return_code}.
-    {Groonga::Client::Response#status_code} is deprecated. Use
+  * Added `Groonga::Client::Response#return_code`.
+    `Groonga::Client::Response#status_code` is deprecated. Use
     `#return_code` instead.
 
   * `select` response: Supported vector of `Time`.
@@ -251,10 +251,11 @@
     [GitHub#7][Patch by Masafumi Yokoyama]
 
   * HTTP: Supported HTTPS by passing `:use_tls => true` option to
-    {Groonga::Client.new}.
+    {Groonga::Client#initialize}.
     [GitHub#8][Patch by KITAITI Makoto]
 
-  * Supported URI as server information in {Groonga::Client.new}.
+  * Supported URI as server information in
+    {Groonga::Client#initialize}.
 
   * Required groonga-command 1.2.0 or later.
 
@@ -413,7 +414,7 @@
   * select: Supported auto time value conversion.
   * select: Renamed to {Groonga::Client::Response::Select#n_hits}
     from #n_records. It is a backward incompatible change.
-  * Added {Groonga::Client::Connection::Error} as an abstracted error.
+  * Added `Groonga::Client::Connection::Error` as an abstracted error.
   * Required groonga-command 1.0.4 or later.
 
 ## 0.0.2 - 2013-07-08
