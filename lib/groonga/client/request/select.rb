@@ -95,8 +95,8 @@ module Groonga
         #
         #   @example: Use between function
         #      request.
-        #        filter.between("tags", 19, "include", 32, "include")
-        #          # -> --filter 'between(tags, 19, "include", 32, "include")'
+        #        filter.between("age", 19, "include", 32, "include")
+        #          # -> --filter 'between(age, 19, "include", 32, "include")'
         #
         #   @return [Groonga::Client::Request::Select::Filter]
         #     The new request object for setting a filter condition.
