@@ -101,44 +101,12 @@ class TestRequestSelect < Test::Unit::TestCase
                                 max, max_border).to_parameters
       end
 
-      test("column_name_include") do
+      test("border") do
         assert_equal({
                        :table => "posts",
-                       :filter => "between(ages, 2, \"include\", 29, \"include\")",
+                       :filter => "between(ages, 2, \"include\", 29, \"exclude\")",
                      },
-                     between("ages", 2, "include", 29, "include"))
-      end
-
-      test("column_name_exclude") do
-        assert_equal({
-                       :table => "posts",
-                       :filter => "between(ages, 2, \"exclude\", 29, \"exclude\")",
-                     },
-                     between("ages", 2, "exclude", 29, "exclude"))
-      end
-
-      test("number_include") do
-        assert_equal({
-                       :table => "posts",
-                       :filter => "between(10, 2, \"include\", 29, \"include\")",
-                     },
-                     between(10, 2, "include", 29, "include"))
-      end
-
-      test("number_exclude") do
-        assert_equal({
-                       :table => "posts",
-                       :filter => "between(10, 2, \"exclude\", 29, \"exclude\")",
-                     },
-                     between(10, 2, "exclude", 29, "exclude"))
-      end
-
-      test("no values") do
-        assert_raise(ArgumentError){ between("tags") }
-      end
-
-      test("too much values") do
-        assert_raise(ArgumentError){ between("ages", 2, "include", 29, "include", 3) }
+                     between("ages", 2, "include", 29, "exclude"))
       end
     end
 
