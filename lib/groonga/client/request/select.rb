@@ -192,8 +192,8 @@ module Groonga
           #
           # @example: Single condition
           #    request.
-          #      filter.between("tags", "min", "min_border", "max", "max_border").
-          #        # -> --filter 'between(tags, min, "min_border", max, "max_border")'
+          #      filter.between("age", 19, "include", 32, "exclude").
+          #        # -> --filter 'between(age, 19, "include", 32, "exclude")'
           #
           # @param column_name [String, Symbol] The target column name.
           #
