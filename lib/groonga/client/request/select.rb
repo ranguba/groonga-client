@@ -93,6 +93,11 @@ module Groonga
         #        filter.in_values(:tags, "tag1", "tag2")
         #          # -> --filter 'in_values(tags, "tag1", "tag2")'
         #
+        #   @example: Use geo_in_rectangle function
+        #      request.
+        #        filter.geo_in_rectangle("50x50", "0x100", "100x0")
+        #          # -> --filter 'geo_in_rectangle("50x50", "0x100", "100x0")'
+        #
         #   @example Use geo_in_circle function
         #      request.
         #        filter.geo_in_circle(:location, "100x100", 300)
@@ -216,6 +221,39 @@ module Groonga
 
           def initialize(request)
             @request = request
+          end
+
+          # Adds a `geo_in_rectangle` condition then return a new `select`
+          # request object.
+          #
+          # @see http://groonga.org/docs/reference/functions/geo_in_rectangle.html
+          #   geo_in_rectangle function in the Groonga document
+          #
+          # @example: Basic usage
+          #    request.
+          #      filter.geo_in_rectangle("50x50", "0x100", "100x0").
+          #        # -> --filter 'in_values(50x50, 0x100, 100x0)'
+          #
+          # @param point [String] The point to be checked.
+          #    `"#{LONGITUDE}x#{LATITUDE}"` is the point format.
+          #
+          # @param top_left [String] The top left of the condition rectangle.
+          #
+          # @param bottom_right [String] The bottom right of the condition rectangle.
+          #
+          # @return [Groonga::Client::Request::Select]
+          #   The new request with the given condition.
+          #
+          # @since 0.5.0
+          def geo_in_rectangle(point, top_left, bottom_right)
+            expression = "geo_in_rectangle(%{point}"
+            expression << ", %{top_left}"
+            expression << ", %{bottom_right}"
+            expression << ")"
+            @request.filter(expression,
+                            point: point,
+                            top_left: top_left,
+                            bottom_right: bottom_right)
           end
 
           # Adds a `geo_in_circle` condition then returns a new `select`

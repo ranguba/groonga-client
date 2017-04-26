@@ -202,6 +202,20 @@ title == "[\"He\\ llo\"]"
   end
 
   sub_test_case("Filter") do
+    sub_test_case("#geo_in_rectangle") do
+      def geo_in_rectangle(*args)
+        @request.filter.geo_in_rectangle(*args).to_parameters
+      end
+
+      test("point") do
+        assert_equal({
+                       :table => "posts",
+                       :filter => "geo_in_rectangle(\"50x50\", \"0x100\", \"100x0\")",
+                     },
+                     geo_in_rectangle("50x50", "0x100", "100x0"))
+      end
+    end
+
     sub_test_case("#geo_in_circle") do
       def geo_in_circle(*args)
         @request.filter.geo_in_circle(*args).to_parameters
