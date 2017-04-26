@@ -190,7 +190,7 @@ module Groonga
           # Adds a `between` condition then return a new `select`
           # request object.
           #
-          # @example: Single condition
+          # @example: Basic usage
           #    request.
           #      filter.between("age", 19, "include", 32, "exclude").
           #        # -> --filter 'between(age, 19, "include", 32, "exclude")'
