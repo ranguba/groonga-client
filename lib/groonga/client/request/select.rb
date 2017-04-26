@@ -218,6 +218,8 @@ module Groonga
           #
           # @return [Groonga::Client::Request::Select]
           #   The new request with the given condition.
+          #
+          # @since 0.4.4
           def between(column_name, min, min_border, max, max_border)
             parameter = FilterBetweenParameter.new(column_name, min, min_border, max, max_border)
             add_parameter(FilterMerger, parameter)
