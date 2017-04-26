@@ -509,19 +509,25 @@ module Groonga
         class FilterBetweenParameter
           include ScriptSyntaxValueEscapable
 
-          def initialize(column_name, *values)
+          def initialize(column_name,
+                         min, min_border,
+                         max, max_border)
             @column_name = column_name
-            @values = values
+            @min = min
+            @min_border = min_border
+            @max = max
+            @max_border = max_border
           end
 
           def to_parameters
-            return {} if @values.empty?
-
-            escaped_values = @values.collect do |value|
-              escape_script_syntax_value(value)
-            end
+            filter = "between(#{@column_name}"
+            filter << ", #{escape_script_syntax_value(@min)}"
+            filter << ", #{escape_script_syntax_value(@min_border)}"
+            filter << ", #{escape_script_syntax_value(@max)}"
+            filter << ", #{escape_script_syntax_value(@max_border)}"
+            filter << ")"
             {
-              filter: "between(#{@column_name}, #{escaped_values.join(", ")})",
+              filter: filter,
             }
           end
         end
