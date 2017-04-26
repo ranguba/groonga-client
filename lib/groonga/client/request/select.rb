@@ -195,21 +195,26 @@ module Groonga
           #      filter.between("age", 19, "include", 32, "exclude").
           #        # -> --filter 'between(age, 19, "include", 32, "exclude")'
           #
+          # @see http://groonga.org/docs/reference/functions/between.html
+          #   between function in the Groonga document
+          #
           # @param column_name [String, Symbol] The target column name.
           #
-          # @param min [Integer] Specifies the minimal border value of the range.
+          # @param min [Integer] The minimal value of the condition
+          #   range.
           #
-          # @param min_border [String] Specifies whether the specified range contains the value
-          #                            of min or not.
-          #                            If it is "include", min value is include.
-          #                            If it is "exclude", min value is not include.
+          # @param min_border ["include", "exclude"] Whether `min` is
+          #    included or not. If `"include"` is specified, `min` is
+          #    included. If `"exclude"` is specified, `min` isn't
+          #    included.
           #
-          # @param max [Integer] Specifies the maximum border value of the range.
+          # @param max [Integer] The maximum value of the condition
+          #   range.
           #
-          # @param max_border [String] Specifies whether the specified range contains the value
-          #                            of max or not.
-          #                            If it is "include", max value is include.
-          #                            If it is "exclude", max value is not include.
+          # @param max_border ["include", "exclude"] Whether `max` is
+          #    included or not. If `"include"` is specified, `max` is
+          #    included. If `"exclude"` is specified, `max` isn't
+          #    included.
           #
           # @return [Groonga::Client::Request::Select]
           #   The new request with the given condition.
@@ -234,6 +239,9 @@ module Groonga
           #    request.
           #      filter.in_values("tags")
           #        # -> --filter ''
+          #
+          # @see http://groonga.org/docs/reference/functions/in_values.html
+          #   `in_values` function in the Groonga document
           #
           # @param column_name [String, Symbol] The target column name.
           #
