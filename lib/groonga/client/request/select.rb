@@ -195,11 +195,6 @@ module Groonga
           #      filter.between("tags", "min", "min_border", "max", "max_border").
           #        # -> --filter 'between(tags, min, "min_border", max, "max_border")'
           #
-          # @example: Error no values case
-          #    request.
-          #      filter.between("tags")
-          #        # -> ArgumentError
-          #
           # @param column_name [String, Symbol] The target column name.
           #
           # @param min [Integer] Specifies the minimal border value of the range.
