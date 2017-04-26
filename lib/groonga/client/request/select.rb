@@ -220,7 +220,18 @@ module Groonga
           #   The new request with the given condition.
           #
           # @since 0.4.4
-          def between(column_name, min, min_border, max, max_border)
+          def between(column_name, min, *args, min_border: :include, max_border: :include)
+            case args.size
+            when 1
+              max = args[0]
+            when 2
+              min_border = args[0]
+              max = args[1]
+            when 3
+              min_border = args[0]
+              max = args[1]
+              max_border = args[2]
+            end
             parameter = FilterBetweenParameter.new(column_name,
                                                    min, min_border,
                                                    max, max_border)
