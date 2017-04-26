@@ -50,7 +50,7 @@ module Groonga
         # Adds a script syntax condition. If the request already has
         # any filter condition, they are combined by AND.
         #
-        # @example: Multiple filters
+        # @example Multiple filters
         #    request.
         #      filter("user", "alice").
         #        # -> --filter 'user == "alice"'
@@ -88,12 +88,12 @@ module Groonga
         #   Returns a request object for filter condition. It provides
         #   convenient methods to add a popular filter condition.
         #
-        #   @example: Use in_values function
+        #   @example Use in_values function
         #      request.
         #        filter.in_values("tags", "tag1", "tag2")
         #          # -> --filter 'in_values(tags, "tag1", "tag2")'
         #
-        #   @example: Use between function
+        #   @example Use between function
         #      request.
         #        filter.between("age", 19, "include", 32, "include")
         #          # -> --filter 'between(age, 19, "include", 32, "include")'
@@ -190,7 +190,7 @@ module Groonga
           # Adds a `between` condition then return a new `select`
           # request object.
           #
-          # @example: Basic usage
+          # @example Basic usage
           #    request.
           #      filter.between("age", 19, "include", 32, "exclude").
           #        # -> --filter 'between(age, 19, "include", 32, "exclude")'
@@ -228,14 +228,14 @@ module Groonga
           # Adds a `in_values` condition then return a new `select`
           # request object.
           #
-          # @example: Multiple conditions
+          # @example Multiple conditions
           #    request.
           #      filter.in_values("tags", "tag1", "tag2").
           #        # -> --filter 'in_values(tags, "tag1", "tag2")'
           #      filter("user", "alice")
           #        # -> --filter '(in_values(tags, "tag1", "tag2")) && (user == "alice")'
           #
-          # @example: Ignore no values case
+          # @example Ignore no values case
           #    request.
           #      filter.in_values("tags")
           #        # -> --filter ''
