@@ -234,7 +234,7 @@ module Groonga
           #   @example: Basic usage
           #      request.
           #        filter.geo_in_rectangle(:location, "0x100", "100x0").
-          #          # -> --filter 'geo_in_rectangle(location, 0x100, 100x0)'
+          #          # -> --filter 'geo_in_rectangle(location, "0x100", "100x0")'
           #
           #   @param column_name [Symbol] The column name to be checked.
           #
