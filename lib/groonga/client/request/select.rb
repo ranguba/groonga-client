@@ -229,21 +229,39 @@ module Groonga
           # @see http://groonga.org/docs/reference/functions/geo_in_rectangle.html
           #   geo_in_rectangle function in the Groonga document
           #
-          # @example: Basic usage
-          #    request.
-          #      filter.geo_in_rectangle(:location, "0x100", "100x0").
-          #        # -> --filter 'in_values(location, 0x100, 100x0)'
+          # @overload geo_in_rectangle(column_name, top_left, bottom_right)
           #
-          # @param column_name [Symbol] The column name to be checked.
+          #   @example: Basic usage
+          #      request.
+          #        filter.geo_in_rectangle(:location, "0x100", "100x0").
+          #          # -> --filter 'geo_in_rectangle(location, 0x100, 100x0)'
           #
-          # @param top_left [String] The top left of the condition rectangle.
-          #    `"#{LONGITUDE}x#{LATITUDE}"` is the point format.
+          #   @param column_name [Symbol] The column name to be checked.
           #
-          # @param bottom_right [String] The bottom right of the condition rectangle.
-          #    `"#{LONGITUDE}x#{LATITUDE}"` is the point format.
+          #   @!macro [new] geo_in_rectangle
           #
-          # @return [Groonga::Client::Request::Select]
-          #   The new request with the given condition.
+          #     @param top_left [String] The top left of the condition rectangle.
+          #        `"#{LONGITUDE}x#{LATITUDE}"` is the point format.
+          #
+          #     @param bottom_right [String] The bottom right of the condition rectangle.
+          #        `"#{LONGITUDE}x#{LATITUDE}"` is the point format.
+          #
+          #     @return [Groonga::Client::Request::Select]
+          #        The new request with the given condition.
+          #
+          #   @macro geo_in_rectangle
+          #
+          # @overload geo_in_rectangle(point, top_left, bottom_right)
+          #
+          #   @example Basic usage
+          #      request.
+          #        filter.geo_in_rectangle("50x50", "0x100", "100x0").
+          #          # -> --filter 'geo_in_rectangle("50x50", "0x100", "100x0")'
+          #
+          #   @param point [String] The point to be checked.
+          #      `"#{LONGITUDE}x#{LATITUDE}"` is the point format.
+          #
+          #   @macro geo_in_rectangle
           #
           # @since 0.5.0
           def geo_in_rectangle(column_name_or_point,
