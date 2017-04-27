@@ -114,11 +114,13 @@ class TestRequestSelect < Test::Unit::TestCase
 
     sub_test_case("#between") do
       def between(column_name,
-                  min, min_border,
-                  max, max_border)
+                  min, *args,
+                  min_border: :include,
+                  max_border: :include)
         @request.filter.between(column_name,
-                                min, min_border,
-                                max, max_border).to_parameters
+                                min, *args,
+                                min_border: min_border,
+                                max_border: max_border).to_parameters
       end
 
       test("border") do
@@ -127,6 +129,39 @@ class TestRequestSelect < Test::Unit::TestCase
                        :filter => "between(ages, 2, \"include\", 29, \"exclude\")",
                      },
                      between("ages", 2, "include", 29, "exclude"))
+      end
+
+      test("min max") do
+        assert_equal({
+                       :table => "posts",
+                       :filter => "between(ages, 2, \"include\", 29, \"include\")",
+                     },
+                     between("ages", 2, 29))
+      end
+
+      sub_test_case("keyword parameters") do
+        test("full") do
+          assert_equal({
+                         :table => "posts",
+                         :filter => "between(ages, 2, \"include\", 29, \"exclude\")",
+                       },
+                       between("ages", 2, 29, min_border: :include, max_border: :exclude))
+        end
+
+        test("omit max_border") do
+          assert_equal({
+                         :table => "posts",
+                         :filter => "between(ages, 2, \"exclude\", 29, \"include\")",
+                       },
+                       between("ages", 2, 29, min_border: :exclude))
+        end
+        test("omit min_border") do
+          assert_equal({
+                         :table => "posts",
+                         :filter => "between(ages, 2, \"include\", 29, \"exclude\")",
+                       },
+                       between("ages", 2, 29, max_border: :exclude))
+        end
       end
     end
 
