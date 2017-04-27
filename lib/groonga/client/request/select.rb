@@ -302,10 +302,23 @@ module Groonga
           #
           # @since 0.4.4
           def between(column_name, min, min_border, max, max_border)
-            parameter = FilterBetweenParameter.new(column_name,
-                                                   min, min_border,
-                                                   max, max_border)
-            add_parameter(FilterMerger, parameter)
+            # TODO: Accept not only column name but also literal as
+            # the first argument.
+            column_name = column_namify(column_name,
+                                        "first",
+                                        "#{self.class}\##{__method__}")
+            expression = "between(%{column_name}"
+            expression << ", %{min}"
+            expression << ", %{min_border}"
+            expression << ", %{max}"
+            expression << ", %{max_border}"
+            expression << ")"
+            @request.filter(expression,
+                            column_name: column_name,
+                            min: min,
+                            min_border: min_border,
+                            max: max,
+                            max_border: max_border)
           end
 
           # Adds a `in_values` condition then returns a new `select`
@@ -338,14 +351,9 @@ module Groonga
 
             # TODO: Accept not only column name but also literal as
             # the first argument.
-            if column_name.is_a?(String)
-              message = "column name (the first argument) "
-              message << "of #{self.class}\##{__method__} "
-              message << "should be Symbol: #{column_name.inspect}: "
-              message << caller(1, 1)[0]
-              warn(message)
-              column_name = column_name.to_sym
-            end
+            column_name = column_namify(column_name,
+                                        "first",
+                                        "#{self.class}\##{__method__}")
             expression_values = {column_name: column_name}
             expression = "in_values(%{column_name}"
             values.each_with_index do |value, i|
@@ -357,8 +365,14 @@ module Groonga
           end
 
           private
-          def add_parameter(merger, parameter)
-            @request.__send__(:add_parameter, merger, parameter)
+          def column_namify(column_name, ith, signature)
+            return column_name unless column_name.is_a?(String)
+
+            message = "column name (the #{ith} argument) of #{signature} "
+            message << "should be Symbol: #{column_name.inspect}: "
+            message << caller(2, 1)[0]
+            warn(message)
+            column_name.to_sym
           end
         end
 
@@ -612,32 +626,6 @@ module Groonga
         class FilterExpressionParameter < ScriptSyntaxExpressionParameter
           def initialize(expression, values)
             super(:filter, expression, values)
-          end
-        end
-
-        class FilterBetweenParameter
-          include ScriptSyntaxValueEscapable
-
-          def initialize(column_name,
-                         min, min_border,
-                         max, max_border)
-            @column_name = column_name
-            @min = min
-            @min_border = min_border
-            @max = max
-            @max_border = max_border
-          end
-
-          def to_parameters
-            filter = "between(#{@column_name}"
-            filter << ", #{escape_script_syntax_value(@min)}"
-            filter << ", #{escape_script_syntax_value(@min_border)}"
-            filter << ", #{escape_script_syntax_value(@max)}"
-            filter << ", #{escape_script_syntax_value(@max_border)}"
-            filter << ")"
-            {
-              filter: filter,
-            }
           end
         end
 

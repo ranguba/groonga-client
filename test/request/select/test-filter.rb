@@ -256,7 +256,7 @@ title == "[\"He\\ llo\"]"
                        :table => "posts",
                        :filter => "between(ages, 2, \"include\", 29, \"exclude\")",
                      },
-                     between("ages", 2, "include", 29, "exclude"))
+                     between(:ages, 2, "include", 29, "exclude"))
       end
     end
 
