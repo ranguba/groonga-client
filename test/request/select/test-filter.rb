@@ -213,12 +213,9 @@ title == "[\"He\\ llo\"]"
 
   sub_test_case("Filter") do
     sub_test_case("#geo_in_circle") do
-      def geo_in_circle(point,
-                        center, radious_or_point,
-                        approximate_type="rectangle")
-        @request.filter.geo_in_circle(point,
-                                      center, radious_or_point,
-                                      approximate_type).to_parameters
+      def geo_in_circle(*args)
+        @request.filter.geo_in_circle(*args).to_parameters
+      end
 
       test("column") do
         assert_equal({
