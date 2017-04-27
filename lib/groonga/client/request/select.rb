@@ -52,7 +52,7 @@ module Groonga
         #
         # @example Multiple filters
         #    request.
-        #      filter("user", "alice").
+        #      filter(:user, "alice").
         #        # -> --filter 'user == "alice"'
         #      filter("tags @ %{tag}", tag: "Ruby")
         #        # -> --filter '(user == "alice") && (tags @ "Ruby")'
@@ -63,7 +63,7 @@ module Groonga
         # @overload filter(column_name, value)
         #   Adds a `#{column_name} == #{value}` condition.
         #
-        #   @param column_name [String, Symbol] The target column name.
+        #   @param column_name [Symbol] The target column name.
         #
         #   @param value [Object] The column value. It's escaped
         #     automatically.
@@ -90,17 +90,17 @@ module Groonga
         #
         #   @example Use in_values function
         #      request.
-        #        filter.in_values("tags", "tag1", "tag2")
+        #        filter.in_values(:tags, "tag1", "tag2")
         #          # -> --filter 'in_values(tags, "tag1", "tag2")'
         #
         #   @example Use geo_in_circle function
         #      request.
-        #        filter.geo_in_circle("0x0", "100x100", 300)
-        #          # -> --filter 'geo_in_circle("0x0", "100x100", 300, "rectangle")'
+        #        filter.geo_in_circle(:location, "100x100", 300)
+        #          # -> --filter 'geo_in_circle(location, "100x100", 300, "rectangle")'
         #
         #   @example Use between function
         #      request.
-        #        filter.between("age", 19, "include", 32, "include")
+        #        filter.between(:age, 19, "include", 32, "include")
         #          # -> --filter 'between(age, 19, "include", 32, "include")'
         #
         #   @return [Groonga::Client::Request::Select::Filter]
