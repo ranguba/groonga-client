@@ -256,11 +256,16 @@ module Groonga
                             center,
                             radius_or_point,
                             approximate_type="rectangle")
-            parameter = FilterGeoInCircleParameter.new(column_name_or_point,
-                                                       center,
-                                                       radius_or_point,
-                                                       approximate_type)
-            add_parameter(FilterMerger, parameter)
+            expression = "geo_in_circle(%{column_name_or_point}"
+            expression << ", %{center}"
+            expression << ", %{radius_or_point}"
+            expression << ", %{approximate_type}"
+            expression << ")"
+            @request.filter(expression,
+                            column_name_or_point: column_name_or_point,
+                            center: center,
+                            radius_or_point: radius_or_point,
+                            approximate_type: approximate_type)
           end
 
           # Adds a `between` condition then return a new `select`
@@ -589,31 +594,6 @@ module Groonga
         class FilterExpressionParameter < ScriptSyntaxExpressionParameter
           def initialize(expression, values)
             super(:filter, expression, values)
-          end
-        end
-
-        # @private
-        class FilterGeoInCircleParameter
-          include ScriptSyntaxValueEscapable
-
-          def initialize(point,
-                         center, radious,
-                         approximate_type)
-            @point = point
-            @center = center
-            @radious = radious
-            @approximate_type = approximate_type
-          end
-
-          def to_parameters
-            filter = "geo_in_circle(#{escape_script_syntax_value(@point)}"
-            filter << ", #{escape_script_syntax_value(@center)}"
-            filter << ", #{escape_script_syntax_value(@radious)}"
-            filter << ", #{escape_script_syntax_value(@approximate_type)}"
-            filter << ")"
-            {
-              filter: filter,
-            }
           end
         end
 
