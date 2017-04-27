@@ -107,22 +107,33 @@ module Groonga
         #     The new request object for setting a filter condition.
         #
         #   @since 0.4.3
-        def filter(expression_or_column_name=nil, values_or_value=nil)
-          if expression_or_column_name.nil? and values_or_value.nil?
-            return Filter.new(self)
-          end
+        def filter(*args)
+          n_args = args.size
+          case n_args
+          when 0
+            Filter.new(self)
+          when 1, 2
+            expression_or_column_name, values_or_value = *args
 
-          if expression_or_column_name.is_a?(Symbol)
-            parameter = FilterEqualParameter.new(expression_or_column_name,
-                                                 values_or_value)
-          elsif values_or_value.nil? or values_or_value.is_a?(::Hash)
-            parameter = FilterExpressionParameter.new(expression_or_column_name,
-                                                      values_or_value)
+            if values_or_value.nil? or values_or_value.is_a?(::Hash)
+              expression = expression_or_column_name
+              values = values_or_value
+            else
+              expression = "%{column} == %{value}"
+              column_name = expression_or_column_name
+              column_name = column_name.to_sym if column_name.is_a?(String)
+              values = {
+                column: column_name,
+                value: values_or_value,
+              }
+            end
+            parameter = FilterExpressionParameter.new(expression, values)
+            add_parameter(FilterMerger, parameter)
           else
-            parameter = FilterEqualParameter.new(expression_or_column_name,
-                                                 values_or_value)
+            message =
+              "wrong number of arguments (given #{n_args}, expected 0..2)"
+            raise ArgumentError, message
           end
-          add_parameter(FilterMerger, parameter)
         end
 
         def output_columns(value)
@@ -627,21 +638,6 @@ module Groonga
             end
             {
               filter: "in_values(#{@column_name}, #{escaped_values.join(", ")})",
-            }
-          end
-        end
-
-        class FilterEqualParameter
-          include ScriptSyntaxValueEscapable
-
-          def initialize(column_name, value)
-            @column_name = column_name
-            @value = value
-          end
-
-          def to_parameters
-            {
-              filter: "#{@column_name} == #{escape_script_syntax_value(@value)}",
             }
           end
         end
