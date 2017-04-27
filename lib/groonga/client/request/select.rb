@@ -199,7 +199,6 @@ module Groonga
           parameters.key?(:offset) and parameters.key?(:limit)
         end
 
-        # @since 0.4.3
         class Filter
           class << self
             # @private
@@ -286,37 +285,72 @@ module Groonga
           # Adds a `between` condition then returns a new `select`
           # request object.
           #
-          # @example Basic usage
-          #    request.
-          #      filter.between(:age, 19, "include", 32, "exclude").
-          #        # -> --filter 'between(age, 19, "include", 32, "exclude")'
-          #
           # @see http://groonga.org/docs/reference/functions/between.html
           #   between function in the Groonga document
-          #
-          # @param column_name [String, Symbol] The target column name.
-          #
-          # @param min [Integer] The minimal value of the condition
-          #   range.
-          #
-          # @param min_border ["include", "exclude"] Whether `min` is
-          #    included or not. If `"include"` is specified, `min` is
-          #    included. If `"exclude"` is specified, `min` isn't
-          #    included.
-          #
-          # @param max [Integer] The maximum value of the condition
-          #   range.
-          #
-          # @param max_border ["include", "exclude"] Whether `max` is
-          #    included or not. If `"include"` is specified, `max` is
-          #    included. If `"exclude"` is specified, `max` isn't
-          #    included.
           #
           # @return [Groonga::Client::Request::Select]
           #   The new request with the given condition.
           #
-          # @since 0.4.4
-          def between(column_name, min, min_border, max, max_border)
+          # @overload between(column_name, min, max, min_border: "include", max_border: "include")
+          #
+          #   @example Basic usage
+          #      request.
+          #        filter.between(:age, 19, 32)
+          #          # -> --filter 'between(age, 19, "include", 32, "exclude")'
+          #
+          #   @!macro [new] between_common
+          #
+          #     @param column_name [Symbol] The target column name.
+          #
+          #     @param min [Integer] The minimal value of the
+          #        condition range.
+          #
+          #     @param max [Integer] The maximum value of the
+          #        condition range.
+          #
+          #     @param min_border ["include", "exclude"] Whether `min` is
+          #        included or not. If `"include"` is specified, `min` is
+          #        included. If `"exclude"` is specified, `min` isn't
+          #        included.
+          #
+          #     @param max_border ["include", "exclude"] Whether `max` is
+          #        included or not. If `"include"` is specified, `max` is
+          #        included. If `"exclude"` is specified, `max` isn't
+          #        included.
+          #
+          #   @macro between_common
+          #
+          #   @since 0.5.0
+          #
+          # @overload between(column_name, min, min_border, max, max_border)
+          #
+          #   @example Basic usage
+          #      request.
+          #        filter.between(:age, 19, "include", 32, "exclude")
+          #          # -> --filter 'between(age, 19, "include", 32, "exclude")'
+          #
+          #   @macro between_common
+          #
+          #   @since 0.4.4
+          def between(*args)
+            n_args = args.size
+            case n_args
+            when 3
+              column_name, min, max = args
+              min_border = "include"
+              max_border = "include"
+            when 4
+              column_name, min, max, options = args
+              min_border = options[:min_border] || "include"
+              max_border = options[:max_border] || "include"
+            when 5
+              column_name, min, min_border, max, max_border = args
+            else
+              message =
+                "wrong number of arguments (given #{n_args}, expected 3..5)"
+              raise ArgumentError, message
+            end
+
             # TODO: Accept not only column name but also literal as
             # the first argument.
             column_name =
@@ -362,6 +396,8 @@ module Groonga
           #
           # @return [Groonga::Client::Request::Select]
           #   The new request with the given condition.
+          #
+          # @since 0.4.3
           def in_values(column_name, *values)
             return @request if values.empty?
 

@@ -233,15 +233,29 @@ title == "[\"He\\ llo\"]"
     end
 
     sub_test_case("#between") do
-      def between(column_name,
-                  min, min_border,
-                  max, max_border)
-        @request.filter.between(column_name,
-                                min, min_border,
-                                max, max_border).to_parameters
+      def between(*args)
+        @request.filter.between(*args).to_parameters
       end
 
-      test("border") do
+      test("min and max") do
+        assert_equal({
+                       :table => "posts",
+                       :filter => "between(ages, 2, \"include\", 29, \"include\")",
+                     },
+                     between(:ages, 2, 29))
+      end
+
+      test("min, max and options") do
+        assert_equal({
+                       :table => "posts",
+                       :filter => "between(ages, 2, \"exclude\", 29, \"exclude\")",
+                     },
+                     between(:ages, 2, 29,
+                             min_border: "exclude",
+                             max_border: "exclude"))
+      end
+
+      test("all") do
         assert_equal({
                        :table => "posts",
                        :filter => "between(ages, 2, \"include\", 29, \"exclude\")",
