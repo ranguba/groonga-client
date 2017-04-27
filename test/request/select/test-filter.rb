@@ -138,22 +138,12 @@ title == "[\"He\\ llo\"]"
     end
   end
 
-  sub_test_case("column name") do
-    test("String") do
-      assert_equal({
-                     :table => "posts",
-                     :filter => "_key == 29",
-                   },
-                   filter("_key", 29))
-    end
-
-    test("Symbol") do
-      assert_equal({
-                     :table => "posts",
-                     :filter => "_key == 29",
-                   },
-                   filter(:_key, 29))
-    end
+  test("column name") do
+    assert_equal({
+                   :table => "posts",
+                   :filter => "_key == 29",
+                 },
+                 filter(:_key, 29))
   end
 
   sub_test_case("value") do
@@ -165,7 +155,7 @@ title == "[\"He\\ llo\"]"
                      :table => "posts",
                      :filter => filter,
                    },
-                   filter("title", "[\"He\\ llo\"]"))
+                   filter(:title, "[\"He\\ llo\"]"))
     end
 
     sub_test_case("Symbol") do
@@ -174,7 +164,7 @@ title == "[\"He\\ llo\"]"
                        :table => "posts",
                        :filter => "title == normalized_title",
                      },
-                     filter("title", :normalized_title))
+                     filter(:title, :normalized_title))
       end
 
       test("invalid ID") do
@@ -182,7 +172,7 @@ title == "[\"He\\ llo\"]"
                        :table => "posts",
                        :filter => "title == \"Hello World\"",
                      },
-                     filter("title", :"Hello World"))
+                     filter(:title, :"Hello World"))
       end
     end
 
@@ -191,7 +181,7 @@ title == "[\"He\\ llo\"]"
                      :table => "posts",
                      :filter => "age == 29",
                    },
-                   filter("age", 29))
+                   filter(:age, 29))
     end
 
     test("true") do
@@ -199,7 +189,7 @@ title == "[\"He\\ llo\"]"
                      :table => "posts",
                      :filter => "published == true",
                    },
-                   filter("published", true))
+                   filter(:published, true))
     end
 
     test("false") do
@@ -207,7 +197,7 @@ title == "[\"He\\ llo\"]"
                      :table => "posts",
                      :filter => "published == false",
                    },
-                   filter("published", false))
+                   filter(:published, false))
     end
   end
 

@@ -121,7 +121,9 @@ module Groonga
             else
               expression = "%{column} == %{value}"
               column_name = expression_or_column_name
-              column_name = column_name.to_sym if column_name.is_a?(String)
+              column_name = Filter.column_namify(column_name,
+                                                 "first",
+                                                 "#{self.class}\##{__method__}")
               values = {
                 column: column_name,
                 value: values_or_value,
@@ -199,6 +201,19 @@ module Groonga
 
         # @since 0.4.3
         class Filter
+          class << self
+            # @private
+            def column_namify(column_name, ith, signature)
+              return column_name unless column_name.is_a?(String)
+
+              message = "column name (the #{ith} argument) of #{signature} "
+              message << "should be Symbol: #{column_name.inspect}: "
+              message << caller(2, 1)[0]
+              warn(message)
+              column_name.to_sym
+            end
+          end
+
           def initialize(request)
             @request = request
           end
@@ -304,9 +319,10 @@ module Groonga
           def between(column_name, min, min_border, max, max_border)
             # TODO: Accept not only column name but also literal as
             # the first argument.
-            column_name = column_namify(column_name,
-                                        "first",
-                                        "#{self.class}\##{__method__}")
+            column_name =
+              self.class.column_namify(column_name,
+                                       "first",
+                                       "#{self.class}\##{__method__}")
             expression = "between(%{column_name}"
             expression << ", %{min}"
             expression << ", %{min_border}"
@@ -351,9 +367,10 @@ module Groonga
 
             # TODO: Accept not only column name but also literal as
             # the first argument.
-            column_name = column_namify(column_name,
-                                        "first",
-                                        "#{self.class}\##{__method__}")
+            column_name =
+              self.class.column_namify(column_name,
+                                       "first",
+                                       "#{self.class}\##{__method__}")
             expression_values = {column_name: column_name}
             expression = "in_values(%{column_name}"
             values.each_with_index do |value, i|
@@ -362,17 +379,6 @@ module Groonga
             end
             expression << ")"
             @request.filter(expression, expression_values)
-          end
-
-          private
-          def column_namify(column_name, ith, signature)
-            return column_name unless column_name.is_a?(String)
-
-            message = "column name (the #{ith} argument) of #{signature} "
-            message << "should be Symbol: #{column_name.inspect}: "
-            message << caller(2, 1)[0]
-            warn(message)
-            column_name.to_sym
           end
         end
 
