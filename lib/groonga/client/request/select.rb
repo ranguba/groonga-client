@@ -93,6 +93,11 @@ module Groonga
         #        filter.in_values(:tags, "tag1", "tag2")
         #          # -> --filter 'in_values(tags, "tag1", "tag2")'
         #
+        #   @example Use geo_distance function
+        #      request.
+        #        filter.geo_distance("100x100", "140x250")
+        #          # -> --filter 'geo_distance("100x100", "140x250", "rectangle")'
+        #
         #   @example Use geo_in_circle function
         #      request.
         #        filter.geo_in_circle(:location, "100x100", 300)
@@ -215,6 +220,66 @@ module Groonga
 
           def initialize(request)
             @request = request
+          end
+
+          # Adds a `geo_distance` condition then returns a new `select`
+          # request object.
+          #
+          # @see http://groonga.org/docs/reference/functions/geo_distance.html
+          #   geo_distance function in the Groonga document
+          #
+          # @overload geo_distance(point1, point2)
+          #
+          #   @example Basic usage
+          #      request.
+          #        filter.geo_distance("100x100", "140x250").
+          #          # -> --filter 'geo_distance("100x100", "140x250", "rectangle")'
+          #
+          #   @!macro [new] geo_distance_common
+          #
+          #     @param point1 [String] The start point of the value of
+          #        distance between two point.
+          #        `"#{LONGITUDE}x#{LATITUDE}"` is the point format.
+          #
+          #     @param point2 [String] The end point of the value of
+          #        distance between two point.
+          #        `"#{LONGITUDE}x#{LATITUDE}"` is the point format.
+          #
+          #   @macro geo_distance_common
+          #
+          #   @return [Groonga::Client::Request::Select]
+          #     The new request with the given condition.
+          #
+          # @overload geo_distance(point1, point2, approximate_type="rectangle")
+          #
+          #   @example Basic usage
+          #      request.
+          #        filter.geo_distance("100x100", "140x250", "rectangle").
+          #          # -> --filter 'geo_distance("100x100", "140x250", "rectangle")'
+          #
+          #   @macro geo_distance_common
+          #
+          #   @param approximate_type
+          #      ["rectangle", "sphere", "ellipsoid"]
+          #      ("rectangle")
+          #
+          #      How to approximate geography to compute distance.
+          #
+          #      The default is `"rectangle"`.
+          #
+          #   @return [Groonga::Client::Request::Select]
+          #     The new request with the given condition.
+          #
+          # @since 0.5.0
+          def geo_distance(point1, point2,
+                           approximate_type="rectangle")
+            expression = "geo_distance(%{point1}, %{point2}" 
+            expression << ", %{approximate_type}"
+            expression << ")"
+            @request.filter(expression,
+                            point1: point1,
+                            point2: point2,
+                            approximate_type: approximate_type)
           end
 
           # Adds a `geo_in_circle` condition then returns a new `select`
