@@ -236,9 +236,9 @@ title == "[\"He\\ llo\"]"
       test("approximate type") do
         assert_equal({
                        :table => "posts",
-                       :filter => "geo_in_circle(\"100x100\", \"140x250\", 300, \"rectangle\")",
+                       :filter => "geo_in_circle(\"100x100\", \"140x250\", 300, \"sphere\")",
                      },
-                     geo_in_circle("100x100", "140x250", 300, "rectangle"))
+                     geo_in_circle("100x100", "140x250", 300, "sphere"))
       end
     end
 
