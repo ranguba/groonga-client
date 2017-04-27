@@ -69,7 +69,9 @@ class TestRequestSelect < Test::Unit::TestCase
                      :table => "posts",
                      :filter => "title == \"Hello\"",
                    },
-                   filter("title == %{title}", :title => :Hello))
+                   filter("%{column} == %{value}",
+                          :column => :title,
+                          :value => "Hello"))
     end
 
     test("Array") do

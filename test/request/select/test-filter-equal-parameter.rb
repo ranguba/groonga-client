@@ -51,11 +51,20 @@ title == "[\"He\\ llo\"]"
                    to_parameters("title", "[\"He\\ llo\"]"))
     end
 
-    def test_symbol
-      assert_equal({
-                     :filter => "title == \"Hello\"",
-                   },
-                   to_parameters("title", :Hello))
+    sub_test_case("Symbol") do
+      def test_id
+        assert_equal({
+                       :filter => "title == normalized_title",
+                     },
+                     to_parameters("title", :normalized_title))
+      end
+
+      def test_not_id
+        assert_equal({
+                       :filter => "title == \"Hello World\"",
+                     },
+                     to_parameters("title", :"Hello World"))
+      end
     end
 
     def test_number

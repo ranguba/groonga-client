@@ -55,12 +55,23 @@ title == "[\"He\\ llo\"]"
                                  :value => "[\"He\\ llo\"]"))
     end
 
-    def test_symbol
-      assert_equal({
-                     :filter => "title == \"Hello\"",
-                   },
-                   to_parameters("title == %{value}",
-                                 :value => :Hello))
+    sub_test_case("Symbol") do
+      def test_valid_id
+        assert_equal({
+                       :filter => "title == \"Hello\"",
+                     },
+                     to_parameters("%{column} == %{value}",
+                                   :column => :title,
+                                   :value => "Hello"))
+      end
+
+      def test_invalid_id
+        assert_equal({
+                       :filter => "title == \"Hello World\"",
+                     },
+                     to_parameters("title == %{value}",
+                                   :value => :"Hello World"))
+      end
     end
 
     def test_number

@@ -433,7 +433,11 @@ module Groonga
             when String
               ScriptSyntax.format_string(value)
             when Symbol
-              ScriptSyntax.format_string(value.to_s)
+              if valid_script_syntax_identifier?(value)
+                value.to_s
+              else
+                ScriptSyntax.format_string(value.to_s)
+              end
             when ::Array
               escaped_value = "["
               value.each_with_index do |element, i|
@@ -455,6 +459,13 @@ module Groonga
             else
               value
             end
+          end
+
+          identifier_part = "[a-zA-Z_][a-zA-Z0-9_]*"
+          VALID_SCRIPT_SYNTAX_IDENTIFIER_PATTERN =
+            /\A#{identifier_part}(?:\.#{identifier_part})*\z/
+          def valid_script_syntax_identifier?(value)
+            VALID_SCRIPT_SYNTAX_IDENTIFIER_PATTERN === value.to_s
           end
         end
 
