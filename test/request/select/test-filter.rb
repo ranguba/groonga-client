@@ -202,6 +202,28 @@ title == "[\"He\\ llo\"]"
   end
 
   sub_test_case("Filter") do
+    sub_test_case("#geo_distance") do
+      def geo_distance(*args)
+        @request.filter.geo_distance(*args).to_parameters
+      end
+
+      test("point") do
+        assert_equal({
+                       :table => "posts",
+                       :filter => "geo_distance(\"100x100\", \"140x250\", \"rectangle\")",
+                     },
+                     geo_distance("100x100", "140x250"))
+      end
+
+      test("approximate type") do
+        assert_equal({
+                       :table => "posts",
+                       :filter => "geo_distance(\"100x100\", \"140x250\", \"sphere\")",
+                     },
+                     geo_distance("100x100", "140x250", "sphere"))
+      end
+    end
+
     sub_test_case("#geo_in_circle") do
       def geo_in_circle(*args)
         @request.filter.geo_in_circle(*args).to_parameters
