@@ -95,8 +95,8 @@ module Groonga
         #
         #   @example: Use geo_in_rectangle function
         #      request.
-        #        filter.geo_in_rectangle("50x50", "0x100", "100x0")
-        #          # -> --filter 'geo_in_rectangle("50x50", "0x100", "100x0")'
+        #        filter.geo_in_rectangle(:location, "0x100", "100x0")
+        #          # -> --filter 'geo_in_rectangle(location, "0x100", "100x0")'
         #
         #   @example Use geo_in_circle function
         #      request.
@@ -231,27 +231,29 @@ module Groonga
           #
           # @example: Basic usage
           #    request.
-          #      filter.geo_in_rectangle("50x50", "0x100", "100x0").
-          #        # -> --filter 'in_values(50x50, 0x100, 100x0)'
+          #      filter.geo_in_rectangle(:location, "0x100", "100x0").
+          #        # -> --filter 'in_values(location, 0x100, 100x0)'
           #
-          # @param point [String] The point to be checked.
-          #    `"#{LONGITUDE}x#{LATITUDE}"` is the point format.
+          # @param column_name [Symbol] The column name to be checked.
           #
           # @param top_left [String] The top left of the condition rectangle.
+          #    `"#{LONGITUDE}x#{LATITUDE}"` is the point format.
           #
           # @param bottom_right [String] The bottom right of the condition rectangle.
+          #    `"#{LONGITUDE}x#{LATITUDE}"` is the point format.
           #
           # @return [Groonga::Client::Request::Select]
           #   The new request with the given condition.
           #
           # @since 0.5.0
-          def geo_in_rectangle(point, top_left, bottom_right)
-            expression = "geo_in_rectangle(%{point}"
+          def geo_in_rectangle(column_name_or_point,
+                               top_left, bottom_right)
+            expression = "geo_in_rectangle(%{column_name_or_point}"
             expression << ", %{top_left}"
             expression << ", %{bottom_right}"
             expression << ")"
             @request.filter(expression,
-                            point: point,
+                            column_name_or_point: column_name_or_point,
                             top_left: top_left,
                             bottom_right: bottom_right)
           end

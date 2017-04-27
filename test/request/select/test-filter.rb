@@ -207,6 +207,14 @@ title == "[\"He\\ llo\"]"
         @request.filter.geo_in_rectangle(*args).to_parameters
       end
 
+      test("column") do
+        assert_equal({
+                       :table => "posts",
+                       :filter => "geo_in_rectangle(location, \"0x100\", \"100x0\")",
+                     },
+                     geo_in_rectangle(:location, "0x100", "100x0"))
+      end
+
       test("point") do
         assert_equal({
                        :table => "posts",
