@@ -270,7 +270,7 @@ title == "[\"He\\ llo\"]"
                        :table => "posts",
                        :filter => "in_values(ages, 2, 29)",
                      },
-                     in_values("ages", 2, 29))
+                     in_values(:ages, 2, 29))
       end
 
       test("strings") do
@@ -278,14 +278,14 @@ title == "[\"He\\ llo\"]"
                        :table => "posts",
                        :filter => "in_values(tags, \"groonga\", \"have \\\"double\\\" quote\")",
                      },
-                     in_values("tags", "groonga", "have \"double\" quote"))
+                     in_values(:tags, "groonga", "have \"double\" quote"))
       end
 
       test("no values") do
         assert_equal({
                        :table => "posts",
                      },
-                     in_values("tags"))
+                     in_values(:tags))
       end
     end
   end

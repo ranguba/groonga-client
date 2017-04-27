@@ -308,25 +308,25 @@ module Groonga
             add_parameter(FilterMerger, parameter)
           end
 
-          # Adds a `in_values` condition then return a new `select`
+          # Adds a `in_values` condition then returns a new `select`
           # request object.
           #
           # @example Multiple conditions
           #    request.
-          #      filter.in_values("tags", "tag1", "tag2").
+          #      filter.in_values(:tags, "tag1", "tag2").
           #        # -> --filter 'in_values(tags, "tag1", "tag2")'
           #      filter("user", "alice")
           #        # -> --filter '(in_values(tags, "tag1", "tag2")) && (user == "alice")'
           #
           # @example Ignore no values case
           #    request.
-          #      filter.in_values("tags")
+          #      filter.in_values(:tags)
           #        # -> --filter ''
           #
           # @see http://groonga.org/docs/reference/functions/in_values.html
           #   `in_values` function in the Groonga document
           #
-          # @param column_name [String, Symbol] The target column name.
+          # @param column_name [Symbol] The target column name.
           #
           # @param values [Object] The column values that cover target
           #   column values.
@@ -334,8 +334,26 @@ module Groonga
           # @return [Groonga::Client::Request::Select]
           #   The new request with the given condition.
           def in_values(column_name, *values)
-            parameter = FilterInValuesParameter.new(column_name, *values)
-            add_parameter(FilterMerger, parameter)
+            return @request if values.empty?
+
+            # TODO: Accept not only column name but also literal as
+            # the first argument.
+            if column_name.is_a?(String)
+              message = "column name (the first argument) "
+              message << "of #{self.class}\##{__method__} "
+              message << "should be Symbol: #{column_name.inspect}: "
+              message << caller(1, 1)[0]
+              warn(message)
+              column_name = column_name.to_sym
+            end
+            expression_values = {column_name: column_name}
+            expression = "in_values(%{column_name}"
+            values.each_with_index do |value, i|
+              expression << ", %{value#{i}}"
+              expression_values[:"value#{i}"] = value
+            end
+            expression << ")"
+            @request.filter(expression, expression_values)
           end
 
           private
@@ -619,27 +637,6 @@ module Groonga
             filter << ")"
             {
               filter: filter,
-            }
-          end
-        end
-
-        # @private
-        class FilterInValuesParameter
-          include ScriptSyntaxValueEscapable
-
-          def initialize(column_name, *values)
-            @column_name = column_name
-            @values = values
-          end
-
-          def to_parameters
-            return {} if @values.empty?
-
-            escaped_values = @values.collect do |value|
-              escape_script_syntax_value(value)
-            end
-            {
-              filter: "in_values(#{@column_name}, #{escaped_values.join(", ")})",
             }
           end
         end
