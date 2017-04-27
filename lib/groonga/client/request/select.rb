@@ -93,6 +93,11 @@ module Groonga
         #        filter.in_values("tags", "tag1", "tag2")
         #          # -> --filter 'in_values(tags, "tag1", "tag2")'
         #
+        #   @example Use geo_in_circle function
+        #      request.
+        #        filter.geo_in_circle("0x0", "100x100", 300)
+        #          # -> --filter 'geo_in_circle("0x0", "100x100", 300, "rectangle")'
+        #
         #   @example Use between function
         #      request.
         #        filter.between("age", 19, "include", 32, "include")
@@ -185,6 +190,44 @@ module Groonga
         class Filter
           def initialize(request)
             @request = request
+          end
+
+          # Adds a `geo_in_circle` condition then return a new `select`
+          # request object.
+          #
+          # @example Basic usage
+          #    request.
+          #      filter.geo_in_circle("0x0", "100x100", 300).
+          #        # -> --filter 'geo_in_circle("0x0", "100x100", 300, "rectangle")'
+          #
+          # @see http://groonga.org/docs/reference/functions/geo_in_circle.html
+          #   geo_in_circle function in the Groonga document
+          #
+          # @param point [String] Specify point for confirm whether to exit in circle or not.
+          #
+          # @param center [String] This value that center of circle.
+          #
+          # @param radious [Integer] This value that radious of circle.
+          #
+          # @param approximate_type ["rectangle", "sphere", "ellopsoid"]
+          #    This value that type of approximate of geographical.
+          #    If it is nil, approximate_type value is `"rectangle"`.
+          #    If it is `"rectangle"`, calcurate distance from radious
+          #    by approximate of rectangle.
+          #    If it is `"sphere"`, calcurate distance from radious
+          #    by approximate of sphere.
+          #    If it is `"ellopsoid"`, calcurate distance from radious
+          #    by approximate of ellopsoid.
+          #
+          # @return [Groonga::Client::Request::Select]
+          #   The new request with the given condition.
+          #
+          # @since 0.4.4
+          def geo_in_circle(point, center, radious_or_point, approximate_type="rectangle")
+            parameter = FilterGeoInCircleParameter.new(point,
+                                                       center, radious_or_point,
+                                                       approximate_type)
+            add_parameter(FilterMerger, parameter)
           end
 
           # Adds a `between` condition then return a new `select`
@@ -517,6 +560,30 @@ module Groonga
         end
 
         # @private
+        class FilterGeoInCircleParameter
+          include ScriptSyntaxValueEscapable
+
+          def initialize(point,
+                         center, radious,
+                         approximate_type)
+            @point = point
+            @center = center
+            @radious = radious
+            @approximate_type = approximate_type
+          end
+
+          def to_parameters
+            filter = "geo_in_circle(#{escape_script_syntax_value(@point)}"
+            filter << ", #{escape_script_syntax_value(@center)}"
+            filter << ", #{escape_script_syntax_value(@radious)}"
+            filter << ", #{escape_script_syntax_value(@approximate_type)}"
+            filter << ")"
+            {
+              filter: filter,
+            }
+          end
+        end
+
         class FilterBetweenParameter
           include ScriptSyntaxValueEscapable
 
@@ -543,6 +610,7 @@ module Groonga
           end
         end
 
+        # @private
         class FilterInValuesParameter
           include ScriptSyntaxValueEscapable
 
