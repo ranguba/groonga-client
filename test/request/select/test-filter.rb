@@ -219,6 +219,21 @@ title == "[\"He\\ llo\"]"
         @request.filter.geo_in_circle(point,
                                       center, radious_or_point,
                                       approximate_type).to_parameters
+
+      test("column") do
+        assert_equal({
+                       :table => "posts",
+                       :filter => "geo_in_circle(location, \"140x250\", 300, \"rectangle\")",
+                     },
+                     geo_in_circle(:location, "140x250", 300))
+      end
+
+      test("point") do
+        assert_equal({
+                       :table => "posts",
+                       :filter => "geo_in_circle(\"100x100\", \"140x250\", 300, \"rectangle\")",
+                     },
+                     geo_in_circle("100x100", "140x250", 300))
       end
 
       test("approximate type") do

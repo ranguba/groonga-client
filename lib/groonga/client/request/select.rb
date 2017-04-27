@@ -203,40 +203,62 @@ module Groonga
             @request = request
           end
 
-          # Adds a `geo_in_circle` condition then return a new `select`
+          # Adds a `geo_in_circle` condition then returns a new `select`
           # request object.
-          #
-          # @example Basic usage
-          #    request.
-          #      filter.geo_in_circle("0x0", "100x100", 300).
-          #        # -> --filter 'geo_in_circle("0x0", "100x100", 300, "rectangle")'
           #
           # @see http://groonga.org/docs/reference/functions/geo_in_circle.html
           #   geo_in_circle function in the Groonga document
           #
-          # @param point [String] Specify point for confirm whether to exit in circle or not.
+          # @overload geo_in_circle(column_name, center, radius, approximate_type="rectangle")
           #
-          # @param center [String] This value that center of circle.
+          #   @example Basic usage
+          #      request.
+          #        filter.geo_in_circle(:location, "100x100", 300).
+          #          # -> --filter 'geo_in_circle(location, "100x100", 300, "rectangle")'
           #
-          # @param radious [Integer] This value that radious of circle.
+          #   @param column_name [Symbol] The column name to be checked.
           #
-          # @param approximate_type ["rectangle", "sphere", "ellopsoid"]
-          #    This value that type of approximate of geographical.
-          #    If it is nil, approximate_type value is `"rectangle"`.
-          #    If it is `"rectangle"`, calcurate distance from radious
-          #    by approximate of rectangle.
-          #    If it is `"sphere"`, calcurate distance from radious
-          #    by approximate of sphere.
-          #    If it is `"ellopsoid"`, calcurate distance from radious
-          #    by approximate of ellopsoid.
+          #   @!macro [new] geo_in_circle_common
           #
-          # @return [Groonga::Client::Request::Select]
-          #   The new request with the given condition.
+          #     @param center [String] The center point of the condition circle.
+          #        `"#{LONGITUDE}x#{LATITUDE}"` is the point format.
           #
-          # @since 0.4.4
-          def geo_in_circle(point, center, radious_or_point, approximate_type="rectangle")
-            parameter = FilterGeoInCircleParameter.new(point,
-                                                       center, radious_or_point,
+          #     @param radius [Integer] The radius of the condition circle.
+          #
+          #     @param approximate_type
+          #        ["rectangle", "sphere", "ellipsoid"]
+          #        ("rectangle")
+          #
+          #        How to approximate geography to compute radius.
+          #
+          #        The default is `"rectangle"`.
+          #
+          #     @return [Groonga::Client::Request::Select]
+          #       The new request with the given condition.
+          #
+          #   @macro geo_in_circle_common
+          #
+          # @overload geo_in_circle(point, center, radius, approximate_type="rectangle")
+          #
+          #   @example Basic usage
+          #      request.
+          #        filter.geo_in_circle("0x0", "100x100", 300).
+          #          # -> --filter 'geo_in_circle("0x0", "100x100", 300, "rectangle")'
+          #
+          #   @param point [String] The point to be checked.
+          #      `"#{LONGITUDE}x#{LATITUDE}"` is the point format.
+          #
+          #   @macro geo_in_circle_common
+          #
+          #
+          # @since 0.5.0
+          def geo_in_circle(column_name_or_point,
+                            center,
+                            radius_or_point,
+                            approximate_type="rectangle")
+            parameter = FilterGeoInCircleParameter.new(column_name_or_point,
+                                                       center,
+                                                       radius_or_point,
                                                        approximate_type)
             add_parameter(FilterMerger, parameter)
           end
