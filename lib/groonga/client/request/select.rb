@@ -283,12 +283,12 @@ module Groonga
                             approximate_type: approximate_type)
           end
 
-          # Adds a `between` condition then return a new `select`
+          # Adds a `between` condition then returns a new `select`
           # request object.
           #
           # @example Basic usage
           #    request.
-          #      filter.between("age", 19, "include", 32, "exclude").
+          #      filter.between(:age, 19, "include", 32, "exclude").
           #        # -> --filter 'between(age, 19, "include", 32, "exclude")'
           #
           # @see http://groonga.org/docs/reference/functions/between.html
