@@ -19,6 +19,19 @@
     You can use this method by
     `filter.geo_in_rectangle(:location, "0x100", "100x0")`.
 
+  * `Groonga::Client::Request::Select#filter`: Changed how to handle
+    `Symbol` to identifier in Groonga script syntax expression from
+    string literal in Groonga script syntax expression. It's a
+    backward incompatible change. Some methods keep compatibility as
+    much as possible but some methods may break compatibility
+    unexpectedly. If you find any incompatibility what you think
+    unexpected, please report to us.
+
+### Fixes
+
+  * `groonga-client`: Fixed a bug that `load --values` input causes an
+    error.
+
 ## 0.4.3 - 2017-04-21
 
 ### Improvements
