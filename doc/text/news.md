@@ -1,5 +1,24 @@
 # NEWS
 
+## 0.5.0 - 2017-05-08
+
+### Improvements
+
+  * `Groonga::Client::Request::Select::Filter#between`: Added a
+    convenience method to add a popular filter condition. You can
+    use this method by
+    `filter.between(:age, 19, "include", 32, "include")`.
+
+  * `Groonga::Client::Request::Select::Filter#geo_in_circle`:
+    Added a convenience method to add a popular filter condition.
+    You can use this method by
+    `filter.geo_in_circle(:location, "100x100", 300, "rectangle")`.
+
+  * `Groonga::Client::Request::Select::Filter#geo_in_rectangle`:
+    Added a convenience method to add a popular filter condition.
+    You can use this method by
+    `filter.geo_in_rectangle(:location, "0x100", "100x0")`.
+
 ## 0.4.3 - 2017-04-21
 
 ### Improvements
