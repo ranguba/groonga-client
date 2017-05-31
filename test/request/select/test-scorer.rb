@@ -47,6 +47,13 @@ class TestRequestSelectScorer < Test::Unit::TestCase
                    scorer(""))
     end
 
+    def test_space_only_string
+      assert_equal({
+                     :table => "posts",
+                   },
+                   scorer(" \t\r\n"))
+    end
+
     def test_symbol
       assert_equal({
                      :table => "posts",

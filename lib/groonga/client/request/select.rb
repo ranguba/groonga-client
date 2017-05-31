@@ -151,10 +151,13 @@ module Groonga
             values = { column: column_name }
           when String
             expression = expression_or_column_name
-            unless expression.empty?
-              unless expression.start_with?("_score = ")
-                expression = "_score = " + expression
-              end
+            case expression
+            when /\A\s*\z/
+              expression = nil
+            when /\A_score\s*=/
+              # have "_score ="
+            else
+              expression = "_score = #{expression}"
             end
             values = values_or_value
           else
