@@ -154,8 +154,8 @@ module Groonga
             case expression
             when /\A\s*\z/
               expression = nil
-            when /\A_score\s*=/
-              # have "_score ="
+            when /\A[_a-zA-Z\d]+\s*=/
+              # have assignment such as "_score = "
             else
               expression = "_score = #{expression}"
             end

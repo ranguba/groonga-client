@@ -54,6 +54,14 @@ class TestRequestSelectScorer < Test::Unit::TestCase
                    scorer(" \t\r\n"))
     end
 
+    def test_have_assignment
+      assert_equal({
+                     :table => "posts",
+                     :scorer => "persistent_score = _score",
+                   },
+                   scorer("persistent_score = %{score}", score: :_score))
+    end
+
     def test_symbol
       assert_equal({
                      :table => "posts",
