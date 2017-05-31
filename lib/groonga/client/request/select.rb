@@ -143,7 +143,7 @@ module Groonga
           end
         end
 
-        def scorer(expression_or_column_name, values_or_value=nil)
+        def scorer(expression_or_column_name, values=nil)
           case expression_or_column_name
           when Symbol
             expression = "_score = %{column}"
@@ -159,10 +159,8 @@ module Groonga
             else
               expression = "_score = #{expression}"
             end
-            values = values_or_value
           else
             expression = expression_or_column_name
-            values = values_or_value
           end
           add_parameter(OverwriteMerger,
                         ScorerExpressionParameter.new(expression, values))
