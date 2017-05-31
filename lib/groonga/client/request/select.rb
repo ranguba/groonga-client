@@ -143,7 +143,7 @@ module Groonga
           end
         end
 
-        def scorer(expression_or_column_name, values_or_value)
+        def scorer(expression_or_column_name, values_or_value=nil)
           case expression_or_column_name
           when Symbol
             expression = "_score = %{column}"

@@ -1,4 +1,5 @@
-# Copyright (C) 2016-2017  Yasuhiro Horimoto <horimoto@clear-code.com>
+# Copyright (C) 2017  Yasuhiro Horimoto <horimoto@clear-code.com>
+# Copyright (C) 2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,8 +20,8 @@ class TestRequestSelectScorer < Test::Unit::TestCase
     @request = Groonga::Client::Request::Select.new("posts")
   end
 
-  def scorer(expression, values=nil)
-    @request.scorer(expression, values).to_parameters
+  def scorer(*args)
+    @request.scorer(*args).to_parameters
   end
 
   sub_test_case("expression") do
