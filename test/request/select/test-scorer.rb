@@ -98,4 +98,15 @@ class TestRequestSelectScorer < Test::Unit::TestCase
                           :value => 29))
     end
   end
+
+  def test_multiple
+      assert_equal({
+                     :table => "posts",
+                     :scorer => "_score = age",
+                   },
+                   @request.
+                     scorer("_score = %{value}", :value => 29).
+                     scorer(:age).
+                     to_parameters)
+  end
 end

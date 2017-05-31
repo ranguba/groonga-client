@@ -164,7 +164,7 @@ module Groonga
             expression = expression_or_column_name
             values = values_or_value
           end
-          add_parameter(ScorerMerger,
+          add_parameter(OverwriteMerger,
                         ScorerExpressionParameter.new(expression, values))
         end
 
@@ -652,23 +652,6 @@ module Groonga
               params[:filter] = "(#{filter1}) && (#{filter2})"
             elsif filter1 or filter2
               params[:filter] = (filter1 || filter2)
-            end
-            params
-          end
-        end
-
-        # @private
-        class ScorerMerger < ParameterMerger
-          def to_parameters
-            params1 = @parameters1.to_parameters
-            params2 = @parameters2.to_parameters
-            params = params1.merge(params2)
-            scorer1 = params1[:scorer]
-            scorer2 = params2[:scorer]
-            if scorer1 and scorer2
-              params[:scorer] = "(#{scorer1}) && (#{scorer2})"
-            elsif scorer1 or scorer2
-              params[:scorer] = (scorer1 || scorer2)
             end
             params
           end
