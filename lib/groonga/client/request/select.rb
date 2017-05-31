@@ -144,11 +144,11 @@ module Groonga
         end
 
         def scorer(expression_or_column_name, values_or_value)
-          if expression_or_column_name.is_a?(::Symbol)
+          if expression_or_column_name.is_a?(Symbol)
             expression = "_score = %{column}"
             column_name = expression_or_column_name
             values = { column: column_name }
-          elsif expression_or_column_name.is_a?(::String)
+          elsif expression_or_column_name.is_a?(String)
             expression = expression_or_column_name
             unless expression.empty?
               unless expression.start_with?("_score = ")
