@@ -143,6 +143,47 @@ module Groonga
           end
         end
 
+        # Sets scorer.
+        #
+        # @return [Groonga::Client::Request::Select]
+        #   The new request with the given scorer.
+        #
+        # @since 0.5.1
+        #
+        # @overload scorer(column_name)
+        #
+        #   Sets `_score = #{column_name}` scorer.
+        #
+        #   @example Use column value as score
+        #      request.scorer(:rate)
+        #          # -> --scorer '_score = rate'
+        #
+        #   @param column_name [Symbol] The column name to be used as score.
+        #
+        # @overload scorer(expression, values=nil)
+        #
+        #   Adds a `_score = #{expression % values}` scorer. If
+        #   `expression` is already assignment form such as `_score =
+        #   %{column}`, `_score = ` isn't prepended automatically.
+        #
+        #   @example Compute score by expression
+        #      request.scorer("2 * rate")
+        #          # -> --scorer '_score = 2 * rate'
+        #
+        #   @example Expand values
+        #      request.scorer("2 * %{column}", column: :rate)
+        #          # -> --scorer '_score = 2 * rate'
+        #
+        #   @param expression [String] The script syntax expression.
+        #      It can includes `%{name}`s as placeholder. They are expanded
+        #      by `String#%` with the given `values` argument.
+        #
+        #   @param values [nil, ::Hash] The values to be expanded.
+        #      If the given `expression` doesn't have placeholder, you
+        #      should specify `nil`.
+        #
+        #      Values are escaped automatically. Values passed from
+        #      external should be escaped.
         def scorer(expression_or_column_name, values=nil)
           case expression_or_column_name
           when Symbol
