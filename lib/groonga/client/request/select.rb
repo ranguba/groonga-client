@@ -143,6 +143,24 @@ module Groonga
           end
         end
 
+        def scorer(expression_or_column_name, values_or_value)
+          if expression_or_column_name.is_a?(::Symbol)
+            expression = "_score = %{column}"
+            column_name = expression_or_column_name
+            values = { column: column_name }
+          elsif expression_or_column_name.is_a?(::String)
+            expression = expression_or_column_name
+            unless expression.empty?
+              unless expression.start_with?("_score = ")
+                expression = "_score = " + expression
+              end
+            end
+            values = values_or_value
+          end
+          add_parameter(ScorerMerger,
+                        ScorerExpressionParameter.new(expression, values))
+        end
+
         def output_columns(value)
           add_parameter(OverwriteMerger,
                         OutputColumnsParameter.new("", value))
@@ -633,6 +651,23 @@ module Groonga
         end
 
         # @private
+        class ScorerMerger < ParameterMerger
+          def to_parameters
+            params1 = @parameters1.to_parameters
+            params2 = @parameters2.to_parameters
+            params = params1.merge(params2)
+            scorer1 = params1[:scorer]
+            scorer2 = params2[:scorer]
+            if scorer1 and scorer2
+              params[:scorer] = "(#{scorer1}) && (#{scorer2})"
+            elsif scorer1 or scorer2
+              params[:scorer] = (scorer1 || scorer2)
+            end
+            params
+          end
+        end
+
+        # @private
         module ScriptSyntaxValueEscapable
           private
           def escape_script_syntax_value(value)
@@ -726,6 +761,12 @@ module Groonga
         class FilterExpressionParameter < ScriptSyntaxExpressionParameter
           def initialize(expression, values)
             super(:filter, expression, values)
+          end
+        end
+
+        class ScorerExpressionParameter < ScriptSyntaxExpressionParameter
+          def initialize(expression, values)
+            super(:scorer, expression, values)
           end
         end
 
