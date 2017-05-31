@@ -157,6 +157,9 @@ module Groonga
               end
             end
             values = values_or_value
+          else
+            expression = expression_or_column_name
+            values = values_or_value
           end
           add_parameter(ScorerMerger,
                         ScorerExpressionParameter.new(expression, values))
