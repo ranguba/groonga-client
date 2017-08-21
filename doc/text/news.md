@@ -1,5 +1,17 @@
 # NEWS
 
+## 0.5.1 - 2017-08-21
+
+### Improvements
+
+  * `Groonga::Client::Request::Select#scorer`: Added a convenience
+    method to set scorer. You can use this method by
+    `scorer("2 * %{column}", column: :rate)`.
+
+  * `Groonga::Client::Request::Select#query_flags`: Added a
+    convenience method to set query flags. You can use this method by
+    `query_flags(["ALLOW_COLUMN", "QUERY_NO_SYNTAX_ERROR"])`.
+
 ## 0.5.0 - 2017-05-08
 
 ### Improvements
