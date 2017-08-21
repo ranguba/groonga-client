@@ -311,4 +311,26 @@ class TestRequestSelect < Test::Unit::TestCase
       end
     end
   end
+
+  sub_test_case("#query_flags") do
+    def query_flags(*args)
+      @request.query_flags(*args).to_parameters
+    end
+
+    test("one") do
+      assert_equal({
+                     :table => "posts",
+                     :query_flags => "ALLOW_COLUMN",
+                   },
+                   query_flags("ALLOW_COLUMN"))
+    end
+
+    test("multiple") do
+      assert_equal({
+                     :table => "posts",
+                     :query_flags => "ALLOW_COLUMN|QUERY_NO_SYNTAX_ERROR",
+                   },
+                   query_flags(["ALLOW_COLUMN", "QUERY_NO_SYNTAX_ERROR"]))
+    end
+  end
 end

@@ -47,6 +47,54 @@ module Groonga
                         RequestParameter.new(:query, value))
         end
 
+        # Sets flags to custom how to parse query.
+        #
+        # @example One flag
+        #    request.
+        #      # Support "COLUMN_NAME:..." syntax
+        #      query_flags("ALLOW_COLUMN").
+        #        # -> --query_flags 'ALLOW_COLUMN'
+        #      query("title:@Groonga")
+        #        # -> --query_flags 'ALLOW_COLUMN'
+        #        #    --query 'title:@Groonga'
+        #
+        # @example Multiple flags
+        #    request.
+        #      # Support "COLUMN_NAME:..." syntax
+        #      # Fallback syntax error query to searchable query
+        #      query_flags(["ALLOW_COLUMN", "QUERY_NO_SYNTAX_ERROR"]).
+        #        # -> --query_flags 'ALLOW_COLUMN'
+        #      query("nonexistent:@Groonga")
+        #        # -> --query_flags 'ALLOW_COLUMN'
+        #        #    --query 'nonexistent:@Groonga'
+        #        # Normally, "nonexistent:@Groonga" is syntax error
+        #        # but it's parsed as
+        #        # "search by one keyword: 'nonexistent:@Groonga'"
+        #        # because QUERY_NO_SYNTAX_ERROR flag is used
+        #
+        # @return [Groonga::Client::Request::Select]
+        #
+        #   The new request with the given flag.
+        #
+        # @overload query_flags(flag)
+        #
+        #   Sets a `#{flag}` flag.
+        #
+        #   @param flag [String] The flag to be used.
+        #
+        #   @since 0.5.0
+        #
+        # @overload query_flags(flags)
+        #
+        #   Sets `#{flag1}|#{flag2}|...` flags.
+        #
+        #   @param flags [::Array<String>] The flags to be used.
+        #
+        #   @since 0.5.0
+        def query_flags(value)
+          flags_parameter(:query_flags, value)
+        end
+
         # Adds a script syntax condition. If the request already has
         # any filter condition, they are combined by AND.
         #
