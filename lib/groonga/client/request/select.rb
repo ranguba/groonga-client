@@ -82,7 +82,7 @@ module Groonga
         #
         #   @param flag [String] The flag to be used.
         #
-        #   @since 0.5.0
+        #   @since 0.5.1
         #
         # @overload query_flags(flags)
         #
@@ -90,7 +90,7 @@ module Groonga
         #
         #   @param flags [::Array<String>] The flags to be used.
         #
-        #   @since 0.5.0
+        #   @since 0.5.1
         def query_flags(value)
           flags_parameter(:query_flags, value)
         end
