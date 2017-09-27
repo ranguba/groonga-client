@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.5.2 - 2017-09-27
+
+### Improvements
+
+  * `Groonga::Client::Request::Select`: Added XML output support.
+
 ## 0.5.1 - 2017-08-21
 
 ### Improvements
