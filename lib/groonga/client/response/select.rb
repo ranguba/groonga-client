@@ -24,6 +24,84 @@ module Groonga
       class Select < Base
         Response.register("select", self)
 
+        class << self
+          private
+          def parse_xml(response)
+            document = REXML::Document.new(response)
+            return super if document.root.name == "RESULT"
+
+            result_page = document.elements["SEGMENTS/SEGMENT/RESULTPAGE"]
+            result_set = result_page.elements["RESULTSET"]
+            n_hits, columns, records = parse_xml_result_set(result_set)
+
+            navigation_entry = result_page.elements["NAVIGATIONENTRY"]
+            drilldowns = parse_xml_navigation_entry(navigation_entry)
+
+            header = nil
+            body = [
+              [
+                [n_hits],
+                columns,
+                *records,
+              ],
+              *drilldowns,
+            ]
+            [header, body]
+          end
+
+          def parse_xml_result_set(result_set)
+            n_hits = Integer(result_set.attributes["NHITS"])
+
+            columns = []
+            records = []
+            result_set.each_element("HIT") do |hit|
+              if columns.empty?
+                hit.each_element("FIELD") do |field|
+                  name = field.attributes["NAME"]
+                  columns << [name, "ShortText"]
+                end
+              end
+              record = []
+              hit.each_element("FIELD") do |field|
+                record << field.text
+              end
+              records << record
+            end
+
+            [n_hits, columns, records]
+          end
+
+          def parse_xml_navigation_entry(navigation_entry)
+            return [] if navigation_entry.nil?
+
+            drilldowns = []
+            navigation_entry.each_element("NAVIGATIONELEMENTS") do |elements|
+              n_hits = Integer(elements.attributes["COUNT"])
+              columns = []
+              drilldown = []
+              elements.each_element("NAVIGATIONELEMENT") do |element|
+                if columns.empty?
+                  element.attributes.each do |name, value|
+                    columns << [name, "ShortText"]
+                  end
+                end
+
+                drilldown << element.attributes.collect do |_, value|
+                  value
+                end
+              end
+
+              drilldowns << [
+                [n_hits],
+                columns,
+                *drilldown,
+              ]
+            end
+
+            drilldowns
+          end
+        end
+
         include Enumerable
 
         # @return [Integer] The number of records that match againt

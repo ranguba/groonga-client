@@ -16,9 +16,18 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 module TestResponseHelper
-  def parse_raw_response(command_name, raw_response)
+  def parse_raw_response_raw(command_name, pair_arguments, raw_response)
     command_class = Groonga::Command.find(command_name)
-    command = command_class.new(command_name, {})
+    command = command_class.new(command_name, pair_arguments)
     Groonga::Client::Response.parse(command, raw_response)
+  end
+
+  def parse_raw_response(command_name, raw_response)
+    parse_raw_response_raw(command_name, {}, raw_response)
+  end
+
+  def parse_raw_xml_response(command_name, raw_response)
+    parse_raw_response_raw(command_name, {"output_type" => "xml"},
+                           raw_response)
   end
 end
