@@ -19,5 +19,5 @@
 
 require "groonga/client/command-line/groonga-client"
 
-cli = Groonga::Client::CommandLine::GroongaClient.new
-exit(cli.run(ARGV))
+command_line = Groonga::Client::CommandLine::GroongaClient.new
+exit(command_line.run(ARGV))
