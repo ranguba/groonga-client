@@ -20,7 +20,15 @@ require "response/helper"
 class TestResponseColumnList < Test::Unit::TestCase
   include TestResponseHelper
 
-  def test_column_list
+  def column(attributes)
+    c = Groonga::Client::Response::ColumnList::Column.new
+    attributes.each do |name, value|
+      c[name] = value
+    end
+    c
+  end
+
+  def test_parse
     header = [0, 1372430096.70991, 0.000522851943969727]
     body = [
       [
@@ -47,7 +55,17 @@ class TestResponseColumnList < Test::Unit::TestCase
     raw_response = [header, body].to_json
 
     response = parse_raw_response("column_list", raw_response)
-    assert_equal(Groonga::Client::Response::ColumnList, response.class)
+    assert_equal([
+                   column(:id => 256,
+                          :name => "Text",
+                          :path => "/tmp/test.db.0000100",
+                          :type => "var",
+                          :flags => "COLUMN_SCALAR|PERSISTENT",
+                          :domain => "TestTable",
+                          :range => "ShortText",
+                          :source => []),
+                 ],
+                 response.to_a)
   end
 end
 
