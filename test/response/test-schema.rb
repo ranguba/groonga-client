@@ -40,6 +40,139 @@ class TestResponseSchema < Test::Unit::TestCase
       Groonga::Client::Response::Schema.new(@command, header, body)
     end
 
+    class TestReferenceShortCut < self
+      def test_plugin
+        body = {
+          "plugins" => {
+            "token_filters/stop_word" => {
+              "name" => "token_filters/stop_word",
+            },
+          },
+          "types" => {},
+          "tokenizers" => {},
+          "normalizers" => {},
+          "token_filters" => {},
+          "tables" => {},
+        }
+        response = create_response(body)
+        assert_equal({"name" => "token_filters/stop_word"},
+                     response["token_filters/stop_word"])
+      end
+
+      def test_type
+        body = {
+          "plugins" => {},
+          "types" => {
+            "ShortText" => {
+              "name" => "ShortText",
+            },
+          },
+          "tokenizers" => {},
+          "normalizers" => {},
+          "token_filters" => {},
+          "tables" => {},
+        }
+        response = create_response(body)
+        assert_equal({"name" => "ShortText"},
+                     response["ShortText"])
+      end
+
+      def test_tokenizer
+        body = {
+          "plugins" => {},
+          "types" => {},
+          "tokenizers" => {
+            "TokenBigram" => {
+              "name" => "TokenBigram",
+            },
+          },
+          "normalizers" => {},
+          "token_filters" => {},
+          "tables" => {},
+        }
+        response = create_response(body)
+        assert_equal({"name" => "TokenBigram"},
+                     response["TokenBigram"])
+      end
+
+      def test_normalizer
+        body = {
+          "plugins" => {},
+          "types" => {},
+          "tokenizers" => {},
+          "normalizers" => {
+            "NormalizerAuto" => {
+              "name" => "NormalizerAuto",
+            },
+          },
+          "token_filters" => {},
+          "tables" => {},
+        }
+        response = create_response(body)
+        assert_equal({"name" => "NormalizerAuto"},
+                     response["NormalizerAuto"])
+      end
+
+      def test_token_filters
+        body = {
+          "plugins" => {},
+          "types" => {},
+          "tokenizers" => {},
+          "normalizers" => {},
+          "token_filters" => {
+            "TokenFilterStopWord" => {
+              "name" => "TokenFilterStopWord",
+            },
+          },
+          "tables" => {},
+        }
+        response = create_response(body)
+        assert_equal({"name" => "TokenFilterStopWord"},
+                     response["TokenFilterStopWord"])
+      end
+
+      def test_table
+        body = {
+          "plugins" => {},
+          "types" => {},
+          "tokenizers" => {},
+          "normalizers" => {},
+          "token_filters" => {},
+          "tables" => {
+            "Users" => {
+              "name" => "Users",
+            },
+          },
+        }
+        response = create_response(body)
+        assert_equal({"name" => "Users"},
+                     response["Users"])
+      end
+
+      def test_column
+        body = {
+          "plugins" => {},
+          "types" => {},
+          "tokenizers" => {},
+          "normalizers" => {},
+          "token_filters" => {},
+          "tables" => {
+            "Users" => {
+              "name" => "Users",
+              "columns" => {
+                "age" => {
+                  "name" => "age",
+                },
+              },
+            },
+          },
+        }
+        response = create_response(body)
+        assert_equal({"name" => "age"},
+                     response["Users.age"])
+      end
+    end
+
     class TestTable < self
       def test_key_type
         body = {

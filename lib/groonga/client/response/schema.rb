@@ -96,8 +96,25 @@ module Groonga
           @tables
         end
 
-        private
-        def coerce_tables
+        # @param name [String] The object name to be retrieved.
+        #
+        # @return [Plugin, Type, Tokenizer, Normalizer, TokenFilter, Table, Column]
+        #   The object named `name`.
+        #
+        # @since 0.5.3
+        def [](name)
+          name = name.to_s if name.is_a?(Symbol)
+          if name.include?(".")
+            table_name, column_name = name.split(".", 2)
+            tables[table_name].columns[column_name]
+          else
+            tables[name] ||
+              types[name] ||
+              tokenizers[name] ||
+              normalizers[name] ||
+              token_filters[name] ||
+              plugins[name]
+          end
         end
 
         module HashValueConverter
