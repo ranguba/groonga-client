@@ -147,6 +147,11 @@ module Groonga
           include Hashie::Extensions::MethodAccess
         end
 
+        class Command < ::Hash
+          include Hashie::Extensions::MergeInitializer
+          include Hashie::Extensions::MethodAccess
+        end
+
         class Index < ::Hash
           include Hashie::Extensions::MethodAccess
 
@@ -204,6 +209,8 @@ module Groonga
             when :value_type
               value = ValueType.new(value) unless value.nil?
               super(key, value)
+            when :command
+              super(key, Command.new(value))
             else
               super
             end
@@ -243,6 +250,8 @@ module Groonga
               super(key, coerce_columns(value))
             when :indexes
               super(key, coerce_indexes(value))
+            when :command
+              super(key, Command.new(value))
             else
               super
             end

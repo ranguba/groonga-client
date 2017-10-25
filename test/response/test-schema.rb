@@ -263,6 +263,30 @@ class TestResponseSchema < Test::Unit::TestCase
           end
         end
       end
+
+      def test_command
+        body = {
+          "tables" => {
+            "Users" => {
+              "command" => {
+                "name" => "table_create",
+                "arguments" => {
+                  "name" => "Users",
+                  "flags" => "TABLE_HASH_KEY",
+                  "key_type" => "ShortText",
+                },
+              }
+            }
+          }
+        }
+        response = create_response(body)
+        assert_equal({
+                       "name" => "Users",
+                       "flags" => "TABLE_HASH_KEY",
+                       "key_type" => "ShortText",
+                     },
+                     response.tables["Users"].command.arguments)
+      end
     end
 
     class TestColumn < self
@@ -409,6 +433,36 @@ class TestResponseSchema < Test::Unit::TestCase
             column.have_full_text_search_index?
           end
         end
+      end
+
+      def test_command
+        body = {
+          "tables" => {
+            "Users" => {
+              "columns" => {
+                "name" => {
+                  "command" => {
+                    "name" => "column_create",
+                    "arguments" => {
+                      "table" => "Users",
+                      "name" => "name",
+                      "flags" => "COLUMN_SCALAR",
+                      "type" => "ShortText",
+                    },
+                  }
+                }
+              }
+            }
+          }
+        }
+        response = create_response(body)
+        assert_equal({
+                       "table" => "Users",
+                       "name" => "name",
+                       "flags" => "COLUMN_SCALAR",
+                       "type" => "ShortText",
+                     },
+                     response.tables["Users"].columns["name"].command.arguments)
       end
     end
 
