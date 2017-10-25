@@ -31,6 +31,8 @@ module Groonga
 
           @read_timeout = -1
 
+          @interval = :day
+
           @n_workers = 0
         end
 
@@ -43,7 +45,7 @@ module Groonga
                       :port     => @port,
                       :read_timeout => @read_timeout,
                       :backend  => :synchronous) do |client|
-            runner = Runner.new(client, target_indexes)
+            runner = Runner.new(client, @interval, target_indexes)
             runner.run do
               @n_workers.times do
                 client.database_unmap
@@ -59,7 +61,6 @@ module Groonga
           parser.banner += " LEXICON1.INDEX1 LEXICON2.INDEX2 ..."
 
           parser.separator("")
-
           parser.separator("Connection:")
 
           parser.on("--url=URL",
@@ -96,6 +97,20 @@ module Groonga
             @read_timeout = timeout
           end
 
+          parser.separator("")
+          parser.separator("Configuration:")
+
+          available_intervals = [:day]
+          parser.on("--interval=INTERVAL", available_intervals,
+                    "Index create interval.",
+                    "[#{available_intervals.join(", ")}]",
+                    "(#{@interval})") do |interval|
+            @interval = interval
+          end
+
+          parser.separator("")
+          parser.separator("groonga-httpd:")
+
           parser.on("--n-workers=N", Integer,
                     "The number of groonga-httpd workers.",
                     "This options is meaningless for groonga -s.",
@@ -120,9 +135,11 @@ module Groonga
         end
 
         class Runner
-          def initialize(client, target_indexes)
+          def initialize(client, interval, target_indexes)
             @client = client
+            @interval = interval
             @target_indexes = target_indexes
+            @now = Time.now
           end
 
           def run
@@ -139,11 +156,15 @@ module Groonga
           end
 
           private
+          def abort_run(message)
+            $stderr.puts(message)
+            throw(@abort_tag, false)
+          end
+
           def execute_command(name, arguments={})
             response = @client.execute(name, arguments)
             unless response.success?
-              puts("failed to run #{name}: #{response.inspect}")
-              throw(@abort_tag, false)
+              abort_run("Failed to run #{name}: #{response.inspect}")
             end
             response
           end
@@ -191,10 +212,18 @@ module Groonga
                 column => real_name,
               },
             ]
-            # TODO: check return value
-            execute_command(:load,
-                            :table => table,
-                            :values => JSON.generate(values))
+            response = execute_command(:load,
+                                       :table => table,
+                                       :values => JSON.generate(values),
+                                       :command_version => "3",
+                                       :output_errors => "yes")
+            response.errors.each do |error|
+              unless error.return_code.zero?
+                abort_run("Failed to set alias: " +
+                          "<#{alias_name}> -> <#{real_name}>: " +
+                          "#{error.message}(#{error.return_code})")
+              end
+            end
           end
 
           def resolve_alias(alias_column, key)
@@ -233,7 +262,7 @@ module Groonga
           end
 
           def recreate_index(full_index_name, alias_column)
-            revision = Time.now.strftime("%Y%m%d")
+            revision = generate_revision
             table_name, index_name = full_index_name.split(".", 2)
             real_index_name = "#{index_name}_#{revision}"
             real_full_index_name = "#{table_name}.#{real_index_name}"
@@ -249,11 +278,12 @@ module Groonga
               current_table_name, current_index_name =
                 full_current_index_name.split(".", 2)
               if current_table_name != table_name
-                puts("!!!")
+                abort_run("Different lexicon isn't supported: " +
+                          "<#{full_index_name}> -> <#{full_current_index_name}>")
               end
               if current_index_name == real_index_name
-                puts("Same")
-                return nil
+                abort_run("Alias doesn't specify real index column: " +
+                          "<#{full_current_index_name}>")
               end
               column_create_similar(table_name,
                                     real_index_name,
@@ -277,6 +307,15 @@ module Groonga
               next unless /_(\d{4})(\d{2})(\d{2})\z/ =~ index_name
               next if index_name >= current_index_name
               column_remove(table_name, index_name)
+            end
+          end
+
+          def generate_revision
+            case @interval
+            when :day
+              @now.strftime("%Y%m%d")
+            else
+              abort_run("Unsupported revision: #{@interval}")
             end
           end
         end

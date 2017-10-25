@@ -14,6 +14,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "time"
+
 require "groonga/command/parser"
 
 require "groonga/client"
@@ -23,28 +25,345 @@ require "groonga/client/command-line/groonga-client-index-recreate"
 class TestCommandLineIndexRecreate < Test::Unit::TestCase
   include Groonga::Client::TestHelper
 
+  def setup
+    @now = Time.parse("2017-10-25T17:22:00+0900")
+    stub(Time).now {@now}
+  end
+
   def groonga_url
     @groonga_server_runner.url.to_s
   end
 
-  def dump
+  def open_client
     Groonga::Client.open(:url => groonga_url) do |client|
+      yield(client)
+    end
+  end
+
+  def restore(commands)
+    open_client do |client|
+      values = nil
+      Groonga::Command::Parser.parse(commands) do |event, *args|
+        case event
+        when :on_command
+          command, = args
+          response = client.execute(command)
+          unless response.success?
+            raise Groonga::Client::Request::ErrorResponse.new(response)
+          end
+        when :on_load_start
+          command, = args
+          values = []
+        when :on_load_columns
+          command, columns = args
+          command[:columns] ||= columns.join(",")
+        when :on_load_value
+          command, value = args
+          values << value
+        when :on_load_complete
+          command, = args
+          command[:values] ||= JSON.generate(values)
+          response = client.execute(command)
+          unless response.success?
+            raise Groonga::Client::Request::ErrorResponse.new(response)
+          end
+        else
+          p [:unhandled_event, event, *args]
+        end
+      end
+    end
+  end
+
+  def dump
+    open_client do |client|
       client.dump.body
     end
   end
 
   def index_recreate(*arguments)
     command_line = Groonga::Client::CommandLine::GroongaClientIndexRecreate.new
-    command_line.run(["--url", groonga_url, *arguments])
+    begin
+      stdout, $stdout = $stdout, StringIO.new
+      stderr, $stderr = $stderr, StringIO.new
+      [
+        command_line.run(["--url", groonga_url, *arguments]),
+        $stdout.string,
+        $stderr.string,
+      ]
+    ensure
+      $stdout, $stderr = stdout, stderr
+    end
   end
 
-  def test_no_alias
+  def test_no_alias_column
     index_recreate
     assert_equal(<<-DUMP.chomp, dump)
 config_set alias.column Aliases.real_name
 
 table_create Aliases TABLE_HASH_KEY ShortText
 column_create Aliases real_name COLUMN_SCALAR ShortText
+    DUMP
+  end
+
+  def test_real_index
+    restore(<<-COMMANDS)
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText \
+  --normalizer NormalizerAuto \
+  --default_tokenizer TokenBigram
+column_create Terms memos_content \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+    COMMANDS
+
+    assert_equal([true, "", ""],
+                 index_recreate("Terms.memos_content"))
+
+    assert_equal(<<-DUMP.chomp, dump)
+config_set alias.column Aliases.real_name
+
+table_create Aliases TABLE_HASH_KEY ShortText
+column_create Aliases real_name COLUMN_SCALAR ShortText
+
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+
+load --table Aliases
+[
+["_key","real_name"],
+["Terms.memos_content","Terms.memos_content_20171025"]
+]
+
+column_create Terms memos_content_20171025 COLUMN_INDEX|WITH_POSITION Memos content
+    DUMP
+  end
+
+  def test_old_index
+    restore(<<-COMMANDS)
+config_set alias.column CustomAliases.name
+
+table_create CustomAliases TABLE_HASH_KEY ShortText
+column_create CustomAliases name COLUMN_SCALAR ShortText
+
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText \
+  --normalizer NormalizerAuto \
+  --default_tokenizer TokenBigram
+column_create Terms memos_content_20171024 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+
+load --table CustomAliases
+[
+["_key","name"],
+["Terms.memos_content","Terms.memos_content_20171024"]
+]
+    COMMANDS
+
+    assert_equal([true, "", ""],
+                 index_recreate("Terms.memos_content"))
+
+    assert_equal(<<-DUMP.chomp, dump)
+config_set alias.column CustomAliases.name
+
+table_create CustomAliases TABLE_HASH_KEY ShortText
+column_create CustomAliases name COLUMN_SCALAR ShortText
+
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+
+load --table CustomAliases
+[
+["_key","name"],
+["Terms.memos_content","Terms.memos_content_20171025"]
+]
+
+column_create Terms memos_content_20171024 COLUMN_INDEX|WITH_POSITION Memos content
+column_create Terms memos_content_20171025 COLUMN_INDEX|WITH_POSITION Memos content
+    DUMP
+  end
+
+  def test_old_indexes
+    restore(<<-COMMANDS)
+config_set alias.column CustomAliases.name
+
+table_create CustomAliases TABLE_HASH_KEY ShortText
+column_create CustomAliases name COLUMN_SCALAR ShortText
+
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText \
+  --normalizer NormalizerAuto \
+  --default_tokenizer TokenBigram
+column_create Terms memos_content_20171022 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+column_create Terms memos_content_20171023 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+column_create Terms memos_content_20171024 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+
+load --table CustomAliases
+[
+["_key","name"],
+["Terms.memos_content","Terms.memos_content_20171024"]
+]
+    COMMANDS
+
+    assert_equal([true, "", ""],
+                 index_recreate("Terms.memos_content"))
+
+    assert_equal(<<-DUMP.chomp, dump)
+config_set alias.column CustomAliases.name
+
+table_create CustomAliases TABLE_HASH_KEY ShortText
+column_create CustomAliases name COLUMN_SCALAR ShortText
+
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+
+load --table CustomAliases
+[
+["_key","name"],
+["Terms.memos_content","Terms.memos_content_20171025"]
+]
+
+column_create Terms memos_content_20171024 COLUMN_INDEX|WITH_POSITION Memos content
+column_create Terms memos_content_20171025 COLUMN_INDEX|WITH_POSITION Memos content
+    DUMP
+  end
+
+  def test_already_latest
+    restore(<<-COMMANDS)
+config_set alias.column CustomAliases.name
+
+table_create CustomAliases TABLE_HASH_KEY ShortText
+column_create CustomAliases name COLUMN_SCALAR ShortText
+
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText \
+  --normalizer NormalizerAuto \
+  --default_tokenizer TokenBigram
+column_create Terms memos_content_20171022 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+column_create Terms memos_content_20171023 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+column_create Terms memos_content_20171024 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+column_create Terms memos_content_20171025 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+
+load --table CustomAliases
+[
+["_key","name"],
+["Terms.memos_content","Terms.memos_content_20171025"]
+]
+    COMMANDS
+
+    assert_equal([true, "", ""],
+                 index_recreate("Terms.memos_content"))
+
+    assert_equal(<<-DUMP.chomp, dump)
+config_set alias.column CustomAliases.name
+
+table_create CustomAliases TABLE_HASH_KEY ShortText
+column_create CustomAliases name COLUMN_SCALAR ShortText
+
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+
+load --table CustomAliases
+[
+["_key","name"],
+["Terms.memos_content","Terms.memos_content_20171025"]
+]
+
+column_create Terms memos_content_20171022 COLUMN_INDEX|WITH_POSITION Memos content
+column_create Terms memos_content_20171023 COLUMN_INDEX|WITH_POSITION Memos content
+column_create Terms memos_content_20171024 COLUMN_INDEX|WITH_POSITION Memos content
+column_create Terms memos_content_20171025 COLUMN_INDEX|WITH_POSITION Memos content
+    DUMP
+  end
+
+  def test_latest_alias_but_not_exist
+    restore(<<-COMMANDS)
+config_set alias.column CustomAliases.name
+
+table_create CustomAliases TABLE_HASH_KEY ShortText
+column_create CustomAliases name COLUMN_SCALAR ShortText
+
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText \
+  --normalizer NormalizerAuto \
+  --default_tokenizer TokenBigram
+column_create Terms memos_content_20171022 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+column_create Terms memos_content_20171023 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+column_create Terms memos_content_20171024 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+
+load --table CustomAliases
+[
+["_key","name"],
+["Terms.memos_content","Terms.memos_content_20171025"]
+]
+    COMMANDS
+
+    assert_equal([
+                   false,
+                   "",
+                   "Alias doesn't specify real index column: " +
+                   "<Terms.memos_content_20171025>\n",
+                 ],
+                 index_recreate("Terms.memos_content"))
+
+    assert_equal(<<-DUMP.chomp, dump)
+config_set alias.column CustomAliases.name
+
+table_create CustomAliases TABLE_HASH_KEY ShortText
+column_create CustomAliases name COLUMN_SCALAR ShortText
+
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText --default_tokenizer TokenBigram --normalizer NormalizerAuto
+
+load --table CustomAliases
+[
+["_key","name"],
+["Terms.memos_content","Terms.memos_content_20171025"]
+]
+
+column_create Terms memos_content_20171022 COLUMN_INDEX|WITH_POSITION Memos content
+column_create Terms memos_content_20171023 COLUMN_INDEX|WITH_POSITION Memos content
+column_create Terms memos_content_20171024 COLUMN_INDEX|WITH_POSITION Memos content
     DUMP
   end
 end
