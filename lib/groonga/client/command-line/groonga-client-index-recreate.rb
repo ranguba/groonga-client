@@ -24,6 +24,7 @@ module Groonga
     module CommandLine
       class GroongaClientIndexRecreate
         def initialize
+          @url      = nil
           @protocol = :http
           @host     = "localhost"
           @port     = nil
@@ -36,16 +37,17 @@ module Groonga
         def run(argv)
           target_indexes = parse_command_line(argv)
 
-          @client = Client.new(:protocol => @protocol,
-                               :host     => @host,
-                               :port     => @port,
-                               :read_timeout => @read_timeout,
-                               :backend  => :synchronous)
-
-          runner = Runner.new(@client, target_indexes)
-          runner.run do
-            @n_workers.times do
-              @client.database_unmap
+          Client.open(:url      => @url,
+                      :protocol => @protocol,
+                      :host     => @host,
+                      :port     => @port,
+                      :read_timeout => @read_timeout,
+                      :backend  => :synchronous) do |client|
+            runner = Runner.new(client, target_indexes)
+            runner.run do
+              @n_workers.times do
+                client.database_unmap
+              end
             end
           end
         end
@@ -59,6 +61,13 @@ module Groonga
           parser.separator("")
 
           parser.separator("Connection:")
+
+          parser.on("--url=URL",
+                    "URL to connect to Groonga server.",
+                    "If this option is specified,",
+                    "--protocol, --host and --port are ignored.") do |url|
+            @url = url
+          end
 
           available_protocols = [:http, :gqtp]
           parser.on("--protocol=PROTOCOL", [:http, :gqtp],
