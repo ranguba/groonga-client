@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -66,6 +64,37 @@ module Groonga
                                   :domain,
                                   :range,
                                   :source)
+          # @return [::Array<String>]
+          #   The flag names of the column.
+          #
+          # @since 0.5.3
+          def flags
+            (super || "").split("|")
+          end
+
+          # @return [Boolean]
+          #   `true` if the column is a scalar column, `false` otherwise.
+          #
+          # @since 0.5.3
+          def scalar?
+            flags.include?("COLUMN_SCALAR")
+          end
+
+          # @return [Boolean]
+          #   `true` if the column is a vector column, `false` otherwise.
+          #
+          # @since 0.5.3
+          def vector?
+            flags.include?("COLUMN_VECTOR")
+          end
+
+          # @return [Boolean]
+          #   `true` if the column is an index column, `false` otherwise.
+          #
+          # @since 0.5.3
+          def index?
+            flags.include?("COLUMN_INDEX")
+          end
         end
       end
     end

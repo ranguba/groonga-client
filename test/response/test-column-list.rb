@@ -18,54 +18,125 @@
 require "response/helper"
 
 class TestResponseColumnList < Test::Unit::TestCase
-  include TestResponseHelper
+  class TestParse < self
+    include TestResponseHelper
 
-  def column(attributes)
-    c = Groonga::Client::Response::ColumnList::Column.new
-    attributes.each do |name, value|
-      c[name] = value
+    def column(attributes)
+      c = Groonga::Client::Response::ColumnList::Column.new
+      attributes.each do |name, value|
+        c[name] = value
+      end
+      c
     end
-    c
+
+    def test_parse
+      header = [0, 1372430096.70991, 0.000522851943969727]
+      body = [
+        [
+          ["id", "UInt32"],
+          ["name", "ShortText"],
+          ["path", "ShortText"],
+          ["type", "ShortText"],
+          ["flags", "ShortText"],
+          ["domain", "ShortText"],
+          ["range", "ShortText"],
+          ["source", "ShortText"],
+        ],
+        [
+          256,
+          "content",
+          "/tmp/test.db.0000100",
+          "var",
+          "COLUMN_SCALAR|PERSISTENT",
+          "TestTable",
+          "ShortText",
+          [],
+        ],
+      ]
+      raw_response = [header, body].to_json
+
+      response = parse_raw_response("column_list", raw_response)
+      assert_equal([
+                     column(:id => 256,
+                            :name => "content",
+                            :path => "/tmp/test.db.0000100",
+                            :type => "var",
+                            :flags => "COLUMN_SCALAR|PERSISTENT",
+                            :domain => "TestTable",
+                            :range => "ShortText",
+                            :source => []),
+                   ],
+                   response.to_a)
+    end
   end
 
-  def test_parse
-    header = [0, 1372430096.70991, 0.000522851943969727]
-    body = [
-      [
-        ["id", "UInt32"],
-        ["name", "ShortText"],
-        ["path", "ShortText"],
-        ["type", "ShortText"],
-        ["flags", "ShortText"],
-        ["domain", "ShortText"],
-        ["range", "ShortText"],
-        ["source", "ShortText"],
-      ],
-      [
-        256,
-        "Text",
-        "/tmp/test.db.0000100",
-        "var",
-        "COLUMN_SCALAR|PERSISTENT",
-        "TestTable",
-        "ShortText",
-        [],
-      ],
-    ]
-    raw_response = [header, body].to_json
+  class TestBody < self
+    def setup
+      @command = Groonga::Command::Base.new("column_list", "table" => "Memos")
+    end
 
-    response = parse_raw_response("column_list", raw_response)
-    assert_equal([
-                   column(:id => 256,
-                          :name => "Text",
-                          :path => "/tmp/test.db.0000100",
-                          :type => "var",
-                          :flags => "COLUMN_SCALAR|PERSISTENT",
-                          :domain => "TestTable",
-                          :range => "ShortText",
-                          :source => []),
-                 ],
-                 response.to_a)
+    def create_response(columns)
+      header = [0, 1372430096.70991, 0.000522851943969727]
+      body = [
+        [
+          ["id", "UInt32"],
+          ["name", "ShortText"],
+          ["path", "ShortText"],
+          ["type", "ShortText"],
+          ["flags", "ShortText"],
+          ["domain", "ShortText"],
+          ["range", "ShortText"],
+          ["source", "ShortText"],
+        ],
+        *columns,
+      ]
+      Groonga::Client::Response::ColumnList.new(@command, header, body)
+    end
+
+    class TestFlags < self
+      def create_response(flags)
+        columns = [
+          [
+            256,
+            "content",
+            "/tmp/test.db.0000100",
+            "var",
+            flags,
+            "Memos",
+            "ShortText",
+            [],
+          ]
+        ]
+        super(columns)
+      end
+
+      def test_multiple
+        response = create_response("COLUMN_SCALAR|PERSISTENT")
+        assert_equal(["COLUMN_SCALAR", "PERSISTENT"],
+                     response[0].flags)
+      end
+
+      def test_scalar?
+        response = create_response("COLUMN_SCALAR|PERSISTENT")
+        assert do
+          response[0].scalar?
+        end
+      end
+
+      def test_vector?
+        response = create_response("COLUMN_VECTOR|PERSISTENT")
+        assert do
+          response[0].vector?
+        end
+      end
+
+      def test_index?
+        response = create_response("COLUMN_INDEX|WITH_POSITION|PERSISTENT")
+        assert do
+          response[0].index?
+        end
+      end
+    end
   end
 end
 
