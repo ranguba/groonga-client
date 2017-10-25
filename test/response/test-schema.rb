@@ -1,4 +1,4 @@
-# Copyright (C) 2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2016-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@ class TestResponseSchema < Test::Unit::TestCase
   class TestParseRawResponse < self
     include TestResponseHelper
 
-    def test_select
+    def test_parse
       header = [0, 1372430096.70991, 0.000522851943969727]
       body = {}
       raw_response = [header, body].to_json
