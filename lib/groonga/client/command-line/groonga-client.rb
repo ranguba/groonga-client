@@ -27,6 +27,7 @@ module Groonga
     module CommandLine
       class GroongaClient
         def initialize
+          @url      = nil
           @protocol = :http
           @host     = "localhost"
           @port     = nil
@@ -44,7 +45,8 @@ module Groonga
         def run(argv)
           command_file_paths = parse_command_line(argv)
 
-          @client = Client.new(:protocol => @protocol,
+          @client = Client.new(:url      => @url,
+                               :protocol => @protocol,
                                :host     => @host,
                                :port     => @port,
                                :read_timeout => @read_timeout,
@@ -84,6 +86,13 @@ module Groonga
           parser.separator("")
 
           parser.separator("Connection:")
+
+          parser.on("--url=URL",
+                    "URL to connect to Groonga server.",
+                    "If this option is specified,",
+                    "--protocol, --host and --port are ignored.") do |url|
+            @url = url
+          end
 
           available_protocols = [:http, :gqtp]
           parser.on("--protocol=PROTOCOL", [:http, :gqtp],
