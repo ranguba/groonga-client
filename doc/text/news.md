@@ -1,5 +1,31 @@
 # NEWS
 
+## 0.5.3 - 2017-10-26
+
+### Improvements
+
+  * `Groonga::Client::Response::ColumnList::Column#flags`: Changed
+    return type to `Array<Strinng>` from `String`.
+
+  * `Groonga::Client::Response::ColumnList::Column#scalar?`: Added.
+
+  * `Groonga::Client::Response::ColumnList::Column#vector?`: Added.
+
+  * `Groonga::Client::Response::ColumnList::Column#index?`: Added.
+
+  * `Groonga::Client::Response::Schema::Command`: Added.
+
+  * `Groonga::Client::Response::Schema::Table#command`: Changed return
+    type to `Hash` to `Groonga::Client::Response::Schema::Command`.
+
+  * `Groonga::Client::Response::Schema::Column#command`: Changed return
+    type to `Hash` to `Groonga::Client::Response::Schema::Command`.
+
+  * `Groonga::Client::Response::Schema#[]`: Added.
+
+  * `groonga-client-index-recreate`: Added a new command that
+    recreates indexes dynamically and safely.
+
 ## 0.5.2 - 2017-09-27
 
 ### Improvements
