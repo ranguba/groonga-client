@@ -45,34 +45,35 @@ module Groonga
         def run(argv)
           command_file_paths = parse_command_line(argv)
 
-          @client = Client.new(:url      => @url,
-                               :protocol => @protocol,
-                               :host     => @host,
-                               :port     => @port,
-                               :read_timeout => @read_timeout,
-                               :chunk    => @chunk,
-                               :backend  => :synchronous)
-          runner = Runner.new(@client, @runner_options)
+          Client.open(:url      => @url,
+                      :protocol => @protocol,
+                      :host     => @host,
+                      :port     => @port,
+                      :read_timeout => @read_timeout,
+                      :chunk    => @chunk,
+                      :backend  => :synchronous) do |client|
+            runner = Runner.new(client, @runner_options)
 
-          if command_file_paths.empty?
-            $stdin.each_line do |line|
-              runner << line
-            end
-          else
-            command_file_paths.each do |command_file_path|
-              File.open(command_file_path) do |command_file|
-                last_line = nil
-                command_file.each_line do |line|
-                  last_line = line
-                  runner << line
+            if command_file_paths.empty?
+              $stdin.each_line do |line|
+                runner << line
+              end
+            else
+              command_file_paths.each do |command_file_path|
+                File.open(command_file_path) do |command_file|
+                  last_line = nil
+                  command_file.each_line do |line|
+                    last_line = line
+                    runner << line
                 end
-                if last_line and !last_line.end_with?("\n")
-                  runner << "\n"
+                  if last_line and !last_line.end_with?("\n")
+                    runner << "\n"
+                  end
                 end
               end
             end
+            runner.finish
           end
-          runner.finish
 
           true
         end
