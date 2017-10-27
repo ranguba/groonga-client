@@ -101,7 +101,6 @@ module Groonga
             @client = client
             @options = options
             @targets = @options[:targets]
-            @exit_code = 0
           end
 
           def check
@@ -267,7 +266,6 @@ module Groonga
               end
             end
             if target_columns.empty?
-              @exit_code = 1
               abort_run("Failed to check <#{@targets.join(',')}> because there is no such a LEXCON.INDEX.")
             end
             broken_indexes = []
