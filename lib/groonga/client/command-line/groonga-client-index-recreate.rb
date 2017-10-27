@@ -18,6 +18,7 @@ require "json"
 
 require "groonga/client"
 require "groonga/client/command-line/parser"
+require "groonga/client/command-line/runner"
 
 module Groonga
   class Client
@@ -36,8 +37,8 @@ module Groonga
           end
 
           parser.open_client do |client|
-            runner = Runner.new(client, @interval, indexes)
-            runner.run do
+            recreator = Recreator.new(client, @interval, indexes)
+            recreator.run do
               @n_workers.times do
                 client.database_unmap
               end
@@ -71,39 +72,23 @@ module Groonga
           end
         end
 
-        class Runner
+        class Recreator < Runner
           def initialize(client, interval, target_indexes)
-            @client = client
+            super(client)
             @interval = interval
             @target_indexes = target_indexes
             @now = Time.now
           end
 
-          def run
-            catch do |tag|
-              @abort_tag = tag
-              alias_column = ensure_alias_column
-              @target_indexes.each do |index|
-                current_index = recreate_index(index, alias_column)
-                remove_old_indexes(index, current_index)
-              end
-              yield if block_given?
-              true
-            end
-          end
-
           private
-          def abort_run(message)
-            $stderr.puts(message)
-            throw(@abort_tag, false)
-          end
-
-          def execute_command(name, arguments={})
-            response = @client.execute(name, arguments)
-            unless response.success?
-              abort_run("Failed to run #{name}: #{response.inspect}")
+          def run_internal
+            alias_column = ensure_alias_column
+            @target_indexes.each do |index|
+              current_index = recreate_index(index, alias_column)
+              remove_old_indexes(index, current_index)
             end
-            response
+            yield if block_given?
+            true
           end
 
           def config_get(key)

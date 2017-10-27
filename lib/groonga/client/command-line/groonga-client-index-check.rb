@@ -17,6 +17,7 @@
 
 require "groonga/client"
 require "groonga/client/command-line/parser"
+require "groonga/client/command-line/runner"
 
 module Groonga
   class Client
@@ -39,7 +40,7 @@ module Groonga
 
           parser.open_client do |client|
             checker = Checker.new(client, @methods, indexes)
-            checker.check
+            checker.run
           end
         end
 
@@ -67,34 +68,20 @@ module Groonga
           end
         end
 
-        class Checker
+        class Checker < Runner
           def initialize(client, methods, targets)
-            @client = client
+            super(client)
             @methods = methods
             @targets = targets
           end
 
-          def check
-            catch(:fail) do
-              succeeded = true
-              @methods.each do |method|
-                succeeded = false unless __send__("check_#{method}")
-              end
-              succeeded
+          private
+          def run_internal
+            succeeded = true
+            @methods.each do |method|
+              succeeded = false unless __send__("check_#{method}")
             end
-          end
-
-          def abort_run(message)
-            $stderr.puts(message)
-            throw(:fail, false)
-          end
-
-          def execute_command(name, arguments={})
-            response = @client.execute(name, arguments)
-            unless response.success?
-              abort_run("Failed to run #{name}: #{response.inspect}")
-            end
-            response
+            succeeded
           end
 
           def table_list
