@@ -43,11 +43,11 @@ column_create Terms memos_content \
   Memos
     COMMANDS
 
-    expected = <<CLIENT_OUTPUT
-index column:<Terms.memos_content> is missing source.
-CLIENT_OUTPUT
+    error_output = <<-OUTPUT
+Source is missing: <Terms.memos_content>
+    OUTPUT
 
-    assert_equal([false, expected, ""],
+    assert_equal([false, "", error_output],
                  run_client_index_check("--method=source",
                                         "Terms.memos_content"))
   end
@@ -71,11 +71,7 @@ load --table Memos
 ]
     COMMANDS
 
-    expected = <<CLIENT_OUTPUT
-check 3 tokens against <Terms.memos_content>.
-CLIENT_OUTPUT
-
-    assert_equal([true, expected, ""],
+    assert_equal([true, "", ""],
                  run_client_index_check("--method=content",
                                         "Terms.memos_content"))
   end

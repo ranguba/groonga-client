@@ -78,10 +78,25 @@ module Groonga
           private
           def run_internal
             succeeded = true
-            @methods.each do |method|
-              succeeded = false unless __send__("check_#{method}")
+            each_target_index_column do |index_column|
+              @methods.each do |method|
+                unless __send__("check_#{method}", index_column)
+                  succeeded = false
+                end
+              end
             end
             succeeded
+          end
+
+          def each_target_index_column
+            table_list.each do |table|
+              next unless check_target_table?(table.name)
+              column_list(table.name).each do |column|
+                next unless check_target_column?(column)
+                next unless column.index?
+                yield(column)
+              end
+            end
           end
 
           def check_target_table?(table_name)
@@ -114,29 +129,10 @@ module Groonga
             false
           end
 
-          def missing_source?(column)
-            column["type"] == "index" and column["source"].empty?
-          end
-
-          def check_source
-            missing_index_names = []
-            table_list.each do |table|
-              unless check_target_table?(table["name"])
-                next
-              end
-              column_list(table["name"]).each do |column|
-                unless check_target_column?(column)
-                  next
-                end
-                if missing_source?(column)
-                  missing_index_names << "#{column['domain']}.#{column['name']}"
-                end
-              end
-            end
-            missing_index_names.each do |column|
-              puts "index column:<#{column}> is missing source."
-            end
-            missing_index_names.empty?
+          def check_source(column)
+            return true unless column.source.empty?
+            $stderr.puts("Source is missing: <#{column.domain}.#{column.name}>")
+            false
           end
 
           def list_tokens(table_name)
@@ -182,53 +178,33 @@ module Groonga
             broken_index_tokens
           end
 
-          def check_content
-            table_names = table_list.collect do |table|
-              if check_target_table?(table["name"])
-                table["name"]
-              end
-            end.compact
-            target_columns = []
-            table_names.each do |table_name|
-              column_list(table_name).collect do |column|
-                if check_target_column?(column)
-                  target_columns << column
-                end
-              end
+          def check_content(index_column)
+            if index_column.source.empty?
+              $stderr.puts("Source is missing: <#{column.domain}.#{column.name}>")
+              return false
             end
-            if target_columns.empty?
-              abort_run("Failed to check <#{@index_names.join(',')}> because there is no such a LEXCON.INDEX.")
+
+            table_name = index_column["domain"]
+            column_name = index_column["name"]
+            suffix = Time.now.strftime("%Y%m%d%H%M%S_%N")
+            new_column_name = "#{column_name}_#{suffix}"
+            type, source = index_column.sources.first.split(".")
+            flags = index_column["flags"].sub(/\|PERSISTENT/, '')
+            column_create(table_name,
+                          new_column_name,
+                          flags,
+                          type,
+                          source)
+            tokens = list_tokens(table_name)
+            broken_index_tokens = verify_tokens(table_name, column_name,
+                                                new_column_name, tokens)
+            column_remove(table_name, new_column_name)
+            if broken_index_tokens.empty?
+              true
+            else
+              $stderr.puts("Broken: #{table_name}.#{column_name}")
+              false
             end
-            broken_indexes = []
-            target_columns.each do |column|
-              table_name = column["domain"]
-              column_name = column["name"]
-              suffix = Time.now.strftime("%Y%m%d%H%M%S_%N")
-              new_column_name = "#{column_name}_#{suffix}"
-              if column["source"].empty?
-                puts("Failed to check <#{column['domain']}.#{column['name']}> because of missing source.")
-                next
-              end
-              type, source = column["source"].first.split(".")
-              flags = column["flags"].sub(/\|PERSISTENT/, '')
-              column_create(table_name,
-                            new_column_name,
-                            flags,
-                            type,
-                            source)
-              tokens = list_tokens(table_name)
-              puts "check #{tokens.count} tokens against <#{table_name}.#{column_name}>."
-              broken_index_tokens = verify_tokens(table_name, column_name,
-                                                  new_column_name, tokens)
-              column_remove(table_name, new_column_name)
-              if broken_index_tokens.count > 0
-                broken_indexes << "#{table_name}.#{column_name}"
-              end
-            end
-            broken_indexes.each do |index_column|
-              puts "<#{index_column}> is broken."
-            end
-            broken_indexes.empty?
           end
         end
       end
