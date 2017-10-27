@@ -66,8 +66,8 @@ column_create Terms memos_content \
 
 load --table Memos
 [
-["_key","content"],
-["groonga","Groonga is fast"]
+["_key", "content"],
+["groonga", "Groonga is fast"]
 ]
     COMMANDS
 
