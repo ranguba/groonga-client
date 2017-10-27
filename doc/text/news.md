@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.5.4 - 2017-10-27
+
+### Improvements
+
+  * `groonga-client`: Disabled auto retry on timeout.
+
 ## 0.5.3 - 2017-10-26
 
 ### Improvements
