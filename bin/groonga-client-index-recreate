@@ -17,6 +17,12 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "net/http"
+
+if Net::HTTP.const_defined?(:IDEMPOTENT_METHODS_)
+  Net::HTTP::IDEMPOTENT_METHODS_.clear
+end
+
 require "groonga/client/command-line/groonga-client-index-recreate"
 
 command_line = Groonga::Client::CommandLine::GroongaClientIndexRecreate.new
