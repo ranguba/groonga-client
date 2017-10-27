@@ -1,4 +1,4 @@
-dist: trusty
+sudo: required
 notifications:
   email:
     recipients:
@@ -9,4 +9,5 @@ rvm:
   - 2.3.0
   - 2.4.0
 before_install:
+  - curl --silent --location https://raw.githubusercontent.com/groonga/groonga/master/data/travis/setup.sh | sh
   - gem update bundler
