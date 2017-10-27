@@ -137,6 +137,36 @@ class TestResponseColumnList < Test::Unit::TestCase
         end
       end
     end
+
+    class TestSource < self
+      def create_response(sources)
+        columns = [
+          [
+            256,
+            "content",
+            "/tmp/test.db.0000100",
+            "var",
+            "COLUMN_INDEX|WITH_POSITION|PERSISTENT",
+            "Memos",
+            "ShortText",
+            sources,
+          ]
+        ]
+        super(columns)
+      end
+
+      def test_source
+        sources = ["Memos.title", "Memos.content"]
+        response = create_response(sources)
+        assert_equal(sources, response[0].source)
+      end
+
+      def test_sources
+        sources = ["Memos.title", "Memos.content"]
+        response = create_response(sources)
+        assert_equal(sources, response[0].sources)
+      end
+    end
   end
 end
 

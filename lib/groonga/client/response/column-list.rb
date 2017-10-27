@@ -95,6 +95,8 @@ module Groonga
           def index?
             flags.include?("COLUMN_INDEX")
           end
+
+          alias_method :sources, :source
         end
       end
     end
