@@ -30,7 +30,7 @@ module Groonga
 
         def run(arguments)
           parser = Parser.new
-          indexes = parser.parse(arguments) do |option_parser|
+          indexe_names = parser.parse(arguments) do |option_parser|
             parse_command_line(option_parser)
           end
 
@@ -39,7 +39,7 @@ module Groonga
           end
 
           parser.open_client do |client|
-            checker = Checker.new(client, @methods, indexes)
+            checker = Checker.new(client, @methods, indexe_names)
             checker.run
           end
         end
@@ -69,10 +69,10 @@ module Groonga
         end
 
         class Checker < Runner
-          def initialize(client, methods, targets)
+          def initialize(client, methods, index_names)
             super(client)
             @methods = methods
-            @targets = targets
+            @index_names = index_names
           end
 
           private
@@ -85,11 +85,11 @@ module Groonga
           end
 
           def check_target_table?(table_name)
-            unless @targets.count > 0
+            unless @index_names.count > 0
               return true
             end
-            if @targets.kind_of?(Array)
-              @targets.each do |name|
+            if @index_names.kind_of?(Array)
+              @index_names.each do |name|
                 table_part = name.split(".").first
                 return true if table_name == table_part
               end
@@ -98,15 +98,15 @@ module Groonga
           end
 
           def check_target_column?(column)
-            unless @targets.count > 0
+            unless @index_names.count > 0
               return column["type"] == "index"
             else
               unless column["type"] == "index"
                 return false
               end
             end
-            if @targets.kind_of?(Array)
-              @targets.each do |name|
+            if @index_names.kind_of?(Array)
+              @index_names.each do |name|
                 return true if name == "#{column['domain']}.#{column['name']}" or
                   name == column["domain"]
               end
@@ -197,7 +197,7 @@ module Groonga
               end
             end
             if target_columns.empty?
-              abort_run("Failed to check <#{@targets.join(',')}> because there is no such a LEXCON.INDEX.")
+              abort_run("Failed to check <#{@index_names.join(',')}> because there is no such a LEXCON.INDEX.")
             end
             broken_indexes = []
             target_columns.each do |column|
