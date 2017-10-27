@@ -91,35 +91,6 @@ module Groonga
             true
           end
 
-          def config_get(key)
-            execute_command(:config_get, :key => key).body
-          end
-
-          def config_set(key, value)
-            execute_command(:config_set, :key => key, :value => value).body
-          end
-
-          def object_exist?(name)
-            execute_command(:object_exist, :name => name).body
-          end
-
-          def column_rename(table, name, new_name)
-            execute_command(:column_rename,
-                            :table => table,
-                            :name => name,
-                            :new_name => new_name).body
-          end
-
-          def column_list(table)
-            execute_command(:column_list, :table => table)
-          end
-
-          def column_remove(table, column)
-            execute_command(:column_remove,
-                            :table => table,
-                            :name => column)
-          end
-
           def column_create_similar(table, column_name, base_column_name)
             info = execute_command(:schema)["#{table}.#{base_column_name}"]
             arguments = info.command.arguments.merge("name" => column_name)

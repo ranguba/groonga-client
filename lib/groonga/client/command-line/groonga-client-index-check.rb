@@ -84,30 +84,6 @@ module Groonga
             succeeded
           end
 
-          def table_list
-            execute_command(:table_list)
-          end
-
-          def column_list(table_name)
-            execute_command(:column_list,
-                            :table => table_name)
-          end
-
-          def column_create(table_name, name, flags, type, source)
-            execute_command(:column_create,
-                            :table => table_name,
-                            :name => name,
-                            :flags => flags,
-                            :type => type,
-                            :source => source)
-          end
-
-          def column_remove(table_name, column_name)
-            execute_command(:column_remove,
-                            :table => table_name,
-                            :name => column_name)
-          end
-
           def check_target_table?(table_name)
             unless @targets.count > 0
               return true
