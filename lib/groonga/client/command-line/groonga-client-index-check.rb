@@ -1,7 +1,3 @@
-#!/usr/bin/env ruby
-# coding: utf-8
-# -*- ruby -*-
-#
 # Copyright (C) 2015-2016  Kouhei Sutou <kou@clear-code.com>
 # Copyright (C) 2017 Kentaro Hayashi <hayashi@clear-code.com>
 #
