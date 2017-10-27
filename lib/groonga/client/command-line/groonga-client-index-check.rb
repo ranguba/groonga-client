@@ -28,24 +28,24 @@ module Groonga
           @protocol = :http
           @host     = "localhost"
           @port     = 10041
-          @check_missing_source = false
-          @check_index_integrity = false
+
+          @available_methods = [:source, :content]
+          @methods = []
         end
 
         def run(argv)
           targets = parse_command_line(argv)
+
+          if @methods.empty?
+            @methods = @available_methods
+          end
 
           Client.open(:url      => @url,
                       :protocol => @protocol,
                       :host     => @host,
                       :port     => @port,
                       :backend  => :synchronous) do |client|
-            options = {
-              :check_missing_source => @check_missing_source,
-              :check_index_integrity => @check_index_integrity,
-              :targets => targets,
-            }
-            checker = Checker.new(client, options)
+            checker = Checker.new(client, @methods, targets)
             checker.check
           end
         end
@@ -57,19 +57,23 @@ module Groonga
           parser.banner += " [LEXICON1.INDEX1 LEXICON2.INDEX2 ...]"
 
           parser.separator("")
+          parser.separator("If no indexes are specified, " +
+                           "all indexes are checked.")
 
-          parser.separator("Mode:")
+          parser.separator("")
 
-          parser.on("--check-missing-source",
-                    "Check whether there is an index column which lacks index source.",
-                    "(false)") do
-            @check_missing_source = true
-          end
+          parser.separator("Method:")
 
-          parser.on("--check-index-integrity",
-                    "Check whether there is a broken index column.",
-                    "(false)") do
-            @check_index_integrity = true
+          parser.on("--method=METHOD", @available_methods,
+                    "Specify a method how to check indexes.",
+                    "You can specify this option multiple times",
+                    "to use multiple methods in one execution.",
+                    "All methods are used by default.",
+                    "Available methods:",
+                    "  source: Find indexes that don't have source.",
+                    "  content: Find indexes that their content is broken.",
+                    "(#{@available_methods.join(", ")})") do |method|
+            @methods << method
           end
 
           parser.separator("Connection:")
@@ -97,20 +101,17 @@ module Groonga
         end
 
         class Checker
-          def initialize(client, options)
+          def initialize(client, methods, targets)
             @client = client
-            @options = options
-            @targets = @options[:targets]
+            @methods = methods
+            @targets = targets
           end
 
           def check
             catch(:fail) do
               succeeded = true
-              if @options[:check_missing_source]
-                succeeded = false unless check_missing_source
-              end
-              if @options[:check_index_integrity]
-                succeeded = false unless check_index_integrity
+              @methods.each do |method|
+                succeeded = false unless __send__("check_#{method}")
               end
               succeeded
             end
@@ -187,7 +188,7 @@ module Groonga
             column["type"] == "index" and column["source"].empty?
           end
 
-          def check_missing_source
+          def check_source
             missing_index_names = []
             table_list.each do |table|
               unless check_target_table?(table["name"])
@@ -251,7 +252,7 @@ module Groonga
             broken_index_tokens
           end
 
-          def check_index_integrity
+          def check_content
             table_names = table_list.collect do |table|
               if check_target_table?(table["name"])
                 table["name"]

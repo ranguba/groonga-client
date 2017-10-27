@@ -86,7 +86,7 @@ class TestCommandLineIndexCheck < Test::Unit::TestCase
     end
   end
 
-  def test_check_missing_source
+  def test_source
     restore(<<-COMMANDS)
 table_create Memos TABLE_HASH_KEY ShortText
 column_create Memos content COLUMN_SCALAR Text
@@ -104,11 +104,11 @@ index column:<Terms.memos_content> is missing source.
 CLIENT_OUTPUT
 
     assert_equal([false, expected, ""],
-                 run_client_index_check("--check-missing-source",
+                 run_client_index_check("--method=source",
                                         "Terms.memos_content"))
   end
 
-  def test_check_index_integrity
+  def test_content
     restore(<<-COMMANDS)
 table_create Memos TABLE_HASH_KEY ShortText
 column_create Memos content COLUMN_SCALAR Text
@@ -132,7 +132,7 @@ check 3 tokens against <Terms.memos_content>.
 CLIENT_OUTPUT
 
     assert_equal([true, expected, ""],
-                 run_client_index_check("--check-index-integrity",
+                 run_client_index_check("--method=content",
                                         "Terms.memos_content"))
     
   end
