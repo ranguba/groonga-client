@@ -134,7 +134,6 @@ CLIENT_OUTPUT
     assert_equal([true, expected, ""],
                  run_client_index_check("--method=content",
                                         "Terms.memos_content"))
-    
   end
 
 end
