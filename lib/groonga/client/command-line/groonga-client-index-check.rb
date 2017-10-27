@@ -54,7 +54,7 @@ module Groonga
         def parse_command_line(argv)
           parser = OptionParser.new
           parser.version = VERSION
-          parser.banner += " LEXICON1.INDEX LEXICON2.INDEX2 ..."
+          parser.banner += " [LEXICON1.INDEX1 LEXICON2.INDEX2 ...]"
 
           parser.separator("")
 
