@@ -43,7 +43,7 @@ module Groonga
             options = {
               :check_missing_source => @check_missing_source,
               :check_index_integrity => @check_index_integrity,
-              :target => targets
+              :targets => targets,
             }
             checker = Checker.new(client, options)
             checker.check
@@ -100,6 +100,7 @@ module Groonga
           def initialize(client, options)
             @client = client
             @options = options
+            @targets = @options[:targets]
             @exit_code = 0
           end
 
@@ -154,11 +155,11 @@ module Groonga
           end
 
           def check_target_table?(table_name)
-            unless @options[:target].count > 0
+            unless @targets.count > 0
               return true
             end
-            if @options[:target].kind_of?(Array)
-              @options[:target].each do |name|
+            if @targets.kind_of?(Array)
+              @targets.each do |name|
                 table_part = name.split(".").first
                 return true if table_name == table_part
               end
@@ -167,15 +168,15 @@ module Groonga
           end
 
           def check_target_column?(column)
-            unless @options[:target].count > 0
+            unless @targets.count > 0
               return column["type"] == "index"
             else
               unless column["type"] == "index"
                 return false
               end
             end
-            if @options[:target].kind_of?(Array)
-              @options[:target].each do |name|
+            if @targets.kind_of?(Array)
+              @targets.each do |name|
                 return true if name == "#{column['domain']}.#{column['name']}" or
                   name == column["domain"]
               end
@@ -267,7 +268,7 @@ module Groonga
             end
             if target_columns.empty?
               @exit_code = 1
-              abort_run("Failed to check <#{@options[:target].join(',')}> because there is no such a LEXCON.INDEX.")
+              abort_run("Failed to check <#{@targets.join(',')}> because there is no such a LEXCON.INDEX.")
             end
             broken_indexes = []
             target_columns.each do |column|
