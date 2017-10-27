@@ -146,7 +146,7 @@ module Groonga
                             :type => type,
                             :source => source)
           end
-          
+
           def column_remove(table_name, column_name)
             execute_command(:column_remove,
                             :table => table_name,
@@ -212,14 +212,14 @@ module Groonga
             keys = []
             response = execute_command(:select,
                             :table => table_name,
-                            :limit => -1,   
+                            :limit => -1,
                             :output_columns => :_key)
             keys = response.records.collect do |record|
                 record["_key"]
             end
             keys
           end
-          
+
           def verify_tokens(table_name, old_column, new_column, tokens)
             broken_index_tokens = []
             tokens.each do |token|
@@ -250,7 +250,7 @@ module Groonga
             end
             broken_index_tokens
           end
-          
+
           def check_index_integrity
             table_names = table_list.collect do |table|
               if check_target_table?(table["name"])
