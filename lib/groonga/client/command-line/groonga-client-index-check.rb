@@ -280,7 +280,7 @@ module Groonga
                 next
               end
               type, source = column["source"].first.split(".")
-              flags = column["flags"].sub(/\|PERSISTENT/,'')
+              flags = column["flags"].sub(/\|PERSISTENT/, '')
               column_create(table_name,
                             new_column_name,
                             flags,
