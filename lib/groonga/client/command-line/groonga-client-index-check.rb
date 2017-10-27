@@ -35,18 +35,19 @@ module Groonga
         def run(argv)
           targets = parse_command_line(argv)
 
-          @client = Client.new(:url      => @url,
-                               :protocol => @protocol,
-                               :host     => @host,
-                               :port     => @port,
-                               :backend  => :synchronous)
-          options = {
-            :check_missing_source => @check_missing_source,
-            :check_index_integrity => @check_index_integrity,
-            :target => targets
-          }
-          checker = Checker.new(@client, options)
-          checker.check
+          Client.open(:url      => @url,
+                      :protocol => @protocol,
+                      :host     => @host,
+                      :port     => @port,
+                      :backend  => :synchronous) do |client|
+            options = {
+              :check_missing_source => @check_missing_source,
+              :check_index_integrity => @check_index_integrity,
+              :target => targets
+            }
+            checker = Checker.new(client, options)
+            checker.check
+          end
         end
 
         private
