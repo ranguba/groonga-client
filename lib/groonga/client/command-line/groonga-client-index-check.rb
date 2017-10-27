@@ -211,11 +211,11 @@ module Groonga
           def list_tokens(table_name)
             keys = []
             response = execute_command(:select,
-                            :table => table_name,
-                            :limit => -1,
-                            :output_columns => :_key)
+                                       :table => table_name,
+                                       :limit => -1,
+                                       :output_columns => :_key)
             keys = response.records.collect do |record|
-                record["_key"]
+              record["_key"]
             end
             keys
           end
@@ -225,19 +225,19 @@ module Groonga
             tokens.each do |token|
               query = Groonga::Client::ScriptSyntax.format_string(token)
               old_response = execute_command(:select,
-                                          :table => table_name,
-                                          :match_columns => old_column,
-                                          :query => query,
-                                          :output_columns => :_id,
-                                          :limit => -1,
-                                          :sort_keys => :_id)
+                                             :table => table_name,
+                                             :match_columns => old_column,
+                                             :query => query,
+                                             :output_columns => :_id,
+                                             :limit => -1,
+                                             :sort_keys => :_id)
               new_response = execute_command(:select,
-                                          :table => table_name,
-                                          :match_columns => new_column,
-                                          :query => query,
-                                          :output_columns => :_id,
-                                          :limit => -1,
-                                          :sort_keys => :_id)
+                                             :table => table_name,
+                                             :match_columns => new_column,
+                                             :query => query,
+                                             :output_columns => :_id,
+                                             :limit => -1,
+                                             :sort_keys => :_id)
               old_response_ids = old_response.records.collect do |value|
                 value["_id"]
               end
