@@ -135,5 +135,4 @@ CLIENT_OUTPUT
                  run_client_index_check("--method=content",
                                         "Terms.memos_content"))
   end
-
 end
