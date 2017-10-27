@@ -15,45 +15,36 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "optparse"
-
 require "groonga/client"
+require "groonga/client/command-line/parser"
 
 module Groonga
   class Client
     module CommandLine
       class GroongaClientIndexCheck
         def initialize
-          @url      = nil
-          @protocol = :http
-          @host     = "localhost"
-          @port     = 10041
-
           @available_methods = [:source, :content]
           @methods = []
         end
 
-        def run(argv)
-          targets = parse_command_line(argv)
+        def run(arguments)
+          parser = Parser.new
+          indexes = parser.parse(arguments) do |option_parser|
+            parse_command_line(option_parser)
+          end
 
           if @methods.empty?
             @methods = @available_methods
           end
 
-          Client.open(:url      => @url,
-                      :protocol => @protocol,
-                      :host     => @host,
-                      :port     => @port,
-                      :backend  => :synchronous) do |client|
-            checker = Checker.new(client, @methods, targets)
+          parser.open_client do |client|
+            checker = Checker.new(client, @methods, indexes)
             checker.check
           end
         end
 
         private
-        def parse_command_line(argv)
-          parser = OptionParser.new
-          parser.version = VERSION
+        def parse_command_line(parser)
           parser.banner += " [LEXICON1.INDEX1 LEXICON2.INDEX2 ...]"
 
           parser.separator("")
@@ -61,7 +52,6 @@ module Groonga
                            "all indexes are checked.")
 
           parser.separator("")
-
           parser.separator("Method:")
 
           parser.on("--method=METHOD", @available_methods,
@@ -75,29 +65,6 @@ module Groonga
                     "(#{@available_methods.join(", ")})") do |method|
             @methods << method
           end
-
-          parser.separator("Connection:")
-
-          parser.on("--url=URL",
-                    "URL to connect to Groonga server.",
-                    "If this option is specified,",
-                    "--protocol, --host and --port are ignored.") do |url|
-            @url = url
-          end
-
-          parser.on("--host=HOST",
-                    "Groonga server to be connected.",
-                    "(#{@host})") do |host|
-            @host = host
-          end
-
-          parser.on("--port=PORT", Integer,
-                    "Port number of Groonga server to be connected.",
-                    "(auto)") do |port|
-            @port = port
-          end
-
-          parser.parse(argv)
         end
 
         class Checker

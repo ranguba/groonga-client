@@ -14,38 +14,29 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "optparse"
 require "json"
 
 require "groonga/client"
+require "groonga/client/command-line/parser"
 
 module Groonga
   class Client
     module CommandLine
       class GroongaClientIndexRecreate
         def initialize
-          @url      = nil
-          @protocol = :http
-          @host     = "localhost"
-          @port     = nil
-
-          @read_timeout = -1
-
           @interval = :day
 
           @n_workers = 0
         end
 
-        def run(argv)
-          target_indexes = parse_command_line(argv)
+        def run(arguments)
+          parser = Parser.new(:read_timeout => -1)
+          indexes = parser.parse(arguments) do |option_parser|
+            parse_command_line(option_parser)
+          end
 
-          Client.open(:url      => @url,
-                      :protocol => @protocol,
-                      :host     => @host,
-                      :port     => @port,
-                      :read_timeout => @read_timeout,
-                      :backend  => :synchronous) do |client|
-            runner = Runner.new(client, @interval, target_indexes)
+          parser.open_client do |client|
+            runner = Runner.new(client, @interval, indexes)
             runner.run do
               @n_workers.times do
                 client.database_unmap
@@ -55,47 +46,8 @@ module Groonga
         end
 
         private
-        def parse_command_line(argv)
-          parser = OptionParser.new
-          parser.version = VERSION
+        def parse_command_line(parser)
           parser.banner += " LEXICON1.INDEX1 LEXICON2.INDEX2 ..."
-
-          parser.separator("")
-          parser.separator("Connection:")
-
-          parser.on("--url=URL",
-                    "URL to connect to Groonga server.",
-                    "If this option is specified,",
-                    "--protocol, --host and --port are ignored.") do |url|
-            @url = url
-          end
-
-          available_protocols = [:http, :gqtp]
-          parser.on("--protocol=PROTOCOL", [:http, :gqtp],
-                    "Protocol to connect to Groonga server.",
-                    "[#{available_protocols.join(", ")}]",
-                    "(#{@protocol})") do |protocol|
-            @protocol = protocol
-          end
-
-          parser.on("--host=HOST",
-                    "Groonga server to be connected.",
-                    "(#{@host})") do |host|
-            @host = host
-          end
-
-          parser.on("--port=PORT", Integer,
-                    "Port number of Groonga server to be connected.",
-                    "(auto)") do |port|
-            @port = port
-          end
-
-          parser.on("--read-timeout=TIMEOUT", Integer,
-                    "Timeout on reading response from Groonga server.",
-                    "You can disable timeout by specifying -1.",
-                    "(#{@read_timeout})") do |timeout|
-            @read_timeout = timeout
-          end
 
           parser.separator("")
           parser.separator("Configuration:")
@@ -116,21 +68,6 @@ module Groonga
                     "This options is meaningless for groonga -s.",
                     "(#{@n_workers})") do |n|
             @n_workers = n
-          end
-
-          target_indexes = parser.parse(argv)
-
-          @port ||= default_port(@protocol)
-
-          target_indexes
-        end
-
-        def default_port(protocol)
-          case protocol
-          when :http
-            10041
-          when :gqtp
-            10043
           end
         end
 
