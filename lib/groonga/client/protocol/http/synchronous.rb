@@ -27,6 +27,27 @@ module Groonga
     module Protocol
       class HTTP
         class Synchronous
+          # TODO: Workaround to disable retry in net/http.
+          class HTTPClient < Net::HTTP
+            class ReadTimeout < StandardError
+            end
+
+            module ReadTimeoutConvertable
+              def rbuf_fill
+                begin
+                  super
+                rescue Net::ReadTimeout => error
+                  raise ReadTimeout, error.message, error.backtrace
+                end
+              end
+            end
+
+            private
+            def on_connect
+              @socket.extend(ReadTimeoutConvertable)
+            end
+          end
+
           include PathResolvable
 
           def initialize(url, options={})
@@ -36,7 +57,7 @@ module Groonga
 
           def send(command)
             begin
-              Net::HTTP.start(@url.host, @url.port, start_options) do |http|
+              HTTPClient.start(@url.host, @url.port, start_options) do |http|
                 http.read_timeout = read_timeout
                 response = send_request(http, command)
                 case response
