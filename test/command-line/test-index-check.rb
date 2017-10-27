@@ -103,7 +103,7 @@ column_create Terms memos_content \
 index column:<Terms.memos_content> is missing source.
 CLIENT_OUTPUT
 
-    assert_equal([1, expected, ""],
+    assert_equal([false, expected, ""],
                  run_client_index_check("--check-missing-source",
                                         "Terms.memos_content"))
   end
@@ -131,7 +131,7 @@ load --table Memos
 check 3 tokens against <Terms.memos_content>.
 CLIENT_OUTPUT
 
-    assert_equal([0, expected, ""],
+    assert_equal([true, expected, ""],
                  run_client_index_check("--check-index-integrity",
                                         "Terms.memos_content"))
     

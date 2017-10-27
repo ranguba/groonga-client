@@ -104,16 +104,16 @@ module Groonga
           end
 
           def check
-            succeeded = 1
             catch(:fail) do
+              succeeded = true
               if @options[:check_missing_source]
-                succeeded = check_missing_source
+                succeeded = false unless check_missing_source
               end
               if @options[:check_index_integrity]
-                succeeded = check_index_integrity
+                succeeded = false unless check_index_integrity
               end
+              succeeded
             end
-            succeeded
           end
 
           def abort_run(message)
@@ -205,7 +205,7 @@ module Groonga
             missing_index_names.each do |column|
               puts "index column:<#{column}> is missing source."
             end
-            missing_index_names.count
+            missing_index_names.empty?
           end
 
           def list_tokens(table_name)
@@ -297,7 +297,7 @@ module Groonga
             broken_indexes.each do |index_column|
               puts "<#{index_column}> is broken."
             end
-            broken_indexes.count
+            broken_indexes.empty?
           end
         end
       end
