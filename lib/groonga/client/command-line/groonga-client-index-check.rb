@@ -30,7 +30,7 @@ module Groonga
 
         def run(arguments)
           parser = Parser.new
-          indexe_names = parser.parse(arguments) do |option_parser|
+          target_names = parser.parse(arguments) do |option_parser|
             parse_command_line(option_parser)
           end
 
@@ -39,14 +39,14 @@ module Groonga
           end
 
           parser.open_client do |client|
-            checker = Checker.new(client, @methods, indexe_names)
+            checker = Checker.new(client, @methods, target_names)
             checker.run
           end
         end
 
         private
         def parse_command_line(parser)
-          parser.banner += " [LEXICON1.INDEX1 LEXICON2.INDEX2 ...]"
+          parser.banner += " [LEXICON1.INDEX1 LEXICON2.INDEX2 LEXICON3 ...]"
 
           parser.separator("")
           parser.separator("If no indexes are specified, " +
@@ -69,10 +69,10 @@ module Groonga
         end
 
         class Checker < Runner
-          def initialize(client, methods, index_names)
+          def initialize(client, methods, target_names)
             super(client)
             @methods = methods
-            @index_names = index_names
+            @target_names = target_names
           end
 
           private
@@ -90,43 +90,36 @@ module Groonga
 
           def each_target_index_column
             table_list.each do |table|
-              next unless check_target_table?(table.name)
+              next unless target_table?(table)
               column_list(table.name).each do |column|
-                next unless check_target_column?(column)
                 next unless column.index?
+                next unless target_column?(column)
                 yield(column)
               end
             end
           end
 
-          def check_target_table?(table_name)
-            unless @index_names.count > 0
-              return true
-            end
-            if @index_names.kind_of?(Array)
-              @index_names.each do |name|
-                table_part = name.split(".").first
-                return true if table_name == table_part
+          def target_table?(table)
+            return true if @target_names.empty?
+            @target_names.any? do |name|
+              if name.include?(".")
+                index_table_name = name.split(".").first
+                index_table_name == table.name
+              else
+                name == table.name
               end
             end
-            false
           end
 
-          def check_target_column?(column)
-            unless @index_names.count > 0
-              return column["type"] == "index"
-            else
-              unless column["type"] == "index"
-                return false
+          def target_column?(column)
+            return true if @target_names.empty?
+            @target_names.any? do |name|
+              if name.include?(".")
+                name == column.full_name
+              else
+                name == column["domain"]
               end
             end
-            if @index_names.kind_of?(Array)
-              @index_names.each do |name|
-                return true if name == "#{column['domain']}.#{column['name']}" or
-                  name == column["domain"]
-              end
-            end
-            false
           end
 
           def check_source(column)
