@@ -177,27 +177,10 @@ module Groonga
             column_name = index_column["name"]
             suffix = Time.now.strftime("%Y%m%d%H%M%S_%N")
             new_column_name = "#{column_name}_#{suffix}"
-            source_table = nil
-            source_columns = []
-            index_column.sources.each do |source|
-              if source.include?(".")
-                source_table, source_column = source.split(".")
-                source_columns << source_column
-              else
-                source_table = source
-                source_columns << "_key"
-              end
-            end
-            flags = index_column["flags"].split("|")
-            flags.delete("PERSISTENT")
-            column_create(table_name,
-                          new_column_name,
-                          flags.join("|"),
-                          source_table,
-                          source_columns.join(","))
+            column_create_similar(table_name, new_column_name, column_name)
             begin
               tokens = list_tokens(table_name)
-              broken_token = verify_tokens(source_table,
+              broken_token = verify_tokens(index_column.range,
                                            table_name,
                                            column_name,
                                            new_column_name,

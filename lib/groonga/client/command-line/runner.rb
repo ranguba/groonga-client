@@ -72,6 +72,33 @@ module Groonga
                           :source => source).body
         end
 
+        def column_create_similar(table_name, column_name, base_column_name)
+          if object_exist?(:schema)
+            info = execute_command(:schema)["#{table_name}.#{base_column_name}"]
+            arguments = info.command.arguments.merge("name" => column_name)
+            execute_command(:column_create, arguments).body
+          else
+            base_column = column_list(table_name).find do |column|
+              column.name == base_column_name
+            end
+            range = base_column.range
+            source_columns = base_column.sources.collect do |source|
+              if source.include?(".")
+                source.split(".", 2)[1]
+              else
+                "_key"
+              end
+            end
+            flags = base_column.flags.dup
+            flags.delete("PERSISTENT")
+            column_create(table_name,
+                          column_name,
+                          flags.join("|"),
+                          range,
+                          source_columns.join(","))
+          end
+        end
+
         def column_remove(table, column)
           execute_command(:column_remove,
                           :table => table,

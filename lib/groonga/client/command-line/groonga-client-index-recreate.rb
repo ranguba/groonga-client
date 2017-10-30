@@ -91,12 +91,6 @@ module Groonga
             true
           end
 
-          def column_create_similar(table, column_name, base_column_name)
-            info = execute_command(:schema)["#{table}.#{base_column_name}"]
-            arguments = info.command.arguments.merge("name" => column_name)
-            execute_command(:column_create, arguments).body
-          end
-
           def set_alias(alias_column, alias_name, real_name)
             table, column = alias_column.split(".", 2)
             values = [
