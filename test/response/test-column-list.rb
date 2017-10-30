@@ -93,6 +93,30 @@ class TestResponseColumnList < Test::Unit::TestCase
       Groonga::Client::Response::ColumnList.new(@command, header, body)
     end
 
+    class TestFullName < self
+      def create_response(domain, name)
+        columns = [
+          [
+            256,
+            name,
+            "/tmp/test.db.0000100",
+            "var",
+            "COLUMN_SCALAR|PERSISTENT",
+            domain,
+            "ShortText",
+            [],
+          ]
+        ]
+        super(columns)
+      end
+
+      def test_full_name
+        response = create_response("Memos", "content")
+        assert_equal("Memos.content",
+                     response[0].full_name)
+      end
+    end
+
     class TestFlags < self
       def create_response(flags)
         columns = [

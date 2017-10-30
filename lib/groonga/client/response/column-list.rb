@@ -64,6 +64,14 @@ module Groonga
                                   :domain,
                                   :range,
                                   :source)
+          # @return [String]
+          #   The column name with table name such as `TABLE.COLUMN`.
+          #
+          # @since 0.5.4
+          def full_name
+            "#{domain}.#{name}"
+          end
+
           # @return [::Array<String>]
           #   The flag names of the column.
           #
