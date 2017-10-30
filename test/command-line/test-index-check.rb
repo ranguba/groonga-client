@@ -242,7 +242,7 @@ delete Terms --key groonga
                    index_check("--method=content"))
     end
 
-    def test_broken_multiple_column
+    def test_multiple_column
       restore(<<-COMMANDS)
 table_create Memos TABLE_HASH_KEY ShortText
 column_create Memos content COLUMN_SCALAR Text
@@ -263,6 +263,29 @@ delete Terms --key is
       COMMANDS
 
       assert_equal([false, "", "Broken: Terms.memos: <is>\n"],
+                   index_check("--method=content"))
+    end
+
+    def test_number
+      restore(<<-COMMANDS)
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos score COLUMN_SCALAR Int32
+
+table_create Scores TABLE_PAT_KEY Int32
+column_create Scores memos_score \
+  COLUMN_INDEX \
+  Memos score
+
+load --table Memos
+[
+{"_key": "groonga", "score": 10},
+{"_key": "mroonga", "score": 9}
+]
+
+delete Scores --key 9
+      COMMANDS
+
+      assert_equal([false, "", "Broken: Scores.memos_score: <9>\n"],
                    index_check("--method=content"))
     end
   end
