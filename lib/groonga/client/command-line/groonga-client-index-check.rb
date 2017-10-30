@@ -128,72 +128,59 @@ module Groonga
             false
           end
 
-          def list_tokens(table_name)
-            response = select(table_name,
-                              :limit => "-1",
-                              :output_columns => "_key")
-            response.records.collect do |record|
-              record["_key"]
+          def valid_token?(source_table_name,
+                           full_index_column_name1,
+                           full_index_column_name2,
+                           token)
+            case token
+            when String
+              value = Groonga::Client::ScriptSyntax.format_string(token)
+            else
+              value = token
             end
-          end
-
-          def verify_tokens(source_table, table_name, old_column, new_column, tokens)
-            full_old_column = "#{table_name}.#{old_column}"
-            full_new_column = "#{table_name}.#{new_column}"
-            tokens.each do |token|
-              case token
-              when String
-                value = Groonga::Client::ScriptSyntax.format_string(token)
-              else
-                value = token
-              end
-              old_response = select(source_table,
-                                    :filter => "#{full_old_column} @ #{value}",
-                                    :output_columns => "_id",
-                                    :limit => "-1",
-                                    :sort_keys => "_id")
-              new_response = select(source_table,
-                                    :filter => "#{full_new_column} @ #{value}",
-                                    :output_columns => "_id",
-                                    :limit => "-1",
-                                    :sort_keys => "_id")
-              old_response_ids = old_response.records.collect do |record|
-                record["_id"]
-              end
-              new_response_ids = new_response.records.collect do |record|
-                record["_id"]
-              end
-              if old_response_ids != new_response_ids
-                return token
-              end
-            end
-            nil
+            response1 = select(source_table_name,
+                               :filter => "#{full_index_column_name1} @ #{value}",
+                               :output_columns => "_id",
+                               :limit => "-1",
+                               :sort_keys => "_id")
+            response2 = select(source_table_name,
+                               :filter => "#{full_index_column_name2} @ #{value}",
+                               :output_columns => "_id",
+                               :limit => "-1",
+                               :sort_keys => "_id")
+            response1.records == response2.records
           end
 
           def check_content(index_column)
             return if index_column.source.empty?
 
-            table_name = index_column["domain"]
-            column_name = index_column["name"]
+            lexicon_name = index_column.domain
+            index_column_name = index_column.name
             suffix = Time.now.strftime("%Y%m%d%H%M%S_%N")
-            new_column_name = "#{column_name}_#{suffix}"
-            column_create_similar(table_name, new_column_name, column_name)
+            new_index_column_name = "#{index_column_name}_#{suffix}"
+            full_index_column_name = index_column.full_name
+            full_new_index_column_name = "#{full_index_column_name}_#{suffix}"
+            source_table = index_column.range
+            column_create_similar(lexicon_name,
+                                  new_index_column_name,
+                                  index_column_name)
             begin
-              tokens = list_tokens(table_name)
-              broken_token = verify_tokens(index_column.range,
-                                           table_name,
-                                           column_name,
-                                           new_column_name,
-                                           tokens)
-              if broken_token
-                $stderr.puts("Broken: #{table_name}.#{column_name}: " +
-                             "<#{broken_token}>")
-                false
-              else
-                true
+              response = select(lexicon_name,
+                                :limit => "-1",
+                                :output_columns => "_key")
+              response.records.each do |record|
+                token = record["_key"]
+                unless valid_token?(source_table,
+                                    full_index_column_name,
+                                    full_new_index_column_name,
+                                    token)
+                  $stderr.puts("Broken: #{index_column.full_name}: <#{token}>")
+                  return false
+                end
               end
+              true
             ensure
-              column_remove(table_name, new_column_name)
+              column_remove(lexicon_name, new_index_column_name)
             end
           end
         end
