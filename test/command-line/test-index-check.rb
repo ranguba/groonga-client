@@ -48,7 +48,7 @@ Source is missing: <Terms.memos_content>
     OUTPUT
 
     assert_equal([false, "", error_output],
-                 index_check("--method=source", "Terms.memos_content"))
+                 index_check("--method=source"))
   end
 
   sub_test_case("content") do
@@ -72,7 +72,144 @@ load --table Memos
       COMMANDS
 
       assert_equal([true, "", ""],
-                   index_check("--method=content", "Terms.memos_content"))
+                   index_check("--method=content"))
+    end
+
+    def test_all
+      restore(<<-COMMANDS)
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText \
+  --normalizer NormalizerAuto \
+  --default_tokenizer TokenBigram
+column_create Terms memos_content1 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+column_create Terms memos_content2 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+
+load --table Memos
+[
+["_key", "content"],
+["groonga", "Groonga is fast"]
+]
+
+delete --table Terms --key is
+      COMMANDS
+
+      assert_equal([
+                     false,
+                     "",
+                     "Broken: Terms.memos_content1: <is>\n" +
+                     "Broken: Terms.memos_content2: <is>\n",
+                   ],
+                   index_check("--method=content"))
+    end
+
+
+    def test_specify
+      restore(<<-COMMANDS)
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText \
+  --normalizer NormalizerAuto \
+  --default_tokenizer TokenBigram
+column_create Terms memos_content1 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+column_create Terms memos_content2 \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+
+load --table Memos
+[
+["_key", "content"],
+["groonga", "Groonga is fast"]
+]
+
+delete --table Terms --key is
+      COMMANDS
+
+      assert_equal([
+                     false,
+                     "",
+                     "Broken: Terms.memos_content1: <is>\n",
+                   ],
+                   index_check("--method=content", "Terms.memos_content1"))
+    end
+
+    def test_broken_single_column
+      restore(<<-COMMANDS)
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText \
+  --normalizer NormalizerAuto \
+  --default_tokenizer TokenBigram
+column_create Terms memos_content \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos content
+
+load --table Memos
+[
+{"_key": "groonga", "content": "Groonga is fast"}
+]
+
+delete Terms --key is
+      COMMANDS
+
+      assert_equal([false, "", "Broken: Terms.memos_content: <is>\n"],
+                   index_check("--method=content"))
+    end
+
+    def test_key
+      restore(<<-COMMANDS)
+table_create Memos TABLE_HASH_KEY ShortText
+
+table_create Terms TABLE_PAT_KEY ShortText \
+  --normalizer NormalizerAuto \
+  --default_tokenizer TokenBigram
+column_create Terms memos_key \
+  COLUMN_INDEX|WITH_POSITION \
+  Memos _key
+
+load --table Memos
+[
+{"_key": "groonga"}
+]
+
+delete Terms --key groonga
+      COMMANDS
+
+      assert_equal([false, "", "Broken: Terms.memos_key: <groonga>\n"],
+                   index_check("--method=content"))
+    end
+
+    def test_broken_multiple_column
+      restore(<<-COMMANDS)
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos content COLUMN_SCALAR Text
+
+table_create Terms TABLE_PAT_KEY ShortText \
+  --normalizer NormalizerAuto \
+  --default_tokenizer TokenBigram
+column_create Terms memos \
+  COLUMN_INDEX|WITH_SECTION|WITH_POSITION \
+  Memos _key,content
+
+load --table Memos
+[
+{"_key": "groonga", "content": "Groonga is fast"}
+]
+
+delete Terms --key is
+      COMMANDS
+
+      assert_equal([false, "", "Broken: Terms.memos: <is>\n"],
+                   index_check("--method=content"))
     end
   end
 end

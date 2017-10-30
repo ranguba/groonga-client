@@ -145,35 +145,39 @@ module Groonga
             end
           end
 
-          def verify_tokens(table_name, old_column, new_column, tokens)
-            broken_index_tokens = []
+          def verify_tokens(source_table, table_name, old_column, new_column, tokens)
+            full_old_column = "#{table_name}.#{old_column}"
+            full_new_column = "#{table_name}.#{new_column}"
             tokens.each do |token|
-              query = Groonga::Client::ScriptSyntax.format_string(token)
+              case token
+              when String
+                value = Groonga::Client::ScriptSyntax.format_string(token)
+              else
+                value = token
+              end
               old_response = execute_command(:select,
-                                             :table => table_name,
-                                             :match_columns => old_column,
-                                             :query => query,
+                                             :table => source_table,
+                                             :filter => "#{full_old_column} @ #{value}",
                                              :output_columns => "_id",
                                              :limit => "-1",
                                              :sort_keys => "_id")
               new_response = execute_command(:select,
-                                             :table => table_name,
-                                             :match_columns => new_column,
-                                             :query => query,
+                                             :table => source_table,
+                                             :filter => "#{full_new_column} @ #{value}",
                                              :output_columns => "_id",
                                              :limit => "-1",
                                              :sort_keys => "_id")
-              old_response_ids = old_response.records.collect do |value|
-                value["_id"]
+              old_response_ids = old_response.records.collect do |record|
+                record["_id"]
               end
-              new_response_ids = new_response.records.collect do |value|
-                value["_id"]
+              new_response_ids = new_response.records.collect do |record|
+                record["_id"]
               end
               if old_response_ids != new_response_ids
-                broken_index_tokens << token
+                return token
               end
             end
-            broken_index_tokens
+            nil
           end
 
           def check_content(index_column)
@@ -183,26 +187,40 @@ module Groonga
             column_name = index_column["name"]
             suffix = Time.now.strftime("%Y%m%d%H%M%S_%N")
             new_column_name = "#{column_name}_#{suffix}"
-            type, source = index_column.sources.first.split(".")
+            source_table = nil
+            source_columns = []
+            index_column.sources.each do |source|
+              if source.include?(".")
+                source_table, source_column = source.split(".")
+                source_columns << source_column
+              else
+                source_table = source
+                source_columns << "_key"
+              end
+            end
             flags = index_column["flags"].split("|")
             flags.delete("PERSISTENT")
             column_create(table_name,
                           new_column_name,
                           flags.join("|"),
-                          type,
-                          source)
+                          source_table,
+                          source_columns.join(","))
             begin
               tokens = list_tokens(table_name)
-              broken_index_tokens = verify_tokens(table_name, column_name,
-                                                  new_column_name, tokens)
+              broken_token = verify_tokens(source_table,
+                                           table_name,
+                                           column_name,
+                                           new_column_name,
+                                           tokens)
+              if broken_token
+                $stderr.puts("Broken: #{table_name}.#{column_name}: " +
+                             "<#{broken_token}>")
+                false
+              else
+                true
+              end
             ensure
               column_remove(table_name, new_column_name)
-            end
-            if broken_index_tokens.empty?
-              true
-            else
-              $stderr.puts("Broken: #{table_name}.#{column_name}")
-              false
             end
           end
         end

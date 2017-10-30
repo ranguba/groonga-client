@@ -49,7 +49,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency("gqtp", ">= 1.0.4")
   spec.add_runtime_dependency("groonga-command", ">= 1.2.8")
-  spec.add_runtime_dependency("groonga-command-parser", ">= 1.0.7")
+  spec.add_runtime_dependency("groonga-command-parser", ">= 1.1.0")
   spec.add_runtime_dependency("hashie")
 
   spec.add_development_dependency("bundler")
