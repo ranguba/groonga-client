@@ -84,6 +84,11 @@ module Groonga
                           :name => name,
                           :new_name => new_name).body
         end
+
+        def select(table, arguments={})
+          execute_command(:select,
+                          arguments.merge(:table => table))
+        end
       end
     end
   end

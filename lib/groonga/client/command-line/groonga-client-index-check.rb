@@ -129,10 +129,9 @@ module Groonga
           end
 
           def list_tokens(table_name)
-            response = execute_command(:select,
-                                       :table => table_name,
-                                       :limit => "-1",
-                                       :output_columns => "_key")
+            response = select(table_name,
+                              :limit => "-1",
+                              :output_columns => "_key")
             response.records.collect do |record|
               record["_key"]
             end
@@ -148,18 +147,16 @@ module Groonga
               else
                 value = token
               end
-              old_response = execute_command(:select,
-                                             :table => source_table,
-                                             :filter => "#{full_old_column} @ #{value}",
-                                             :output_columns => "_id",
-                                             :limit => "-1",
-                                             :sort_keys => "_id")
-              new_response = execute_command(:select,
-                                             :table => source_table,
-                                             :filter => "#{full_new_column} @ #{value}",
-                                             :output_columns => "_id",
-                                             :limit => "-1",
-                                             :sort_keys => "_id")
+              old_response = select(source_table,
+                                    :filter => "#{full_old_column} @ #{value}",
+                                    :output_columns => "_id",
+                                    :limit => "-1",
+                                    :sort_keys => "_id")
+              new_response = select(source_table,
+                                    :filter => "#{full_new_column} @ #{value}",
+                                    :output_columns => "_id",
+                                    :limit => "-1",
+                                    :sort_keys => "_id")
               old_response_ids = old_response.records.collect do |record|
                 record["_id"]
               end

@@ -122,10 +122,9 @@ module Groonga
           def resolve_alias(alias_column, key)
             table, column = alias_column.split(".", 2)
             filter = "_key == #{ScriptSyntax.format_string(key)}"
-            response = execute_command(:select,
-                                       :table => table,
-                                       :filter => filter,
-                                       :output_columns => column)
+            response = select(table,
+                              :filter => filter,
+                              :output_columns => column)
             return nil if response.n_hits.zero?
             response.records.first[column]
           end
