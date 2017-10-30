@@ -192,10 +192,13 @@ module Groonga
                           flags,
                           type,
                           source)
-            tokens = list_tokens(table_name)
-            broken_index_tokens = verify_tokens(table_name, column_name,
-                                                new_column_name, tokens)
-            column_remove(table_name, new_column_name)
+            begin
+              tokens = list_tokens(table_name)
+              broken_index_tokens = verify_tokens(table_name, column_name,
+                                                  new_column_name, tokens)
+            ensure
+              column_remove(table_name, new_column_name)
+            end
             if broken_index_tokens.empty?
               true
             else
