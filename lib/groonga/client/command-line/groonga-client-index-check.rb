@@ -184,10 +184,11 @@ module Groonga
             suffix = Time.now.strftime("%Y%m%d%H%M%S_%N")
             new_column_name = "#{column_name}_#{suffix}"
             type, source = index_column.sources.first.split(".")
-            flags = index_column["flags"].sub(/\|PERSISTENT/, '')
+            flags = index_column["flags"].split("|")
+            flags.delete("PERSISTENT")
             column_create(table_name,
                           new_column_name,
-                          flags,
+                          flags.join("|"),
                           type,
                           source)
             begin
