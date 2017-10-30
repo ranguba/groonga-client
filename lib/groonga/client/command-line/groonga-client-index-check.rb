@@ -138,8 +138,8 @@ module Groonga
           def list_tokens(table_name)
             response = execute_command(:select,
                                        :table => table_name,
-                                       :limit => -1,
-                                       :output_columns => :_key)
+                                       :limit => "-1",
+                                       :output_columns => "_key")
             response.records.collect do |record|
               record["_key"]
             end
@@ -153,16 +153,16 @@ module Groonga
                                              :table => table_name,
                                              :match_columns => old_column,
                                              :query => query,
-                                             :output_columns => :_id,
-                                             :limit => -1,
-                                             :sort_keys => :_id)
+                                             :output_columns => "_id",
+                                             :limit => "-1",
+                                             :sort_keys => "_id")
               new_response = execute_command(:select,
                                              :table => table_name,
                                              :match_columns => new_column,
                                              :query => query,
-                                             :output_columns => :_id,
-                                             :limit => -1,
-                                             :sort_keys => :_id)
+                                             :output_columns => "_id",
+                                             :limit => "-1",
+                                             :sort_keys => "_id")
               old_response_ids = old_response.records.collect do |value|
                 value["_id"]
               end
