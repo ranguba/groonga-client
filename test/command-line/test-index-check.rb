@@ -23,7 +23,7 @@ class TestCommandLineIndexCheck < Test::Unit::TestCase
   include Groonga::Client::TestHelper
   include CommandLineTestHelper
 
-  def run_client_index_check(*arguments)
+  def index_check(*arguments)
     command_line = Groonga::Client::CommandLine::GroongaClientIndexCheck.new
     capture_outputs do
       command_line.run(["--url", groonga_url, *arguments])
@@ -48,12 +48,12 @@ Source is missing: <Terms.memos_content>
     OUTPUT
 
     assert_equal([false, "", error_output],
-                 run_client_index_check("--method=source",
-                                        "Terms.memos_content"))
+                 index_check("--method=source", "Terms.memos_content"))
   end
 
-  def test_content
-    restore(<<-COMMANDS)
+  sub_test_case("content") do
+    def test_valid
+      restore(<<-COMMANDS)
 table_create Memos TABLE_HASH_KEY ShortText
 column_create Memos content COLUMN_SCALAR Text
 
@@ -69,10 +69,10 @@ load --table Memos
 ["_key", "content"],
 ["groonga", "Groonga is fast"]
 ]
-    COMMANDS
+      COMMANDS
 
-    assert_equal([true, "", ""],
-                 run_client_index_check("--method=content",
-                                        "Terms.memos_content"))
+      assert_equal([true, "", ""],
+                   index_check("--method=content", "Terms.memos_content"))
+    end
   end
 end

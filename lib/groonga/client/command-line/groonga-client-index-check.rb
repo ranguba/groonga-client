@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2015-2017  Kouhei Sutou <kou@clear-code.com>
 # Copyright (C) 2017 Kentaro Hayashi <hayashi@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
@@ -179,10 +179,7 @@ module Groonga
           end
 
           def check_content(index_column)
-            if index_column.source.empty?
-              $stderr.puts("Source is missing: <#{column.domain}.#{column.name}>")
-              return false
-            end
+            return if index_column.source.empty?
 
             table_name = index_column["domain"]
             column_name = index_column["name"]
