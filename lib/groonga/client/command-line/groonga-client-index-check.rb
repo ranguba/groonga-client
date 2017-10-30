@@ -62,7 +62,7 @@ module Groonga
                     "All methods are used by default.",
                     "Available methods:",
                     "  source: Find indexes that don't have source.",
-                    "  content: Find indexes that their content is broken.",
+                    "  content: Find indexes whose content is broken.",
                     "(#{@available_methods.join(", ")})") do |method|
             @methods << method
           end
