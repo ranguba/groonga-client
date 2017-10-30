@@ -136,15 +136,13 @@ module Groonga
           end
 
           def list_tokens(table_name)
-            keys = []
             response = execute_command(:select,
                                        :table => table_name,
                                        :limit => -1,
                                        :output_columns => :_key)
-            keys = response.records.collect do |record|
+            response.records.collect do |record|
               record["_key"]
             end
-            keys
           end
 
           def verify_tokens(table_name, old_column, new_column, tokens)
