@@ -117,14 +117,14 @@ module Groonga
               if name.include?(".")
                 name == column.full_name
               else
-                name == column["domain"]
+                name == column.domain
               end
             end
           end
 
           def check_source(column)
             return true unless column.source.empty?
-            $stderr.puts("Source is missing: <#{column.domain}.#{column.name}>")
+            $stderr.puts("Source is missing: <#{column.full_name}>")
             false
           end
 
