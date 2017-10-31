@@ -1,5 +1,16 @@
 # NEWS
 
+## 0.5.5 - 2017-10-31
+
+### Improvements
+
+  * `groonga-client-index-check`: Added a new command that finds
+    indexes which doesn't have source or indexes whose content is
+    broken.
+
+  * Disabled auto retry feature by `net/http` explicitly because `GET`
+    isn't idempotent request in Groonga such as `delete` command.
+  
 ## 0.5.4 - 2017-10-27
 
 ### Improvements
