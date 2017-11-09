@@ -136,7 +136,12 @@ module Groonga
             when String
               value = Groonga::Client::ScriptSyntax.format_string(token)
             when Time
-              value = token.to_f
+              if token.usec.zero?
+                value = token.to_i
+              else
+                value = token.strftime("%Y-%m-%d %H:%M:%S.%6N")
+                value = Groonga::Client::ScriptSyntax.format_string(value)
+              end
             else
               value = token
             end
