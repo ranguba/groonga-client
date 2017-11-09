@@ -288,5 +288,33 @@ delete Scores --key 9
       assert_equal([false, "", "Broken: Scores.memos_score: <9>\n"],
                    index_check("--method=content"))
     end
+
+    def test_time
+      time = Time.parse("2017-11-09T15:40:50+09:00")
+      restore(<<-COMMANDS)
+table_create Memos TABLE_HASH_KEY ShortText
+column_create Memos created_at COLUMN_SCALAR Time
+
+table_create Times TABLE_PAT_KEY Time
+column_create Times memos_created_at \
+  COLUMN_INDEX \
+  Memos created_at
+
+load --table Memos
+[
+{"_key": "groonga", "created_at": #{time.to_i}},
+{"_key": "mroonga", "created_at": #{time.to_i * 1}}
+]
+
+delete Times --key #{time.to_i}
+      COMMANDS
+
+      assert_equal([
+                     false,
+                     "",
+                     "Broken: Times.memos_created_at: <#{time.to_f}>\n",
+                   ],
+                   index_check("--method=content"))
+    end
   end
 end

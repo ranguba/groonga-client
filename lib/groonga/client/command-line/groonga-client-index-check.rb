@@ -135,6 +135,8 @@ module Groonga
             case token
             when String
               value = Groonga::Client::ScriptSyntax.format_string(token)
+            when Time
+              value = token.to_f
             else
               value = token
             end
@@ -174,6 +176,7 @@ module Groonga
                                     full_index_column_name,
                                     full_new_index_column_name,
                                     token)
+                  token = token.to_f if token.is_a?(Time)
                   $stderr.puts("Broken: #{index_column.full_name}: <#{token}>")
                   return false
                 end
