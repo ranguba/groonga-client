@@ -1,5 +1,12 @@
 # NEWS
 
+## 0.5.7 - 2017-11-09
+
+### Fixes
+
+  * `groonga-client-index-check`: Fixed a bug that `Time` key index
+    may be reported as broken unexpectedly.
+
 ## 0.5.6 - 2017-11-09
 
 ### Improvements
