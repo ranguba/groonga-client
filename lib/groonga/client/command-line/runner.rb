@@ -76,6 +76,10 @@ module Groonga
           if object_exist?(:schema)
             info = execute_command(:schema)["#{table_name}.#{base_column_name}"]
             arguments = info.command.arguments.merge("name" => column_name)
+            # For workaround Groonga < 7.0.6
+            if arguments.key?("sources")
+              arguments["source"] = arguments["sources"]
+            end
             execute_command(:column_create, arguments).body
           else
             base_column = column_list(table_name).find do |column|
