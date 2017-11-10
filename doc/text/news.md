@@ -1,5 +1,12 @@
 # NEWS
 
+## 0.5.8 - 2017-11-09
+
+### Improvements
+
+  * `groonga-client-index-check`: Added Groonga 7.0.5 or earlier
+    support.
+
 ## 0.5.7 - 2017-11-09
 
 ### Fixes
