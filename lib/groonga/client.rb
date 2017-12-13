@@ -1,5 +1,5 @@
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ require "groonga/client/command"
 require "groonga/client/empty-request"
 require "groonga/client/protocol/gqtp"
 require "groonga/client/protocol/http"
+require "groonga/client/protocol/file"
 require "groonga/client/request"
 
 module Groonga
@@ -100,9 +101,11 @@ module Groonga
         @connection = Groonga::Client::Protocol::GQTP.new(url, options)
       when "http", "https"
         @connection = Groonga::Client::Protocol::HTTP.new(url, options)
+      when "file"
+        @connection = Groonga::Client::Protocol::File.new(url, options)
       else
         message = "unsupported scheme: <#{url.scheme}>: "
-        message << "supported: [gqtp, http, https]"
+        message << "supported: [gqtp, http, https, file]"
         raise ArgumentError, message
       end
     end
