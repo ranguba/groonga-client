@@ -21,7 +21,12 @@ module Groonga
         module PathResolvable
           private
           def resolve_path(uri, path)
-            uri.path.chomp("/") + path
+            path_prefix = uri.path.chomp("/")
+            if path_prefix.empty?
+              path
+            else
+              path.sub(/\A\/d/) {path_prefix}
+            end
           end
         end
       end
