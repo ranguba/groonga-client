@@ -491,7 +491,7 @@ EOH
 
       def test_with_trailing_slash
         stub_response("[]")
-        options = component_based_open_options.merge(:path => "/sub_path/")
+        options = component_based_open_options.merge(:path => "/sub_path/d/")
         Groonga::Client.open(options) do |client|
           client.status
         end
@@ -500,7 +500,7 @@ EOH
 
       def test_without_trailing_slash
         stub_response("[]")
-        options = component_based_open_options.merge(:path => "/sub_path")
+        options = component_based_open_options.merge(:path => "/sub_path/d")
         Groonga::Client.open(options) do |client|
           client.status
         end
