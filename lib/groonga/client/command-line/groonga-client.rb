@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2015-2018  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -45,8 +45,12 @@ module Groonga
             runner = Runner.new(client, @runner_options)
 
             if command_file_paths.empty?
-              $stdin.each_line do |line|
-                runner << line
+              if $stdin.tty? and $stdout.tty?
+                runner.repl
+              else
+                $stdin.each_line do |line|
+                  runner << line
+                end
               end
             else
               command_file_paths.each do |command_file_path|
@@ -114,6 +118,16 @@ module Groonga
             @parser.finish
           end
 
+          def repl
+            begin
+              require "readline"
+            rescue LoadError
+              repl_bare
+            else
+              repl_readline
+            end
+          end
+
           private
           def create_command_parser
             parser = Groonga::Command::Parser.new
@@ -173,6 +187,25 @@ module Groonga
               puts(response.raw)
             else
               puts(response.body)
+            end
+          end
+
+          def repl_bare
+            loop do
+              print("> ")
+              $stdout.flush
+              line = gets
+              break if line.nil?
+              self << line
+            end
+          end
+
+          def repl_readline
+            loop do
+              line = Readline.readline("> ", true)
+              break if line.nil?
+              self << line
+              self << "\n"
             end
           end
         end
