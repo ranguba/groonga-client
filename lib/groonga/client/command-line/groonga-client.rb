@@ -14,7 +14,9 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "fileutils"
 require "json"
+require "pathname"
 require "securerandom"
 
 require "groonga/command/parser"
@@ -46,7 +48,14 @@ module Groonga
 
             if command_file_paths.empty?
               if $stdin.tty? and $stdout.tty?
-                runner.repl
+                begin
+                  require "readline"
+                rescue LoadError
+                  repl = BareREPL.new(runner)
+                else
+                  repl = ReadlineREPL.new(runner)
+                end
+                repl.run
               else
                 $stdin.each_line do |line|
                   runner << line
@@ -122,8 +131,9 @@ module Groonga
             begin
               require "readline"
             rescue LoadError
-              repl_bare
+              repl = BareREPL.new(self)
             else
+              repl = ReadlineREPL.new(self)
               repl_readline
             end
           end
@@ -189,24 +199,97 @@ module Groonga
               puts(response.body)
             end
           end
+        end
 
-          def repl_bare
+        class BareREPL
+          def initialize(runner)
+            @runner = runner
+          end
+
+          def run
             loop do
               print("> ")
               $stdout.flush
               line = gets
               break if line.nil?
-              self << line
+              @runner << line
             end
           end
+        end
 
-          def repl_readline
+        class ReadlineREPL
+          def initialize(runner)
+            @runner = runner
+            @history_path = guess_history_path
+            read_history
+          end
+
+          def run
             loop do
               line = Readline.readline("> ", true)
               break if line.nil?
-              self << line
-              self << "\n"
+              add_history(line)
+              @runner << line
+              @runner << "\n"
             end
+          end
+
+          private
+          def guess_history_path
+            case RUBY_PLATFORM
+            when /mswin/, /mingw/
+              base_dir = ENV["LOCALAPPDATA"] || "~/AppData"
+            when /darwin/
+              base_dir = "~/Library/Preferences"
+            else
+              base_dir = ENV["XDG_CONFIG_HOME"] || "~/.config"
+            end
+            Pathname(base_dir).expand_path + "groonga-client" + "history.txt"
+          end
+
+          def read_history
+            if @history_path.exist?
+              @history_path.open do |history_file|
+                history_file.each_line do |line|
+                  Readline::HISTORY << line.chomp
+                end
+              end
+              @history_timestamp = @history_path.mtime
+            else
+              @history_timestamp = Time.now
+            end
+          end
+
+          def add_history(entry)
+            updated = history_is_updated?
+
+            if new_history_entry?(entry)
+              FileUtils.mkdir_p(@history_path.dirname)
+              @history_path.open("a") do |history_file|
+                history_file << entry
+                history_file << "\n"
+              end
+            else
+              Readline::HISTORY.pop
+            end
+
+            if updated
+              Readline::HISTORY.clear
+              read_history
+            end
+          end
+
+          def history_is_updated?
+            @history_path.exist? and
+              @history_path.mtime > @history_timestamp
+          end
+
+          def new_history_entry?(entry)
+            return false if /\A\s*\z/ =~ entry
+            if Readline::HISTORY.size > 1 and Readline::HISTORY[-2] == entry
+              return false
+            end
+            true
           end
         end
       end
