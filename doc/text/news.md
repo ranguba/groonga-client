@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.5.9 - 2018-07-13
+
+### Improvements
+
+  * Added support for TSV output.
+
 ## 0.5.8 - 2017-11-09
 
 ### Improvements
