@@ -17,6 +17,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "csv"
 require "rexml/document"
 require "json"
 
@@ -78,6 +79,9 @@ module Groonga
             when :xml
               header, body = parse_xml(raw_response)
               return_code = header[0] if header
+            when :tsv
+              header, body = parse_tsv(raw_response)
+              return_code = header["return_code"] if header
             else
               header = nil
               body = raw_response
@@ -128,6 +132,46 @@ module Groonga
                 xml_to_ruby(child)
               end
             end
+          end
+
+          def parse_tsv(response)
+            tsv = CSV.new(response, col_sep: "\t")
+            raw_header = tsv.shift
+            return nil, nil if raw_header.nil?
+
+            header = parse_tsv_header(raw_header)
+            return header, nil unless header["return_code"].zero?
+
+            body = parse_tsv_body(tsv)
+            [header, body]
+          end
+
+          def parse_tsv_header(raw_header)
+            header = {
+              "return_code" => Integer(raw_header[0], 10),
+              "start_time" => Float(raw_header[1]),
+              "elapsed_time" => Float(raw_header[2]),
+            }
+            if raw_header.size >= 4
+              header["error"] = {
+                "message" => raw_header[3],
+              }
+              if raw_header.size >= 5
+                header["error"]["function"] = raw_header[4]
+                header["error"]["file"] = raw_header[5]
+                header["error"]["line"] = Integer(raw_header[6])
+              end
+            end
+            header
+          end
+
+          def parse_tsv_body(tsv)
+            body = []
+            tsv.each do |row|
+              break if row.size == 1 and row[0] == "END"
+              body << row
+            end
+            body
           end
         end
 

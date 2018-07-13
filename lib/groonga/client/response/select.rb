@@ -100,6 +100,78 @@ module Groonga
 
             drilldowns
           end
+
+          def parse_tsv_body(tsv)
+            record_sets = []
+
+            n_hits = parse_tsv_n_hits(tsv.shift)
+            columns = parse_tsv_columns(tsv.shift)
+            records = []
+            loop do
+              row = tsv.shift
+              break if row.size == 1 and row[0] == "END"
+              if (row.size % 4).zero? and row[0] == "[" and row[-1] == "]"
+                next_n_hits_row = records.pop
+                record_sets << [
+                  [n_hits],
+                  columns,
+                  *records,
+                ]
+                n_hits = parse_tsv_n_hits(next_n_hits_row)
+                columns = parse_tsv_columns(row)
+                records = []
+                next
+              end
+              records << parse_tsv_record(row)
+            end
+
+            record_sets << [
+              [n_hits],
+              columns,
+              *records,
+            ]
+            record_sets
+          end
+
+          def parse_tsv_n_hits(row)
+            Integer(row[0], 10)
+          end
+
+          def parse_tsv_columns(row)
+            columns = []
+            column = nil
+            row.each do |value|
+              case value
+              when "["
+                column = []
+              when "]"
+                columns << column
+              else
+                column << value
+              end
+            end
+            columns
+          end
+
+          def parse_tsv_record(row)
+            record = []
+            column_value = nil
+            row.each do |value|
+              case value
+              when "["
+                column_value = []
+              when "]"
+                record << column_value
+              else
+                if column_value
+                  column_value << value
+                else
+                  record << value
+                end
+              end
+            end
+            record
+          end
         end
 
         include Enumerable

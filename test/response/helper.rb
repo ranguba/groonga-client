@@ -30,4 +30,9 @@ module TestResponseHelper
     parse_raw_response_raw(command_name, {"output_type" => "xml"},
                            raw_response)
   end
+
+  def parse_raw_tsv_response(command_name, raw_response)
+    parse_raw_response_raw(command_name, {"output_type" => "tsv"},
+                           raw_response)
+  end
 end
