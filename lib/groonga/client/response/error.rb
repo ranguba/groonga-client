@@ -20,10 +20,50 @@ module Groonga
   class Client
     module Response
       class Error < Base
-        # @return [String] The error message of the error response.
+        # @return [String, nil] The error message of the error response.
+        #
         # @since 0.1.0
         def message
-          (header || [0, 0, 0.0, ""])[3]
+          error_message
+        end
+
+        # @return [String, nil] The function name where the error is occurred.
+        #
+        # @since 0.5.9
+        def function
+          if header.nil?
+            nil
+          elsif header_v1?
+            header[4]
+          else
+            (header["error"] || {})["function"]
+          end
+        end
+
+        # @return [String, nil] The file name where the error is occurred.
+        #
+        # @since 0.5.9
+        def file
+          if header.nil?
+            nil
+          elsif header_v1?
+            header[5]
+          else
+            (header["error"] || {})["file"]
+          end
+        end
+
+        # @return [String, nil] The line where the error is occurred.
+        #
+        # @since 0.5.9
+        def line
+          if header.nil?
+            nil
+          elsif header_v1?
+            header[5]
+          else
+            (header["error"] || {})["line"]
+          end
         end
       end
     end
