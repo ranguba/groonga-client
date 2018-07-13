@@ -55,7 +55,7 @@ class TestResponseError < Test::Unit::TestCase
 
     def test_no_header
       response = Groonga::Client::Response::Error.new(nil, nil, nil)
-      assert_equal("", response.message)
+      assert_nil(response.message)
     end
   end
 end
