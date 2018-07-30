@@ -231,6 +231,7 @@ module Groonga
             return unless target_table?(command)
             return unless target_column?(command)
 
+            command = Marshal.load(Marshal.dump(command))
             apply_target_columns(command)
             command[:request_id] ||= SecureRandom.uuid if @generate_request_id
             response = @client.execute(command)
@@ -287,16 +288,19 @@ module Groonga
           def apply_target_columns(command)
             return if @target_columns.empty?
 
-            columns = command[:columns]
             values = command[:values]
-            return if columns.nil? and values.nil?
+            return if values.nil?
 
+            command = command.dup
+
+            values = JSON.parse(values)
+            columns = command[:columns]
             if columns
-              columns = columns.split(/\s*,\s/)
+              columns = columns.split(/\s*,\s*/)
               target_indexes = []
               new_columns = []
               columns.each_with_index do |column, i|
-                if @target_columns.any? {|name| name === column}
+                if load_target_column?(column)
                   target_indexes << i
                   new_columns << column
                 end
@@ -307,19 +311,24 @@ module Groonga
                   value[i]
                 end
               end
-              load_command[:values] = new_values.to_json
+              command[:values] = JSON.generate(new_values)
             else
               new_values = values.collect do |value|
                 new_value = {}
                 value.each do |key, value|
-                  if @target_columns.any? {|name| name === key}
+                  if load_target_column?(key)
                     new_value[key] = value
                   end
                 end
                 new_value
               end
-              load_command[:values] = new_values.to_json
+              command[:values] = JSON.generate(new_values)
             end
+          end
+
+          def load_target_column?(column)
+            column == "_key" or
+              @target_columns.any? {|name| name === column}
           end
         end
 
