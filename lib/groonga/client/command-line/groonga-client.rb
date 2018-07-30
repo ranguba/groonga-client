@@ -34,6 +34,9 @@ module Groonga
           @runner_options = {
             :split_load_chunk_size => 10000,
             :generate_request_id   => false,
+            :target_commands       => [],
+            :target_tables         => [],
+            :target_columns        => [],
           }
         end
 
@@ -108,6 +111,39 @@ module Groonga
                     "(#{@chunk})") do |boolean|
             @chunk = boolean
           end
+
+          parser.on("--target-command=COMMAND",
+                    "Add COMMAND as target commands",
+                    "You can specify multiple times",
+                    "If COMMAND is /.../,",
+                    "it's treated as a regular expression") do |command|
+            add_target(@runner_options[:target_commands], command)
+          end
+
+          parser.on("--target-table=TABLE",
+                    "Add TABLE as target tables",
+                    "You can specify multiple times",
+                    "If TABLE is /.../,",
+                    "it's treated as a regular expression") do |table|
+            add_target(@runner_options[:target_tables], table)
+          end
+
+          parser.on("--target-column=COLUMN",
+                    "Add COLUMN as target columns",
+                    "You can specify multiple times",
+                    "If COLUMN is /.../,",
+                    "it's treated as a regular expression") do |column|
+            add_target(@runner_options[:target_columns], column)
+          end
+        end
+
+        def add_target(targets, target)
+          if /\A\\(.+?)\\(i)?\z/ =~ target
+            pattern = Regexp.new($1, $2 == "i")
+            targets << pattern
+          else
+            targets << target
+          end
         end
 
         class Runner
@@ -115,6 +151,9 @@ module Groonga
             @client = client
             @split_load_chunk_size = options[:split_load_chunk_size] || 10000
             @generate_request_id   = options[:generate_request_id]
+            @target_commands       = options[:target_commands]
+            @target_tables         = options[:target_tables]
+            @target_columns        = options[:target_columns]
             @load_values = []
             @parser = create_command_parser
           end
@@ -188,6 +227,11 @@ module Groonga
           end
 
           def run_command(command)
+            return unless target_command?(command)
+            return unless target_table?(command)
+            return unless target_column?(command)
+
+            apply_target_columns(command)
             command[:request_id] ||= SecureRandom.uuid if @generate_request_id
             response = @client.execute(command)
             case command.output_type
@@ -197,6 +241,84 @@ module Groonga
               puts(response.raw)
             else
               puts(response.body)
+            end
+          end
+
+          def target_command?(command)
+            return true if @target_commands.empty?
+
+            @target_commands.any? do |name|
+              name === command.command_name
+            end
+          end
+
+          def target_table?(command)
+            return true if @target_tables.empty?
+
+            target = nil
+            case command.command_name
+            when "load", "column_create", "select"
+              target = command.table
+            when "table_create", "table_remove"
+              target = command.name
+            end
+            return true if target.nil?
+
+            @target_tables.any? do |name|
+              name === target
+            end
+          end
+
+          def target_column?(command)
+            return true if @target_columns.empty?
+
+            target = nil
+            case command.command_name
+            when "column_create"
+              target = command.name
+            end
+            return true if target.nil?
+
+            @target_columns.any? do |name|
+              name === target
+            end
+          end
+
+          def apply_target_columns(command)
+            return if @target_columns.empty?
+
+            columns = command[:columns]
+            values = command[:values]
+            return if columns.nil? and values.nil?
+
+            if columns
+              columns = columns.split(/\s*,\s/)
+              target_indexes = []
+              new_columns = []
+              columns.each_with_index do |column, i|
+                if @target_columns.any? {|name| name === column}
+                  target_indexes << i
+                  new_columns << column
+                end
+              end
+              command[:columns] = new_columns.join(",")
+              new_values = values.collect do |value|
+                target_indexes.collect do |i|
+                  value[i]
+                end
+              end
+              load_command[:values] = new_values.to_json
+            else
+              new_values = values.collect do |value|
+                new_value = {}
+                value.each do |key, value|
+                  if @target_columns.any? {|name| name === key}
+                    new_value[key] = value
+                  end
+                end
+                new_value
+              end
+              load_command[:values] = new_values.to_json
             end
           end
         end
