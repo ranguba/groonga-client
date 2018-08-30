@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013-2014  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2018  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -67,7 +65,13 @@ module Groonga
             return_code = nil
             case command.output_type
             when :json
-              response = JSON.parse(raw_response)
+              callback = command["callback"]
+              if callback and
+                  /\A#{Regexp.escape(callback)}\((.+)\);\z/ =~ raw_response
+                response = JSON.parse($1)
+              else
+                response = JSON.parse(raw_response)
+              end
               if response.is_a?(::Array)
                 header, body = response
                 return_code = header[0] if header

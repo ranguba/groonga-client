@@ -1,4 +1,4 @@
-# Copyright (C) 2014  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2014-2018  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -208,6 +208,19 @@ class TestResponseBase < Test::Unit::TestCase
           end
         end
       end
+    end
+  end
+
+  class TestParse < self
+    def test_jsonp
+      command = Groonga::Command::Base.new("status", {"callback" => "a"})
+      response = [
+        [0, 1396012478, 0.00050806999206543],
+        {"start_time" => 1396012478},
+      ]
+      raw_response = "a(#{response.to_json});"
+      response = Groonga::Client::Response::Base.parse(command, raw_response)
+      assert_equal(1396012478, response.body["start_time"])
     end
   end
 end
