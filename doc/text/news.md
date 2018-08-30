@@ -1,5 +1,19 @@
 # NEWS
 
+## 0.6.0 - 2018-08-30
+
+### Improvements
+
+  * `groonga-client`:
+
+    * Added `--target-command` option.
+
+    * Added `--target-table` option.
+
+    * Added `--target-column` option.
+
+  * Added support for JSONP.
+
 ## 0.5.9 - 2018-07-13
 
 ### Improvements
