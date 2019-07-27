@@ -1,5 +1,12 @@
 # NEWS
 
+## 0.6.1 - 2019-07-27
+
+### Improvements
+
+  * `Groonga::Client::Request::Select`: Added support for drilldowns
+    in slice.
+
 ## 0.6.0 - 2018-08-30
 
 ### Improvements
