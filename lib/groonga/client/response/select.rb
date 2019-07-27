@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Sutou Kouhei <kou@clear-code.com>
 # Copyright (C) 2013  Kosuke Asami
 # Copyright (C) 2016  Masafumi Yokoyama <yokoyama@clear-code.com>
 #
@@ -329,8 +329,19 @@ module Groonga
         def parse_slices_v1(raw_slices)
           slices = {}
           (raw_slices || {}).each do |key, raw_slice|
+            if raw_slice.last.is_a?(::Hash)
+              raw_drilldowns = raw_slice.last
+              raw_slice = raw_slice[0..-2]
+              drilldowns = {}
+              raw_drilldowns.each do |label, raw_drilldown|
+                n_hits, records = parse_match_records_v1(raw_drilldown)
+                drilldowns[label] = Drilldown.new(label, n_hits, records)
+              end
+            else
+              drilldowns = {}
+            end
             n_hits, records = parse_match_records_v1(raw_slice)
-            slices[key] = Slice.new(key, n_hits, records)
+            slices[key] = Slice.new(key, n_hits, records, drilldowns)
           end
           slices
         end
@@ -339,7 +350,8 @@ module Groonga
           slices = {}
           (raw_slices || {}).each do |key, raw_slice|
             n_hits, records = parse_match_records_v3(raw_slice)
-            slices[key] = Slice.new(key, n_hits, records)
+            drilldowns = parse_drilldowns_v3(raw_slice["drilldowns"])
+            slices[key] = Slice.new(key, n_hits, records, drilldowns)
           end
           slices
         end
@@ -353,7 +365,7 @@ module Groonga
           alias_method :items, :records
         end
 
-        class Slice < Struct.new(:key, :n_hits, :records)
+        class Slice < Struct.new(:key, :n_hits, :records, :drilldowns)
         end
       end
     end

@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Sutou Kouhei <kou@clear-code.com>
 # Copyright (C) 2013  Kosuke Asami
 # Copyright (C) 2016  Masafumi Yokoyama <yokoyama@clear-code.com>
 #
@@ -320,12 +320,14 @@ class TestResponseSelectCommandVersion1 < Test::Unit::TestCase
     class TestSlices < self
       def setup
         pair_arguments = {
-          "slices[groonga].filter" => 'tag @ "groonga"',
+          "slices[groonga].filter" => "tag @ 'groonga'",
+          "slices[groonga].limit" => "2",
+          "slices[groonga].drilldowns[author].keys" => "author",
         }
         @command = Groonga::Command::Select.new("select", pair_arguments)
         @body = [
           [
-            [3],
+            [4],
             [
               [
                 "_id",
@@ -339,10 +341,11 @@ class TestResponseSelectCommandVersion1 < Test::Unit::TestCase
             [1, "groonga"],
             [2, "rroonga"],
             [3, "groonga"],
+            [4, "groonga"],
           ],
           {
             "groonga" => [
-              [2],
+              [3],
               [
                 [
                   "_id",
@@ -355,19 +358,55 @@ class TestResponseSelectCommandVersion1 < Test::Unit::TestCase
               ],
               [1, "groonga"],
               [3, "groonga"],
-            ]
-          }
+              {
+                "author" => [
+                  [3],
+                  [
+                    [
+                      "_key",
+                      "ShortText",
+                    ],
+                    [
+                      "_nsubrecs",
+                      "Int32",
+                    ],
+                  ],
+                  [
+                    "Alice",
+                    1,
+                  ],
+                  [
+                    "Bob",
+                    1,
+                  ],
+                  [
+                    "Chris",
+                    1,
+                  ],
+                ],
+              },
+            ],
+          },
         ]
       end
 
       def test_slices
         assert_equal({
-                       "groonga" => [
-                         {"_id" => 1, "tag" => "groonga"},
-                         {"_id" => 3, "tag" => "groonga"},
-                       ]
+                       "groonga" => {
+                         records: [
+                           {"_id" => 1, "tag" => "groonga"},
+                           {"_id" => 3, "tag" => "groonga"},
+                         ],
+                         drilldowns: {
+                           "author" => [
+                             {"_key" => "Alice", "_nsubrecs" => 1},
+                             {"_key" => "Bob",   "_nsubrecs" => 1},
+                             {"_key" => "Chris", "_nsubrecs" => 1},
+                           ],
+                         },
+                       },
                      },
-                     collect_values(@body, &:records))
+                     collect_values(@body))
       end
 
       private
@@ -375,10 +414,23 @@ class TestResponseSelectCommandVersion1 < Test::Unit::TestCase
         create_response(body).slices
       end
 
+      def build_drilldown(label, n_hits, records)
+        Groonga::Client::Response::Select::Drilldown.new(label,
+                                                         n_hits,
+                                                         records)
+      end
+
       def collect_values(body)
         values = {}
         slices(body).each do |label, slice|
-          values[label] = yield(slice)
+          drilldowns = {}
+          slice.drilldowns.each do |label, drilldown|
+            drilldowns[label] = drilldown.records
+          end
+          values[label] = {
+            records: slice.records,
+            drilldowns: drilldowns,
+          }
         end
         values
       end

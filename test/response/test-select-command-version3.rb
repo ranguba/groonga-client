@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Sutou Kouhei <kou@clear-code.com>
 # Copyright (C) 2013  Kosuke Asami
 # Copyright (C) 2016  Masafumi Yokoyama <yokoyama@clear-code.com>
 #
@@ -319,7 +319,36 @@ class TestResponseSelectCommandVersion3 < Test::Unit::TestCase
               "records" => [
                 [1, "groonga"],
                 [3, "groonga"],
-              ]
+              ],
+              "drilldowns" => {
+                "author" => {
+                  "n_hits" => 3,
+                  "columns" => [
+                    {
+                      "name" => "_key",
+                      "type" => "ShortText",
+                    },
+                    {
+                      "name" => "_nsubrecs",
+                      "type" => "Int32",
+                    },
+                  ],
+                  "records" => [
+                    [
+                      "Alice",
+                      1,
+                    ],
+                    [
+                      "Bob",
+                      1,
+                    ],
+                    [
+                      "Chris",
+                      1,
+                    ],
+                  ],
+                },
+              },
             }
           }
         }
@@ -327,12 +356,21 @@ class TestResponseSelectCommandVersion3 < Test::Unit::TestCase
 
       def test_slices
         assert_equal({
-                       "groonga" => [
-                         {"_id" => 1, "tag" => "groonga"},
-                         {"_id" => 3, "tag" => "groonga"},
-                       ]
+                       "groonga" => {
+                         records: [
+                           {"_id" => 1, "tag" => "groonga"},
+                           {"_id" => 3, "tag" => "groonga"},
+                         ],
+                         drilldowns: {
+                           "author" => [
+                             {"_key" => "Alice", "_nsubrecs" => 1},
+                             {"_key" => "Bob",   "_nsubrecs" => 1},
+                             {"_key" => "Chris", "_nsubrecs" => 1},
+                           ],
+                         },
+                       },
                      },
-                     collect_values(@body, &:records))
+                     collect_values(@body))
       end
 
       private
@@ -343,7 +381,14 @@ class TestResponseSelectCommandVersion3 < Test::Unit::TestCase
       def collect_values(body)
         values = {}
         slices(body).each do |label, slice|
-          values[label] = yield(slice)
+          drilldowns = {}
+          slice.drilldowns.each do |label, drilldown|
+            drilldowns[label] = drilldown.records
+          end
+          values[label] = {
+            records: slice.records,
+            drilldowns: drilldowns,
+          }
         end
         values
       end
