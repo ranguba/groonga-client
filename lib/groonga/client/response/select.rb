@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "groonga/client/response/base"
+require "groonga/client/response/drilldownable"
 require "groonga/client/response/searchable"
 
 module Groonga
@@ -175,6 +176,7 @@ module Groonga
           end
         end
 
+        include Drilldownable
         include Searchable
 
         # @return [Integer] The number of records that match againt
@@ -182,15 +184,6 @@ module Groonga
         attr_accessor :n_hits
         # For Kaminari
         alias_method :total_count, :n_hits
-
-        # @return [::Array<Groonga::Client::Response::Select::Drilldown>,
-        #          ::Hash<String, Groonga::Client::Response::Select::Drilldown>]
-        #   If labeled drilldowns are used or command version 3 or
-        #   later is used, `{"label1" => drilldown1, "label2" => drilldown2}`
-        #   is returned since 0.3.1.
-        #
-        #   Otherwise, `[drilldown1, drilldown2]` is returned.
-        attr_accessor :drilldowns
 
         # @return [::Hash<String, Groonga::Client::Response::Select::Slice>]
         #
@@ -213,10 +206,29 @@ module Groonga
               raw_slices, *raw_drilldowns = body[1..-1]
             end
             @slices = parse_slices_v1(raw_slices)
-            @drilldowns = parse_drilldowns_v1(raw_drilldowns)
+            drilldown_keys = @command.drilldowns
+            labeled_drilldowns = @command.labeled_drilldowns
+            if drilldown_keys.empty? and !labeled_drilldowns.empty?
+              @drilldowns = parse_labeled_drilldowns(labeled_drilldowns,
+                                                     raw_drilldowns[0])
+            else
+              @drilldowns = parse_drilldowns(drilldown_keys, raw_drilldowns)
+            end
           else
             @n_hits, @records = parse_match_records_v3(body)
-            @drilldowns = parse_drilldowns_v3(body["drilldowns"])
+            drilldown_keys = @command.drilldowns
+            labeled_drilldowns = @command.labeled_drilldowns
+            if labeled_drilldowns.empty?
+              drilldown_keys.each do |key|
+                labeled_drilldown =
+                  Groonga::Command::Drilldownable::Drilldown.new
+                labeled_drilldown.label = key
+                labeled_drilldown.keys = [key]
+                labeled_drilldowns[key] = labeled_drilldown
+              end
+            end
+            @drilldowns = parse_labeled_drilldowns(labeled_drilldowns,
+                                                   body["drilldowns"])
             @slices = parse_slices_v3(body["slices"])
           end
           body
@@ -236,44 +248,16 @@ module Groonga
           ]
         end
 
-        def parse_drilldowns_v1(raw_drilldowns)
-          request_drilldowns = @command.drilldowns
-          if request_drilldowns.empty? and !@command.labeled_drilldowns.empty?
-            drilldowns = {}
-            (raw_drilldowns[0] || {}).each do |label, raw_drilldown|
-              n_hits, records = parse_match_records_v1(raw_drilldown)
-              drilldowns[label] = Drilldown.new(label, n_hits, records)
-            end
-            drilldowns
-          else
-            (raw_drilldowns || []).collect.with_index do |raw_drilldown, i|
-              key = request_drilldowns[i]
-              n_hits, records = parse_match_records_v1(raw_drilldown)
-              Drilldown.new(key, n_hits, records)
-            end
-          end
-        end
-
-        def parse_drilldowns_v3(raw_drilldowns)
-          drilldowns = {}
-          (raw_drilldowns || {}).each do |key, raw_drilldown|
-            n_hits, records = parse_match_records_v3(raw_drilldown)
-            drilldowns[key] = Drilldown.new(key, n_hits, records)
-          end
-          drilldowns
-        end
-
         def parse_slices_v1(raw_slices)
           slices = {}
           (raw_slices || {}).each do |key, raw_slice|
+            requested_slice = @command.slices[key]
             if raw_slice.last.is_a?(::Hash)
               raw_drilldowns = raw_slice.last
               raw_slice = raw_slice[0..-2]
-              drilldowns = {}
-              raw_drilldowns.each do |label, raw_drilldown|
-                n_hits, records = parse_match_records_v1(raw_drilldown)
-                drilldowns[label] = Drilldown.new(label, n_hits, records)
-              end
+              drilldowns =
+                parse_labeled_drilldowns(requested_slice.labeled_drilldowns,
+                                         raw_drilldowns)
             else
               drilldowns = {}
             end
@@ -286,16 +270,14 @@ module Groonga
         def parse_slices_v3(raw_slices)
           slices = {}
           (raw_slices || {}).each do |key, raw_slice|
+            requested_slice = @command.slices[key]
             n_hits, records = parse_match_records_v3(raw_slice)
-            drilldowns = parse_drilldowns_v3(raw_slice["drilldowns"])
+              drilldowns =
+                parse_labeled_drilldowns(requested_slice.labeled_drilldowns,
+                                         raw_slice["drilldowns"])
             slices[key] = Slice.new(key, n_hits, records, drilldowns)
           end
           slices
-        end
-
-        class Drilldown < Struct.new(:key, :n_hits, :records)
-          # @deprecated since 0.2.6. Use {#records} instead.
-          alias_method :items, :records
         end
 
         class Slice < Struct.new(:key, :n_hits, :records, :drilldowns)

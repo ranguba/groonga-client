@@ -414,12 +414,6 @@ class TestResponseSelectCommandVersion1 < Test::Unit::TestCase
         create_response(body).slices
       end
 
-      def build_drilldown(label, n_hits, records)
-        Groonga::Client::Response::Select::Drilldown.new(label,
-                                                         n_hits,
-                                                         records)
-      end
-
       def collect_values(body)
         values = {}
         slices(body).each do |label, slice|

@@ -1,4 +1,4 @@
-# Copyright (C) 2018  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2018-2019  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,8 +19,18 @@ require "response/helper"
 class TestResponseSelectTSV < Test::Unit::TestCase
   include TestResponseHelper
 
-  def drilldown(key, n_hits, records)
-    Groonga::Client::Response::Select::Drilldown.new(key, n_hits, records)
+  def drilldown(label,
+                keys,
+                n_hits,
+                records,
+                raw_columns,
+                raw_records)
+    Groonga::Client::Response::Select::Drilldown.new(label,
+                                                     keys,
+                                                     n_hits,
+                                                     records,
+                                                     raw_columns,
+                                                     raw_records)
   end
 
   def test_error
@@ -113,7 +123,19 @@ END
                    :elapsed_time => 0.0,
                    :records => [],
                    :drilldowns => [
-                     drilldown("version", 7, drilldown_records),
+                     drilldown("version",
+                               ["version"],
+                               7,
+                               drilldown_records,
+                               [
+                                 ["_key", "ShortText"],
+                                 ["_nsubrecs", "UInt32"],
+                               ],
+                               [
+                                 ["2.2.0", "18044"],
+                                 ["2.3.0", "18115"],
+                                 ["2.4.0", "14594"],
+                               ]),
                    ],
                  },
                  {

@@ -284,6 +284,7 @@ class TestResponseSelectCommandVersion3 < Test::Unit::TestCase
       def setup
         pair_arguments = {
           "slices[groonga].filter" => 'tag @ "groonga"',
+          "slices[groonga].drilldowns[author].keys" => "author",
         }
         @command = Groonga::Command::Select.new("select", pair_arguments)
         @body = {
