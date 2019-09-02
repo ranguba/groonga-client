@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "groonga/client/response/base"
+require "groonga/client/response/searchable"
 
 module Groonga
   class Client
@@ -174,14 +175,13 @@ module Groonga
           end
         end
 
-        include Enumerable
+        include Searchable
 
         # @return [Integer] The number of records that match againt
         #   a search condition.
         attr_accessor :n_hits
         # For Kaminari
         alias_method :total_count, :n_hits
-        attr_accessor :records
 
         # @return [::Array<Groonga::Client::Response::Select::Drilldown>,
         #          ::Hash<String, Groonga::Client::Response::Select::Drilldown>]
@@ -202,25 +202,6 @@ module Groonga
           parse_body(body)
         end
 
-        # For Kaminari
-        def limit_value
-          (@command[:limit] || 10).to_i
-        end
-
-        # For Kaminari
-        def offset_value
-          (@command[:offset] || 0).to_i
-        end
-
-        # For Kaminari
-        def size
-          records.size
-        end
-
-        def each(&block)
-          records.each(&block)
-        end
-
         private
         def parse_body(body)
           if body.is_a?(::Array)
@@ -239,50 +220,6 @@ module Groonga
             @slices = parse_slices_v3(body["slices"])
           end
           body
-        end
-
-        def parse_records(raw_columns, raw_records)
-          column_names = {}
-          columns = raw_columns.collect do |column|
-            if column.is_a?(::Array)
-              name, type = column
-            else
-              name = column["name"]
-              type = column["type"]
-            end
-            base_column_name = name
-            suffix = 2
-            while column_names.key?(name)
-              name = "#{base_column_name}#{suffix}"
-              suffix += 1
-            end
-            column_names[name] = true
-            [name, type]
-          end
-
-          (raw_records || []).collect do |raw_record|
-            record = Record.new
-            columns.each_with_index do |(name, type), i|
-              record[name] = convert_value(raw_record[i], type)
-            end
-            record
-          end
-        end
-
-        def convert_value(value, type)
-          case value
-          when ::Array
-            value.collect do |element|
-              convert_value(element, type)
-            end
-          else
-            case type
-            when "Time"
-              Time.at(value)
-            else
-              value
-            end
-          end
         end
 
         def parse_match_records_v1(raw_records)
@@ -354,10 +291,6 @@ module Groonga
             slices[key] = Slice.new(key, n_hits, records, drilldowns)
           end
           slices
-        end
-
-        class Record < ::Hash
-          include Hashie::Extensions::MethodAccess
         end
 
         class Drilldown < Struct.new(:key, :n_hits, :records)
