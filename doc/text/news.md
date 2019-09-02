@@ -1,5 +1,17 @@
 # NEWS
 
+## 0.6.2 - 2019-09-02
+
+### Improvements
+
+  * `Groonga::Client::Response::LogicalSelect`: Added.
+
+  * `Groonga::Client::Response::Select#raw_columns`: Added.
+
+  * `Groonga::Client::Response::Select#raw_records`: Added.
+
+  * `Groonga::Client::Response::LogicalRangeFilter`: Added.
+
 ## 0.6.1 - 2019-07-27
 
 ### Improvements
