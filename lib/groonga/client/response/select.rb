@@ -249,7 +249,7 @@ module Groonga
         end
 
         def parse_record_set_v3(raw_record_set)
-          n_hits = raw_record_set["n_hits"],
+          n_hits = raw_record_set["n_hits"]
           raw_columns = raw_record_set["columns"]
           raw_records = raw_record_set["records"] || []
           [
