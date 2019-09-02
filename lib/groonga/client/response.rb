@@ -1,4 +1,4 @@
-# Copyright (C) 2014-2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2014-2019  Sutou Kouhei <kou@clear-code.com>
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
@@ -30,6 +30,7 @@ require "groonga/client/response/lock-clear"
 require "groonga/client/response/log-level"
 require "groonga/client/response/log-put"
 require "groonga/client/response/log-reopen"
+require "groonga/client/response/logical-select"
 require "groonga/client/response/quit"
 require "groonga/client/response/register"
 require "groonga/client/response/schema"
