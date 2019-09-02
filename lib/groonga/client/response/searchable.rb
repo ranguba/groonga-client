@@ -45,11 +45,8 @@ module Groonga
 
         private
         def parse_records(raw_columns, raw_records)
-          @raw_columns = raw_columns
-          @raw_records = raw_records || []
-
           column_names = {}
-          columns = @raw_columns.collect do |column|
+          columns = raw_columns.collect do |column|
             if column.is_a?(::Array)
               name, type = column
             else
@@ -66,7 +63,7 @@ module Groonga
             [name, type]
           end
 
-          @raw_records.collect do |raw_record|
+          (raw_records || []).collect do |raw_record|
             record = Record.new
             columns.each_with_index do |(name, type), i|
               record[name] = convert_value(raw_record[i], type)

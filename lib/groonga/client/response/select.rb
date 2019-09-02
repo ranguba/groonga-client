@@ -198,7 +198,8 @@ module Groonga
         private
         def parse_body(body)
           if body.is_a?(::Array)
-            @n_hits, @records = parse_match_records_v1(body.first)
+            @n_hits, @raw_columns, @raw_records, @records =
+              parse_record_set_v1(body.first)
             if @command.slices.empty?
               raw_slices = nil
               raw_drilldowns = body[1..-1]
@@ -215,7 +216,8 @@ module Groonga
               @drilldowns = parse_drilldowns(drilldown_keys, raw_drilldowns)
             end
           else
-            @n_hits, @records = parse_match_records_v3(body)
+            @n_hits, @raw_columns, @raw_records, @records =
+              parse_record_set_v3(body)
             drilldown_keys = @command.drilldowns
             labeled_drilldowns = @command.labeled_drilldowns
             if labeled_drilldowns.empty?
@@ -234,17 +236,27 @@ module Groonga
           body
         end
 
-        def parse_match_records_v1(raw_records)
+        def parse_record_set_v1(raw_record_set)
+          n_hits = raw_record_set.first.first
+          raw_columns = raw_record_set[1]
+          raw_records = raw_record_set[2..-1] || []
           [
-            raw_records.first.first,
-            parse_records(raw_records[1], raw_records[2..-1]),
+            n_hits,
+            raw_columns,
+            raw_records,
+            parse_records(raw_columns, raw_records),
           ]
         end
 
-        def parse_match_records_v3(raw_records)
+        def parse_record_set_v3(raw_record_set)
+          n_hits = raw_record_set["n_hits"],
+          raw_columns = raw_record_set["columns"]
+          raw_records = raw_record_set["records"] || []
           [
-            raw_records["n_hits"],
-            parse_records(raw_records["columns"], raw_records["records"]),
+            n_hits,
+            raw_columns,
+            raw_records,
+            parse_records(raw_columns, raw_records),
           ]
         end
 
@@ -261,7 +273,7 @@ module Groonga
             else
               drilldowns = {}
             end
-            n_hits, records = parse_match_records_v1(raw_slice)
+            n_hits, _, _, records = parse_record_set_v1(raw_slice)
             slices[key] = Slice.new(key, n_hits, records, drilldowns)
           end
           slices
@@ -271,7 +283,7 @@ module Groonga
           slices = {}
           (raw_slices || {}).each do |key, raw_slice|
             requested_slice = @command.slices[key]
-            n_hits, records = parse_match_records_v3(raw_slice)
+            n_hits, _, _, records = parse_record_set_v3(raw_slice)
               drilldowns =
                 parse_labeled_drilldowns(requested_slice.labeled_drilldowns,
                                          raw_slice["drilldowns"])

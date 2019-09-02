@@ -35,11 +35,14 @@ module Groonga
         private
         def parse_body(body)
           if body.is_a?(::Array)
-            raw_columns, *raw_records = body.first
+            @raw_columns, *@raw_records = body.first
+            @raw_records ||= []
             @records = parse_records(raw_columns, raw_records)
           else
-            @records = parse_records(body["columns"], body["records"])
+            @raw_columns = body["columns"]
+            @raw_records = body["records"] || []
           end
+          @records = parse_records(@raw_columns, @raw_records)
           body
         end
       end
