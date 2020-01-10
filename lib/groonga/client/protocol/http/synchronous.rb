@@ -186,6 +186,7 @@ module Groonga
             else
               request.content_length = body.bytesize
             end
+            request.content_type = content_type
             request.body_stream = StringIO.new(body)
             request
           end
