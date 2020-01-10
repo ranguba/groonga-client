@@ -1,5 +1,5 @@
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2020  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -141,18 +141,7 @@ module Groonga
 
           def send_request(http, command)
             if command.is_a?(Groonga::Command::Load)
-              raw_values = command[:values]
-              command[:values] = nil
-              path = resolve_path(@url, command.to_uri_format)
-              command[:values] = raw_values
-              request = Net::HTTP::Post.new(path, headers)
-              request.content_type = "application/json"
-              if @options[:chunk]
-                request["Transfer-Encoding"] = "chunked"
-              else
-                request.content_length = raw_values.bytesize
-              end
-              request.body_stream = StringIO.new(raw_values)
+              request = prepare_load_request(command)
             else
               path = resolve_path(@url, command.to_uri_format)
               request = Net::HTTP::Get.new(path, headers)
@@ -165,6 +154,40 @@ module Groonga
             {
               "user-agent" => @options[:user_agent],
             }
+          end
+
+          def prepare_load_request(command)
+            path_prefix = command.path_prefix
+            command = command.class.new(command.command_name,
+                                        command.arguments,
+                                        [])
+            command.path_prefix = path_prefix
+            case @options[:load_input_type]
+            when "apache-arrow"
+              command[:input_type] = "apache-arrow"
+              content_type = "application/x-apache-arrow-streaming"
+              arrow_table = command.build_arrow_table
+              if arrow_table
+                buffer = Arrow::ResizableBuffer.new(1024)
+                arrow_table.save(buffer, format: :stream)
+                body = buffer.data.to_s
+              else
+                body = ""
+              end
+              command.arguments.delete(:values)
+            else
+              content_type = "application/json"
+              body = command.arguments.delete(:values)
+            end
+            path = resolve_path(@url, command.to_uri_format)
+            request = Net::HTTP::Post.new(path, headers)
+            if @options[:chunk]
+              request["Transfer-Encoding"] = "chunked"
+            else
+              request.content_length = body.bytesize
+            end
+            request.body_stream = StringIO.new(body)
+            request
           end
 
           def setup_authentication(request)

@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2018  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2015-2020  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,11 @@ require "json"
 require "pathname"
 require "securerandom"
 
+begin
+  require "arrow"
+rescue LoadError
+end
+
 require "groonga/command/parser"
 
 require "groonga/client"
@@ -30,6 +35,11 @@ module Groonga
       class GroongaClient
         def initialize
           @chunk = false
+          @load_input_type = "json"
+          @available_load_input_types = ["json"]
+          if Object.const_defined?(:Arrow)
+            @available_load_input_types << "apache-arrow"
+          end
 
           @runner_options = {
             :split_load_chunk_size => 10000,
@@ -46,7 +56,8 @@ module Groonga
             parse_command_line(option_parser)
           end
 
-          parser.open_client(:chunk => @chunk) do |client|
+          parser.open_client(:chunk => @chunk,
+                             :load_input_type => @load_input_type) do |client|
             runner = Runner.new(client, @runner_options)
 
             if command_file_paths.empty?
@@ -97,6 +108,14 @@ module Groonga
                     "Set 0 to SIZE to disable this feature.",
                     "(#{@runner_options[:split_load_chunk_size]})") do |size|
             @runner_options[:split_load_chunk_size] = size
+          end
+
+          parser.on("--load-input-type=TYPE",
+                    @available_load_input_types,
+                    "Use TYPE as input type for load.",
+                    "[#{@available_load_input_types.join(", ")}]",
+                    "(#{@load_input_types})") do |type|
+            @load_input_type = type
           end
 
           parser.on("--[no-]generate-request-id",
