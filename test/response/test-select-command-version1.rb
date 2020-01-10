@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2019  Sutou Kouhei <kou@clear-code.com>
+# Copyright (C) 2013-2020  Sutou Kouhei <kou@clear-code.com>
 # Copyright (C) 2013  Kosuke Asami
 # Copyright (C) 2016  Masafumi Yokoyama <yokoyama@clear-code.com>
 #
@@ -418,8 +418,8 @@ class TestResponseSelectCommandVersion1 < Test::Unit::TestCase
         values = {}
         slices(body).each do |label, slice|
           drilldowns = {}
-          slice.drilldowns.each do |label, drilldown|
-            drilldowns[label] = drilldown.records
+          slice.drilldowns.each do |drilldown_label, drilldown|
+            drilldowns[drilldown_label] = drilldown.records
           end
           values[label] = {
             records: slice.records,
