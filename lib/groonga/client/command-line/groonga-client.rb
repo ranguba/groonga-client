@@ -40,6 +40,7 @@ module Groonga
           if Object.const_defined?(:Arrow)
             @available_load_input_types << "apache-arrow"
           end
+          @load_lock_table = false
 
           @runner_options = {
             :split_load_chunk_size => 10000,
@@ -57,7 +58,8 @@ module Groonga
           end
 
           parser.open_client(:chunk => @chunk,
-                             :load_input_type => @load_input_type) do |client|
+                             :load_input_type => @load_input_type,
+                             :load_lock_table => @load_lock_table) do |client|
             runner = Runner.new(client, @runner_options)
 
             if command_file_paths.empty?
@@ -116,6 +118,12 @@ module Groonga
                     "[#{@available_load_input_types.join(", ")}]",
                     "(#{@load_input_types})") do |type|
             @load_input_type = type
+          end
+
+          parser.on("--[no-]load-lock-table",
+                    "Use lock_table=yes for load.",
+                    "(#{@load_lock_table})") do |boolean|
+            @load_lock_table = boolean
           end
 
           parser.on("--[no-]generate-request-id",

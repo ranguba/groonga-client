@@ -179,6 +179,7 @@ module Groonga
               content_type = "application/json"
               body = command.arguments.delete(:values)
             end
+            command[:lock_table] = "yes" if @options[:load_lock_table]
             path = resolve_path(@url, command.to_uri_format)
             request = Net::HTTP::Post.new(path, headers)
             if @options[:chunk]
