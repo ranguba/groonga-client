@@ -55,9 +55,15 @@ module Groonga
             @options = options
           end
 
+          DEBUG = (ENV["GROONGA_CLIENT_HTTP_DEBUG"] == "yes")
           def send(command)
             begin
-              HTTPClient.start(@url.host, @url.port, start_options) do |http|
+              http = HTTPClient.new(@url.host, @url.port)
+              http.set_debug_output($stderr) if DEBUG
+              start_options.each do |key, value|
+                http.__send__("#{key}=", value)
+              end
+              http.start do
                 http.read_timeout = read_timeout
                 response = send_request(http, command)
                 case response
