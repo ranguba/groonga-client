@@ -1,5 +1,20 @@
 # NEWS
 
+## 0.6.3 - 2020-06-08
+
+### Improvements
+
+  * `groonga-client`:
+
+    * Added support for `-load-input-type=apache-arrow`.
+
+    * Added `--load-lock-table`.
+
+  * `http`: Added support for debugging by
+    `GROONGA_CLIENT_HTTP_DEBUG=yes` environment variable.
+
+  * Added support for response in Apache Arrow.
+
 ## 0.6.2 - 2019-09-02
 
 ### Improvements
