@@ -19,6 +19,10 @@ require "csv"
 require "rexml/document"
 require "json"
 
+begin
+  require "arrow"
+rescue LoadError
+end
 require "hashie"
 
 module Groonga
@@ -85,6 +89,9 @@ module Groonga
               return_code = header[0] if header
             when :tsv
               header, body = parse_tsv(raw_response)
+              return_code = header["return_code"] if header
+            when :arrow, :"apache-arrow"
+              header, body = parse_apache_arrow(raw_response)
               return_code = header["return_code"] if header
             else
               header = nil
@@ -176,6 +183,40 @@ module Groonga
               body << row
             end
             body
+          end
+
+          def parse_apache_arrow(response)
+            header = nil
+            body = nil
+            buffer = Arrow::Buffer.new(response)
+            Arrow::BufferInputStream.open(buffer) do |input|
+              while input.tell < response.bytesize
+                reader = Arrow::RecordBatchStreamReader.new(input)
+                schema = reader.schema
+                record_batches = reader.to_a
+                if apache_arrow_metadata?(schema)
+                  table = Arrow::Table.new(schema, record_batches)
+                  header = table.each_record.first.to_h
+                else
+                  body = {}
+                  body["columns"] = schema.fields.collect do |field|
+                    [field.name, field.data_type.to_s]
+                  end
+                  if record_batches.empty?
+                    records = []
+                  else
+                    table = Arrow::Table.new(schema, record_batches)
+                    records = table.raw_records
+                  end
+                  body["records"] = records
+                end
+              end
+            end
+            return header, body
+          end
+
+          def apache_arrow_metadata?(schema)
+            (schema.metadata || {})["GROONGA:data_type"] == "metadata"
           end
         end
 
