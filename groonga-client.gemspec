@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 #
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2014-2020  Sutou Kouhei <kou@clear-code.com>
+# Copyright (C) 2014-2021  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -51,6 +51,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency("groonga-command", ">= 1.4.7")
   spec.add_runtime_dependency("groonga-command-parser", ">= 1.1.0")
   spec.add_runtime_dependency("hashie")
+  spec.add_runtime_dependency("rexml")
 
   spec.add_development_dependency("bundler")
   spec.add_development_dependency("rake")
