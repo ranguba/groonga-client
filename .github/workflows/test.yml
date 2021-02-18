@@ -1,0 +1,31 @@
+name: Test
+on:
+  - push
+  - pull_request
+jobs:
+  test:
+    name: ${{ matrix.ruby-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version:
+          - "2.6"
+          - "2.7"
+          - "3.0"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Groonga APT repository
+        run: |
+          sudo -H add-apt-repository -y ppa:groonga/ppa
+          sudo -H apt update
+          sudo -H apt install -y -V groonga-bin
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+      - name: Install dependencies to build gems
+        run: |
+          bundle install
+      - name: Test
+        run: |
+          bundle exec test/run-test.rb
