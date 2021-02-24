@@ -186,8 +186,8 @@ class TestRequestSelect < Test::Unit::TestCase
   end
 
   sub_test_case("#paginate") do
-    def paginate(*args)
-      @request.paginate(*args).to_parameters
+    def paginate(*args, **kwargs)
+      @request.paginate(*args, **kwargs).to_parameters
     end
 
     sub_test_case("page") do
