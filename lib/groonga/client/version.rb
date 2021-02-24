@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2020  Sutou Kouhei <kou@clear-code.com>
+# Copyright (C) 2013-2021  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,6 @@
 
 module Groonga
   class Client
-    VERSION = "0.6.4"
+    VERSION = "0.6.5"
   end
 end
