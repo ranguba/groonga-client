@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.6.4 - 2021-02-24
+
+### Improvements
+
+  * Added support for Ruby 3.0.
+
 ## 0.6.3 - 2020-06-08
 
 ### Improvements
