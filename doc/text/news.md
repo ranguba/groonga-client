@@ -1,5 +1,12 @@
 # NEWS
 
+## 0.6.5 - 2021-03-15
+
+### Fixes
+
+  * `Groonga::Client::Request::Select::LabeledDrilldown#keys`: Fixed a
+    bug that this uses wrong parameter name.
+
 ## 0.6.4 - 2021-02-24
 
 ### Improvements
