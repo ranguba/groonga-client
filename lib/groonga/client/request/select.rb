@@ -595,7 +595,7 @@ module Groonga
           end
 
           def keys(values)
-            @request.values_parameter([:"#{prefix}keys"], values)
+            @request.values_parameter(:"#{prefix}keys", values)
           end
 
           def sort_keys(value)
