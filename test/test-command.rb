@@ -5,7 +5,8 @@ class TestCommand < Test::Unit::TestCase
 
   def test_column_create
     response = Object.new
-    mock(@client).execute(:column_create, :table => :Test, :name => :Body, :type => :ShortText) do
+    mock(@client).execute(:column_create,
+                          {table: :Test, name: :Body, type: :ShortText}) do
       response
     end
     @client.column_create(:table => :Test, :name => :Body, :type => :ShortText)
@@ -13,7 +14,7 @@ class TestCommand < Test::Unit::TestCase
 
   def test_column_list
     response = Object.new
-    mock(@client).execute(:column_list, :table => :Test) do
+    mock(@client).execute(:column_list, {table: :Test}) do
       response
     end
     @client.column_list(:table => :Test)
@@ -27,7 +28,7 @@ class TestCommand < Test::Unit::TestCase
       }
     ]
     response = Object.new
-    mock(@client).execute(:load, :table => :Test, :values => values.to_json) do
+    mock(@client).execute(:load, {table: :Test, values: values.to_json}) do
       response
     end
     @client.load(:table => :Test, :values => values.to_json)
@@ -35,7 +36,7 @@ class TestCommand < Test::Unit::TestCase
 
   def test_select
     response = Object.new
-    mock(@client).execute(:select, :table => :Test) do
+    mock(@client).execute(:select, {table: :Test}) do
       response
     end
     @client.select(:table => :Test)
@@ -43,7 +44,7 @@ class TestCommand < Test::Unit::TestCase
 
   def test_table_create
     response = Object.new
-    mock(@client).execute(:table_create, :name => :Test) do
+    mock(@client).execute(:table_create, {name: :Test}) do
       response
     end
     @client.table_create(:name => :Test)
@@ -58,7 +59,7 @@ class TestCommand < Test::Unit::TestCase
   end
 
   def test_table_remove
-    mock(@client).execute(:table_remove, :name => "Test")
+    mock(@client).execute(:table_remove, {name: "Test"})
     @client.table_remove(:name => "Test")
   end
 end

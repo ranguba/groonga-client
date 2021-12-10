@@ -202,7 +202,7 @@ module Groonga
     end
 
     def method_missing(name, *args, &block)
-      if groonga_command_name?(name)
+      if groonga_command_name?(name) and args.size <= 1
         execute(name, *args, &block)
       else
         super
