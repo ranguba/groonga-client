@@ -73,22 +73,11 @@ module Groonga
                 end
                 repl.run
               else
-                $stdin.each_line do |line|
-                  runner << line
-                end
+                runner.consume($stdin)
               end
             else
               command_file_paths.each do |command_file_path|
-                File.open(command_file_path) do |command_file|
-                  last_line = nil
-                  command_file.each_line do |line|
-                    last_line = line
-                    runner << line
-                end
-                  if last_line and !last_line.end_with?("\n")
-                    runner << "\n"
-                  end
-                end
+                runner.load(command_file_path)
               end
             end
             runner.finish
@@ -173,95 +162,9 @@ module Groonga
           end
         end
 
-        class Runner
-          def initialize(client, options={})
-            @client = client
-            @split_load_chunk_size = options[:split_load_chunk_size] || 10000
-            @generate_request_id   = options[:generate_request_id]
-            @target_commands       = options[:target_commands]
-            @target_tables         = options[:target_tables]
-            @target_columns        = options[:target_columns]
-            @load_values = []
-            @parser = create_command_parser
-          end
-
-          def <<(line)
-            @parser << line
-          end
-
-          def finish
-            @parser.finish
-          end
-
-          def repl
-            begin
-              require "readline"
-            rescue LoadError
-              repl = BareREPL.new(self)
-            else
-              repl = ReadlineREPL.new(self)
-              repl_readline
-            end
-          end
-
+        class Runner < CommandProcessor
           private
-          def create_command_parser
-            parser = Groonga::Command::Parser.new
-
-            parser.on_command do |command|
-              run_command(command)
-            end
-
-            parser.on_load_columns do |command, columns|
-              command[:columns] ||= columns.join(",")
-            end
-
-            parser.on_load_value do |command, value|
-              unless command[:values]
-                @load_values << value
-                if @load_values.size == @split_load_chunk_size
-                  consume_load_values(command)
-                end
-              end
-              command.original_source.clear
-            end
-
-            parser.on_load_complete do |command|
-              if command[:values]
-                run_command(command)
-              else
-                consume_load_values(command)
-              end
-            end
-
-            parser
-          end
-
-          def consume_load_values(load_command)
-            return if @load_values.empty?
-
-            values_json = "["
-            @load_values.each_with_index do |value, i|
-              values_json << "," unless i.zero?
-              values_json << "\n"
-              values_json << JSON.generate(value)
-            end
-            values_json << "\n]\n"
-            load_command[:values] = values_json
-            run_command(load_command)
-            @load_values.clear
-            load_command[:values] = nil
-          end
-
-          def run_command(command)
-            return unless target_command?(command)
-            return unless target_table?(command)
-            return unless target_column?(command)
-
-            command = Marshal.load(Marshal.dump(command))
-            apply_target_columns(command)
-            command[:request_id] ||= SecureRandom.uuid if @generate_request_id
-            response = @client.execute(command)
+          def process_response(response, command)
             case command.output_type
             when :json
               puts(JSON.pretty_generate([response.header, response.body]))
@@ -270,92 +173,6 @@ module Groonga
             else
               puts(response.body)
             end
-          end
-
-          def target_command?(command)
-            return true if @target_commands.empty?
-
-            @target_commands.any? do |name|
-              name === command.command_name
-            end
-          end
-
-          def target_table?(command)
-            return true if @target_tables.empty?
-
-            target = nil
-            case command.command_name
-            when "load", "column_create", "select"
-              target = command.table
-            when "table_create", "table_remove"
-              target = command.name
-            end
-            return true if target.nil?
-
-            @target_tables.any? do |name|
-              name === target
-            end
-          end
-
-          def target_column?(command)
-            return true if @target_columns.empty?
-
-            target = nil
-            case command.command_name
-            when "column_create"
-              target = command.name
-            end
-            return true if target.nil?
-
-            @target_columns.any? do |name|
-              name === target
-            end
-          end
-
-          def apply_target_columns(command)
-            return if @target_columns.empty?
-
-            values = command[:values]
-            return if values.nil?
-
-            command = command.dup
-
-            values = JSON.parse(values)
-            columns = command[:columns]
-            if columns
-              columns = columns.split(/\s*,\s*/)
-              target_indexes = []
-              new_columns = []
-              columns.each_with_index do |column, i|
-                if load_target_column?(column)
-                  target_indexes << i
-                  new_columns << column
-                end
-              end
-              command[:columns] = new_columns.join(",")
-              new_values = values.collect do |value|
-                target_indexes.collect do |i|
-                  value[i]
-                end
-              end
-              command[:values] = JSON.generate(new_values)
-            else
-              new_values = values.collect do |value|
-                new_value = {}
-                value.each do |key, value|
-                  if load_target_column?(key)
-                    new_value[key] = value
-                  end
-                end
-                new_value
-              end
-              command[:values] = JSON.generate(new_values)
-            end
-          end
-
-          def load_target_column?(column)
-            column == "_key" or
-              @target_columns.any? {|name| name === column}
           end
         end
 

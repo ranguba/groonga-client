@@ -18,12 +18,13 @@
 require "uri"
 require "json"
 
-require "groonga/client/default"
 require "groonga/client/command"
+require "groonga/client/command-processor"
+require "groonga/client/default"
 require "groonga/client/empty-request"
+require "groonga/client/protocol/file"
 require "groonga/client/protocol/gqtp"
 require "groonga/client/protocol/http"
-require "groonga/client/protocol/file"
 require "groonga/client/request"
 
 module Groonga
