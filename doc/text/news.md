@@ -1,5 +1,12 @@
 # NEWS
 
+## 0.6.6 - 2021-12-10
+
+### Improvements
+
+  * `Groonga::Client::CommandProcessor`: Extracted Groonga command processor
+    from `groonga-client` command implementation.
+
 ## 0.6.5 - 2021-03-15
 
 ### Fixes
