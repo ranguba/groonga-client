@@ -25,9 +25,9 @@ module Groonga
         @client = client
         @split_load_chunk_size = options[:split_load_chunk_size] || 10000
         @generate_request_id   = options[:generate_request_id]
-        @target_commands       = options[:target_commands]
-        @target_tables         = options[:target_tables]
-        @target_columns        = options[:target_columns]
+        @target_commands       = options[:target_commands] || []
+        @target_tables         = options[:target_tables] || []
+        @target_columns        = options[:target_columns] || []
         @load_values = []
         @parser = create_command_parser
       end
