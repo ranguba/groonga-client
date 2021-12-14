@@ -46,7 +46,7 @@ module Groonga
           last_line = line
           @parser << line
         end
-        if last_line and last_line.end_with?("\n")
+        if last_line and not last_line.end_with?("\n")
           @parser << "\n"
         end
       end
