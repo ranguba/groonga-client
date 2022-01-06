@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.6.7 - 2022-01-07
+
+### Improvements
+
+  * `load`: Added support for `Arrow::Table`.
+
 ## 0.6.6 - 2021-12-10
 
 ### Improvements
