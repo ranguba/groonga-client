@@ -168,11 +168,17 @@ module Groonga
                                         command.arguments,
                                         [])
             command.path_prefix = path_prefix
-            case @options[:load_input_type]
+            load_input_type = @options[:load_input_type]
+            if defined?(Arrow) and command[:values].is_a?(Arrow::Table)
+              load_input_type = "apache-arrow"
+              arrow_table = command[:values]
+            elsif load_input_type == "apache-arrow"
+              arrow_table = command.build_arrow_table
+            end
+            case load_input_type
             when "apache-arrow"
               command[:input_type] = "apache-arrow"
               content_type = "application/x-apache-arrow-streaming"
-              arrow_table = command.build_arrow_table
               if arrow_table
                 buffer = Arrow::ResizableBuffer.new(1024)
                 arrow_table.save(buffer, format: :stream)

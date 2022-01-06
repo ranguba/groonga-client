@@ -280,7 +280,11 @@ module Groonga
     def normalize_parameters(parameters)
       normalized_parameters = {}
       parameters.each do |key, value|
-        normalized_parameters[key] = value.to_s
+        if defined?(Arrow) and value.is_a?(Arrow::Table)
+          normalized_parameters[key] = value
+        else
+          normalized_parameters[key] = value.to_s
+        end
       end
       normalized_parameters
     end
