@@ -13,6 +13,7 @@ jobs:
           - "2.6"
           - "2.7"
           - "3.0"
+          - "3.1"
     steps:
       - uses: actions/checkout@v2
       - name: Set up Groonga APT repository
@@ -20,9 +21,10 @@ jobs:
           sudo -H add-apt-repository -y ppa:groonga/ppa
           sudo -H apt update
           sudo -H apt install -y -V groonga-bin
-      - uses: actions/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
       - name: Install dependencies to build gems
         run: |
           bundle install
