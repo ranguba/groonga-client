@@ -67,6 +67,7 @@ module Groonga
         class << self
           def parse(command, raw_response)
             return_code = nil
+            trace_logs = nil
             case command.output_type
             when :json
               callback = command["callback"]
@@ -81,6 +82,13 @@ module Groonga
                 return_code = header[0] if header
               else
                 header = response["header"]
+                trace_log = response["trace_log"]
+                if trace_log
+                  names = trace_log["columns"].collect {|column| column["name"]}
+                  trace_logs = trace_log["logs"].collect do |log|
+                    Hash[names.zip(log)]
+                  end
+                end
                 body = response["body"]
                 return_code = header["return_code"] if header
               end
@@ -91,7 +99,7 @@ module Groonga
               header, body = parse_tsv(raw_response)
               return_code = header["return_code"] if header
             when :arrow, :"apache-arrow"
-              header, body = parse_apache_arrow(raw_response)
+              header, trace_logs, body = parse_apache_arrow(raw_response)
               return_code = header["return_code"] if header
             else
               header = nil
@@ -102,6 +110,7 @@ module Groonga
             else
               response = Error.new(command, header, body)
             end
+            response.trace_logs = trace_logs
             response.raw = raw_response
             response
           end
@@ -187,6 +196,7 @@ module Groonga
 
           def parse_apache_arrow(response)
             header = nil
+            trace_logs = nil
             body = nil
             buffer = Arrow::Buffer.new(response)
             Arrow::BufferInputStream.open(buffer) do |input|
@@ -194,9 +204,14 @@ module Groonga
                 reader = Arrow::RecordBatchStreamReader.new(input)
                 schema = reader.schema
                 record_batches = reader.to_a
-                if apache_arrow_metadata?(schema)
+                data_type = (schema.metadata || {})["GROONGA:data_type"]
+                case data_type
+                when "metadata"
                   table = Arrow::Table.new(schema, record_batches)
                   header = table.each_record.first.to_h
+                when "trace_log"
+                  table = Arrow::Table.new(schema, record_batches)
+                  trace_logs = table.raw_records
                 else
                   body = {}
                   body["columns"] = schema.fields.collect do |field|
@@ -212,11 +227,7 @@ module Groonga
                 end
               end
             end
-            return header, body
-          end
-
-          def apache_arrow_metadata?(schema)
-            (schema.metadata || {})["GROONGA:data_type"] == "metadata"
+            return header, trace_logs, body
           end
         end
 
@@ -239,11 +250,16 @@ module Groonga
         # @return [String] The unparsed response. It may be JSON, XML or
         #   Groonga command format.
         attr_accessor :raw
+        # @return [::Array, nil] The trace logs of response.
+        # @see https://groonga.org/docs/reference/command/output_trace_log.html
+        #   The trace log document.
+        attr_accessor :trace_logs
 
         def initialize(command, header, body)
           self.command = command
           self.header = header
           self.body = body
+          self.trace_logs = nil
           self.raw = nil
         end
 

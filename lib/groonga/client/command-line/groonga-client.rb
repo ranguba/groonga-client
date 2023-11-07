@@ -167,7 +167,12 @@ module Groonga
           def process_response(response, command)
             case command.output_type
             when :json
-              puts(JSON.pretty_generate([response.header, response.body]))
+              output = {"header" => response.header}
+              if response.trace_logs
+                output["trace_logs"] = response.trace_logs
+              end
+              output["body"] = response.body
+              puts(JSON.pretty_generate(output))
             when :xml
               puts(response.raw)
             else
