@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.6.8 - 2023-11-07
+
+### Improvements
+
+  * Added support for `output_trace_log`.
+
 ## 0.6.7 - 2022-01-07
 
 ### Improvements
