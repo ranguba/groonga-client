@@ -1,5 +1,11 @@
 # NEWS
 
+## 0.6.9 - 2024-04-10
+
+### Improvements
+
+  * HTTP: Added support for request cancel.
+
 ## 0.6.8 - 2023-11-07
 
 ### Improvements
