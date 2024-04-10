@@ -66,15 +66,19 @@ module Groonga
               http.start do
                 http.read_timeout = read_timeout
                 response = send_request(http, command)
+                body = response.body
                 case response
-                when Net::HTTPSuccess, Net::HTTPBadRequest
-                  yield(response.body)
+                when Net::HTTPSuccess,
+                     Net::HTTPBadRequest, # for invalid request
+                     Net::HTTPRequestTimeOut # for canceled request
+                  yield(body)
                 else
-                  if response.body.start_with?("[[")
-                    yield(response.body)
+                  # "[[" is for command_version=1
+                  # "{" is for command_version=3
+                  if body.start_with?("[[") or body.start_with?("{")
+                    yield(body)
                   else
-                    message =
-                      "#{response.code} #{response.message}: #{response.body}"
+                    message = "#{response.code} #{response.message}: #{body}"
                     raise Error.new(message)
                   end
                 end
