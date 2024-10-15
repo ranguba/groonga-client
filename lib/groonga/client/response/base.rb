@@ -71,11 +71,16 @@ module Groonga
             case command.output_type
             when :json
               callback = command["callback"]
+              json_parse = -> (json) do
+                JSON.parse(json)
+              rescue JSON::ParserError => err
+                raise err.exception("source=`#{json}`")
+              end
               if callback and
                   /\A#{Regexp.escape(callback)}\((.+)\);\z/ =~ raw_response
-                response = JSON.parse($1)
+                response = json_parse.call($1)
               else
-                response = JSON.parse(raw_response)
+                response = json_parse.call(raw_response)
               end
               if response.is_a?(::Array)
                 header, body = response
