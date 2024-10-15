@@ -19,23 +19,9 @@ require "groonga/client/error"
 module Groonga
   class Client
     module Request
-      class Error < Client::Error
-      end
-
-      class ErrorResponse < Error
-        attr_reader :response
-        def initialize(response)
-          @response = response
-          command = @response.command
-          status_code = @response.status_code
-          error_message = @response.error_message
-          message = "failed to execute: "
-          message << "#{command.command_name}: #{status_code}: "
-          message << "<#{error_message}>: "
-          message << command.to_command_format
-          super(message)
-        end
-      end
+      # For backward compatibility
+      Error = Client::Error
+      ErrorResponse = Client::ErrorResponse
     end
   end
 end

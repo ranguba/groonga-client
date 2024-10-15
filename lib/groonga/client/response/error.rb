@@ -14,7 +14,6 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "groonga/client/error"
 require "groonga/client/response/base"
 
 module Groonga
@@ -65,21 +64,6 @@ module Groonga
           else
             (header["error"] || {})["line"]
           end
-        end
-      end
-
-      class InvalidResponse < Client::Error
-        attr_reader :command
-        attr_reader :raw_response
-        def initialize(command, raw_response, error_message)
-          @command = command
-          @raw_response = raw_response
-          message = +"invalid response: "
-          message << "#{command.command_name}: "
-          message << "#{error_message}: "
-          message << command.to_command_format
-          message << ": <#{raw_response}>"
-          super(message)
         end
       end
     end
