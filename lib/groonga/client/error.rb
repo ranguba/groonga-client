@@ -34,7 +34,7 @@ module Groonga
       end
     end
 
-    class InvalidResponse < Client::Error
+    class InvalidResponse < Error
       attr_reader :command
       attr_reader :raw_response
       def initialize(command, raw_response, error_message)
