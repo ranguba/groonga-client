@@ -222,5 +222,20 @@ class TestResponseBase < Test::Unit::TestCase
       response = Groonga::Client::Response::Base.parse(command, raw_response)
       assert_equal(1396012478, response.body["start_time"])
     end
+
+    def test_invalid_json
+      command = Groonga::Command::Base.new("cancel")
+      raw_response = '["header", :{"return_code":-77}}'
+      begin
+        JSON.parse(raw_response)
+      rescue JSON::ParserError => error
+        parse_error_message = "invalid JSON: #{error}"
+      end
+      error = Groonga::Client::InvalidResponse.new(command, raw_response, parse_error_message)
+
+      assert_raise(error) do
+        Groonga::Client::Response::Base.parse(command, raw_response)
+      end
+    end
   end
 end

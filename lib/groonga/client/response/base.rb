@@ -73,9 +73,16 @@ module Groonga
               callback = command["callback"]
               if callback and
                   /\A#{Regexp.escape(callback)}\((.+)\);\z/ =~ raw_response
-                response = JSON.parse($1)
+                json = $1
               else
-                response = JSON.parse(raw_response)
+                json = raw_response
+              end
+              begin
+                response = JSON.parse(json)
+              rescue JSON::ParserError => error
+                raise InvalidResponse.new(command,
+                                          raw_response,
+                                          "invalid JSON: #{error}")
               end
               if response.is_a?(::Array)
                 header, body = response
