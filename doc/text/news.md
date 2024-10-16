@@ -1,5 +1,17 @@
 # NEWS
 
+## 0.7.0 - 2024-10-16
+
+### Improvements
+
+  * Improved error message on JSON parse error.
+    * GH-32
+    * Patch by Abe Tomoaki
+
+### Thanks
+
+  * Abe Tomoaki
+
 ## 0.6.9 - 2024-04-10
 
 ### Improvements
