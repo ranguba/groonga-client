@@ -1,5 +1,5 @@
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2024  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -63,7 +63,8 @@ module Groonga
                                   :flags,
                                   :domain,
                                   :range,
-                                  :source)
+                                  :source,
+                                  :generator)
           # @return [String]
           #   The column name with table name such as `TABLE.COLUMN`.
           #
