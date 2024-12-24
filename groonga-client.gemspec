@@ -47,6 +47,7 @@ Gem::Specification.new do |spec|
     spec.executables = Dir.glob("*")
   end
 
+  spec.add_runtime_dependency("csv")
   spec.add_runtime_dependency("gqtp", ">= 1.0.4")
   spec.add_runtime_dependency("groonga-command", ">= 1.4.7")
   spec.add_runtime_dependency("groonga-command-parser", ">= 1.1.0")
