@@ -1,5 +1,5 @@
 # Copyright (C) 2013  Haruka Yoshihara <yoshihara@clear-code.com>
-# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2024  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -153,7 +153,7 @@ module Groonga
     def load(parameters, &block)
       values = parameters[:values]
       if values.is_a?(Array)
-        json = "["
+        json = +"["
         values.each_with_index do |value, i|
           if i.zero?
             json << "\n"
