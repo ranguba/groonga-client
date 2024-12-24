@@ -1,5 +1,22 @@
 # NEWS
 
+## 0.7.1 - 2024-12-24
+
+### Improvements
+
+  * Added explicit csv gem dependency for Ruby 3.3
+    * GH-35
+    * Reported by Tatsuhiko Miyagawa
+
+  * `column_list`: Added support for `generator` that is available
+    since Groonga 14.1.0.
+
+  * Suppressed warnings with Ruby 3.4.
+
+### Thanks
+
+  * Tatsuhiko Miyagawa
+
 ## 0.7.0 - 2024-10-16
 
 ### Improvements
