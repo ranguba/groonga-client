@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2016-2024  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -377,7 +377,7 @@ module Groonga
           # @since 0.5.0
           def geo_in_rectangle(column_name_or_point,
                                top_left, bottom_right)
-            expression = "geo_in_rectangle(%{column_name_or_point}"
+            expression = +"geo_in_rectangle(%{column_name_or_point}"
             expression << ", %{top_left}"
             expression << ", %{bottom_right}"
             expression << ")"
@@ -440,7 +440,7 @@ module Groonga
                             center,
                             radius_or_point,
                             approximate_type="rectangle")
-            expression = "geo_in_circle(%{column_name_or_point}"
+            expression = +"geo_in_circle(%{column_name_or_point}"
             expression << ", %{center}"
             expression << ", %{radius_or_point}"
             expression << ", %{approximate_type}"
@@ -527,7 +527,7 @@ module Groonga
               self.class.column_namify(column_name,
                                        "first",
                                        "#{self.class}\##{__method__}")
-            expression = "between(%{column_name}"
+            expression = +"between(%{column_name}"
             expression << ", %{min}"
             expression << ", %{min_border}"
             expression << ", %{max}"
@@ -578,7 +578,7 @@ module Groonga
                                        "first",
                                        "#{self.class}\##{__method__}")
             expression_values = {column_name: column_name}
-            expression = "in_values(%{column_name}"
+            expression = +"in_values(%{column_name}"
             values.each_with_index do |value, i|
               expression << ", %{value#{i}}"
               expression_values[:"value#{i}"] = value
@@ -764,7 +764,7 @@ module Groonga
                 ScriptSyntax.format_string(value.to_s)
               end
             when ::Array
-              escaped_value = "["
+              escaped_value = +"["
               value.each_with_index do |element, i|
                 escaped_value << ", " if i > 0
                 escaped_value << escape_script_syntax_value(element)
@@ -772,7 +772,7 @@ module Groonga
               escaped_value << "]"
               escaped_value
             when ::Hash
-              escaped_value = "{"
+              escaped_value = +"{"
               value.each_with_index do |(k, v), i|
                 escaped_value << ", " if i > 0
                 escaped_value << escape_script_syntax_value(k.to_s)
