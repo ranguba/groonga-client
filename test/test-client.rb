@@ -442,6 +442,10 @@ EOH
       @password = nil
     end
 
+    def teardown
+      @thread.kill
+    end
+
     class TestLoad < self
       def test_path
         stub_response("[]")
